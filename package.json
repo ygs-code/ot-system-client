@@ -1,0 +1,32 @@
+{
+  "name": "blogsclient",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web:dev": "cross-env NODE_ENV=development  WEB_ENV=dev  target=web   htmlWebpackPluginOptions='{title:网页标题,webpackName:webpack-cli-util}'      webpack-cli-util",
+    "web:build": "cross-env NODE_ENV=production    WEB_ENV=pro  target=web  htmlWebpackPluginOptions='{title:网页标题,webpackName:webpack-cli-util}'     webpack-cli-util"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qq281113270/BlogsClient.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qq281113270/BlogsClient/issues"
+  },
+  "homepage": "https://github.com/qq281113270/BlogsClient#readme",
+  "dependencies": {
+    "css-loader": "^6.7.1",
+    "eslint-webpack-plugin": "^3.2.0",
+    "less-loader": "^11.0.0",
+    "postcss-loader": "^7.0.0",
+    "sass-loader": "^13.0.2",
+    "source-map-loader": "^4.0.0",
+    "style-loader": "^3.3.1",
+    "stylelint-webpack-plugin": "^3.3.0",
+    "webpack-cli-util": "^0.4.7"
+  }
+}
