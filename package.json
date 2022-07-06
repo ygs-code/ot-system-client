@@ -1,0 +1,56 @@
+{
+  "name": "blogs-client",
+  "author": "姚观寿 <281113270@qq.com>",
+  "sideEffects": [
+    "@babel/polyfill",
+    "*.css"
+  ],
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": {
+    "@rematch/core": "^2.2.0",
+    "webpack-cli-util": "^0.5.1"
+  },
+  "setupFiles": [
+    "react-app-polyfill/jsdom"
+  ],
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "scripts": {
+    "git": "node ./bin/git.js",
+    "commit": "git-cz",
+    "commitlint": "npx --no-install commitlint --edit $1",
+    "lint-staged": "lint-staged",
+    "husky-install": "husky install",
+    "clear-node_modules": "rm -rf node_modules&&npm cache clear --force",
+    "//注释0:": "如果用CommonJS运行则需要先运行copy指令",
+    "copy": "node  copy",
+    "//注释1:": "web端dev环境运行",
+    "web:dev": "cross-env NODE_ENV=development  WEB_ENV=dev  target=web   htmlWebpackPluginOptions='{title:网页标题,webpackName:webpack-cli-util}'      webpack-cli-util",
+    "web:build": "cross-env NODE_ENV=production    WEB_ENV=pro  target=web  htmlWebpackPluginOptions='{title:网页标题,webpackName:webpack-cli-util}'     webpack-cli-util",
+    "//注释3:": "node服务端dev环境运行",
+    "node:dev": "cross-env NODE_ENV=development    WEB_ENV=dev  target=web   node  @webpack-cli/index.js",
+    "//注释4:": "node服务端d生产环境运行",
+    "node:build": "cross-env NODE_ENV=production   WEB_ENV=dev  target=web   node  @webpack-cli/index.js",
+    "//注释7": "编译dll文件",
+    "dll": "webpack   --progress --config ./scripts/webpack/config/webpack.dll.config.js",
+    "//注释8单元测试命令": "运行单元测试",
+    "test": "npm run jest",
+    "//注释9": "生成测试覆盖率报告",
+    "coverage": "jest --coverage --config jest.config.ts",
+    "//注释10": "eslint校验",
+    "eslint": "eslint ./src",
+    "mocha": "mocha ./app/test/add.test.ts",
+    "test:webpack": "jest-webpack",
+    "jest": " babel-node ./scripts/test.js"
+  },
+  "license": "ISC",
+  "engines": {
+    "node": ">= 13.0.0",
+    "npm": ">= 6.0.0"
+  },
+  "devDependencies": {}
+}
