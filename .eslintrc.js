@@ -2,8 +2,8 @@
  * @Date: 2022-05-09 11:13:39
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-07-04 12:57:04
- * @FilePath: /webpack-cli/.eslintrc.js
+ * @LastEditTime: 2022-07-06 19:14:41
+ * @FilePath: /Blogs/BlogsClient/.eslintrc.js
  * @Description:
  */
 //配置： https://eslint.bootcss.com/

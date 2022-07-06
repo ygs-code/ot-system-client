@@ -2,8 +2,8 @@
  * @Date: 2022-04-27 20:24:09
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-07-04 12:46:44
- * @FilePath: /webpack-cli/user-webpack-config/webpack.dev.config.js
+ * @LastEditTime: 2022-07-06 19:18:28
+ * @FilePath: /Blogs/BlogsClient/user-webpack-config/webpack.dev.config.js
  * @Description:
  */
 const os = require('os');

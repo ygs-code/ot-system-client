@@ -2,8 +2,8 @@
  * @Date: 2022-04-28 10:55:26
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-07-04 13:36:09
- * @FilePath: /webpack-cli/user-webpack-config/definePlugin/MyExampleWebpackPlugin.js
+ * @LastEditTime: 2022-07-06 19:18:03
+ * @FilePath: /Blogs/BlogsClient/user-webpack-config/definePlugin/MyExampleWebpackPlugin.js
  * @Description:
  */
 const fs = require("fs");

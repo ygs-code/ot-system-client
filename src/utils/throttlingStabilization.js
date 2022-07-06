@@ -2,8 +2,8 @@
  * @Date: 2022-07-04 10:02:13
  * @Author: Yao guan shou
  * @LastEditors: Yao guan shou
- * @LastEditTime: 2022-07-04 10:04:31
- * @FilePath: /webpack-cli/src/utils/throttlingStabilization.js
+ * @LastEditTime: 2022-07-06 19:17:46
+ * @FilePath: /Blogs/BlogsClient/src/utils/throttlingStabilization.js
  * @Description:
  */
 import lodash from 'lodash';
@@ -45,7 +45,7 @@ export const stabilization = (() => {
 // 因为状态拦截需要传递的是地址，所以只能传对象参数
 export const statusThrottle = (() => {
   let objParameter = {
-    status: true,
+    status: true
   };
   return (callback) => {
     return new Promise((resolve, reject) => {
