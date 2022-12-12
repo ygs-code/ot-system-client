@@ -6,7 +6,7 @@
  * @FilePath: /react-ssr-lazy-loading/client/App/App.js
  * @Description:
  */
-import React from "react";
+import React from "react";  
 import { Provider } from "react-redux";
 import Routers from "client/router";
 // import { stringToObject } from "client/utils";
