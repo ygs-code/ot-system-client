@@ -9,11 +9,10 @@
 import React from "react";  
 import { Provider } from "react-redux";
 import Routers from "client/router";
-// import { stringToObject } from "client/utils";
-import "./App.less";
+import "./App.less";  
 import "client/assets/css/base.less";
-import "bootstrap/dist/css/bootstrap.css";
-
+import "bootstrap/dist/css/bootstrap.css" ;
+  
 // let {
 //   NODE_ENV, // 环境参数
 //   target, // 环境参数
