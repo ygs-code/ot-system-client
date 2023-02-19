@@ -8,8 +8,9 @@
  */
 // import Loadable from "react-loadable"; // "client/component/Loadable";
 import Koa from "koa";
-import Router from "./router";
+
 import Middleware from "./middleware";
+import Router from "./router";
 
 let {
   NODE_ENV, // 环境参数
@@ -40,14 +41,12 @@ class App {
     new Middleware(this.app);
   }
   listen() {
-    
-      const server = this.app.listen(port, function () {
-        var port = server.address().port;
-        console.log(
-          `\n==> 🌎  node服务器启动成功，监听端口：${port}. 请打开浏览器 http://localhost:${port}/ \n`
-        );
-      });
-    
+    const server = this.app.listen(port, function () {
+      var port = server.address().port;
+      console.log(
+        `\n==> 🌎  node服务器启动成功，监听端口：${port}. 请打开浏览器 http://localhost:${port}/ \n`
+      );
+    });
   }
 }
 

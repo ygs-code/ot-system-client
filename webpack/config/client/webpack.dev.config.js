@@ -66,6 +66,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               sourceMap: true
+
             }
           },
           {
@@ -157,6 +158,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
@@ -164,6 +166,6 @@ module.exports = {
       chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
     }),
 
-    new webpack.HotModuleReplacementPlugin()
+
   ]
 };

@@ -19,7 +19,6 @@ const HelloWorldCheckerPlugin = require("../../definePlugin/HelloWorldCheckerPlu
 const HappyPack = require("happypack");
 const os = require("os");
 const WebpackBar = require("webpackbar");
-const { ESBuildPlugin, ESBuildMinifyPlugin } = require("esbuild-loader");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const { stringToObject, alias } = require("../../utils");
 let {
@@ -439,6 +438,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // new webpack.HotModuleReplacementPlugin(),
     // new OmitJSforCSSPlugin(),
     // new HelloWorldCheckerPlugin(),
     // eslint 插件
@@ -456,7 +456,7 @@ module.exports = {
     //   target, // 环境参数
     //   htmlWebpackPluginOptions: stringToObject(htmlWebpackPluginOptions),
     // }),
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
     // 使用此插件有助于缓解OSX上的开发人员不遵循严格的路径区分大小写的情况，
     // 这些情况将导致与其他开发人员或运行其他操作系统（需要正确使用大小写正确的路径）的构建箱发生冲突。
     new CaseSensitivePathsPlugin(),
@@ -474,7 +474,7 @@ module.exports = {
       // dependencies: false, // 默认true，显示正在进行的依赖项计数消息。
       // dependenciesCount: 10000, // 默认10000，开始时的最小依赖项计数。PS:dependencies启用属性时生效。
     }),
-    new ESBuildPlugin(),
+
     // ts
     new HappyPack({
       id: "jsx",

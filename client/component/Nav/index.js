@@ -15,11 +15,11 @@ import "./index.less";
 
 const Index = (props) => {
   const {
-    dispatch: { baseInitState: { setMenuActive } = {} } = {},
-    location: { pathname } = {},
+    dispatch: { nav: { setMenuActive } = {} } = {},
+    match: { params = {}, path: matchPath } = {},
     pushRoute
   } = props;
-  // console.log("props======", props);
+
   return (
     <div className="navigate-box center-box">
       <Nav fill pills className="navigate">
@@ -36,7 +36,7 @@ const Index = (props) => {
           },
           {
             title: "优惠券",
-            path: "/marketing/discount-coupon",
+            path: "/marketing/discount-coupon/:id",
             name: "DiscountCoupon"
           }
         ].map((item, index) => {
@@ -44,13 +44,20 @@ const Index = (props) => {
           return (
             <NavItem key={index}>
               <NavLink
-                active={pathname === path}
+                active={matchPath === path}
                 onClick={() => {
                   setMenuActive({
                     menuActive: path
                   });
                   if (index === 1) {
                     pushRoute({ path });
+                  } else if (index === 2) {
+                    pushRoute({
+                      path,
+                      params: {
+                        id: 123
+                      }
+                    });
                   } else {
                     pushRoute({ name });
                   }
@@ -64,6 +71,17 @@ const Index = (props) => {
     </div>
   );
 };
+
+Index.getInitPropsState = async (props = {}) => {
+  const {
+    dispatch: { nav: { setMenuActive } = {} } = {},
+    match: { path: matchPath } = {}
+  } = props;
+  setMenuActive({
+    menuActive: matchPath
+  });
+};
+
 Index.propTypes = {
   history: PropTypes.object,
   dispatch: PropTypes.func,

@@ -1,35 +1,29 @@
-import XMLHttpRequest from "./XMLHttpRequest";
 import baseUrl from "./baseUrl";
-import { codeMap } from "./redirect";
-import token from "./token";
 import filterGraphqlData from "./filterGraphqlData";
-import {
-  error as errorMessage
-  // warning as warningMessage,
-  // success as successMessage
-} from "./requestMessage";
+import { codeMap } from "./redirect";
+import { error as errorMessage } from "./requestMessage";
+import token from "./token";
+import XMLHttpRequest from "./XMLHttpRequest";
 
 // 导出普通请求
 export default class Request {
-  static platform = "web"; // smallProgram 小程序 , web 网页
-
+  static platform = "web"; //smallProgram 小程序 , web 网页
   static baseUrl = "";
-
   // 请求队列
   static requestQueue = [];
-
   // 默认请求头设置
   static defaultHeaders = {};
-
-  // 错误拦截
+  //错误拦截
   static error() {}
-
-  // 请求拦截器
+  //请求拦截器
   static interceptors = {
-    request: (config) => config,
-    response: (response) => response
+    request: (config) => {
+      return config;
+    },
+    response: (response) => {
+      return response;
+    }
   }; //
-
   // 去除 // 地址
   static transformUrl(baseUrl, url) {
     /* eslint-disable   */
@@ -43,15 +37,16 @@ export default class Request {
         (baseUrl + url).replace(urlHpptReg, "").replace(urlReg, "/")
     };
   }
-
   static guid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0;
-      const v = c === "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (c) {
+        var r = (Math.random() * 16) | 0,
+          v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }
+    );
   }
-
   static setLoad(options) {
     const { isLoad = true } = options;
     if (isLoad) {
@@ -62,7 +57,6 @@ export default class Request {
       // });
     }
   }
-
   static post(url, parameter, options = {}) {
     options = {
       method: "POST",
@@ -70,7 +64,6 @@ export default class Request {
     };
     return this.request(url, parameter, options);
   }
-
   static get(url, parameter, options = {}) {
     options = {
       method: "GET",
@@ -78,7 +71,6 @@ export default class Request {
     };
     return this.request(url, parameter, options);
   }
-
   static put(url, parameter, options = {}) {
     options = {
       method: "PUT",
@@ -87,7 +79,6 @@ export default class Request {
 
     return this.request(url, parameter, options);
   }
-
   static delete(url, parameter, options = {}) {
     options = {
       method: "DELETE",
@@ -96,7 +87,6 @@ export default class Request {
 
     return this.request(url, parameter, options);
   }
-
   static trace(url, parameter, options = {}) {
     options = {
       method: "TRACE",
@@ -105,7 +95,6 @@ export default class Request {
 
     return this.request(url, parameter, options);
   }
-
   static connect(url, parameter, options = {}) {
     options = {
       method: "CONNECT",
@@ -113,7 +102,6 @@ export default class Request {
     };
     return this.request(url, parameter, options);
   }
-
   static options(url, parameter, options = {}) {
     options = {
       method: "OPTIONS",
@@ -122,7 +110,6 @@ export default class Request {
 
     return this.request(url, parameter, options);
   }
-
   static head(url, parameter, options = {}) {
     options = {
       method: "HEAD",
@@ -131,26 +118,23 @@ export default class Request {
 
     return this.request(url, parameter, options);
   }
-
   static request(url, parameter, options) {
-    const {
+    let {
       method,
       headers = {},
       requestId = this.guid(),
       success = () => {},
-      isPromise = true,
-      baseUrl
+      isPromise = true
     } = options;
 
-    const error = options.error || Request.error || (() => {});
+    let error = options.error || Request.error || (() => {});
 
-    const urls = this.transformUrl(baseUrl || this.baseUrl, url);
-    const requestInterceptors =
+    const urls = this.transformUrl(this.baseUrl, url);
+    let requestInterceptors =
       options?.interceptors?.request ||
       Request?.interceptors?.request ||
       ((config) => config);
-
-    const responseInterceptors =
+    let responseInterceptors =
       options?.interceptors?.response ||
       Request?.interceptors?.response ||
       ((response) => response);
@@ -175,7 +159,10 @@ export default class Request {
                 ["request-id"]: requestId
               },
               success: async (...ags) => {
-                ags = await responseInterceptors(ags);
+                ags = await responseInterceptors(ags).catch(() => {
+                  error(ags);
+                  reject(ags);
+                });
                 // const data = ags.length ? ags[0] : null;
                 // if (data) {
                 // const { code, message = "" } = data;
@@ -209,7 +196,9 @@ export default class Request {
               ["request-id"]: requestId
             },
             success: async (...ags) => {
-              ags = await responseInterceptors(ags);
+              ags = await responseInterceptors(ags).catch(() => {
+                error(ags);
+              });
               success(ags);
             },
             error: (...ags) => {
@@ -219,18 +208,16 @@ export default class Request {
           })
         );
   }
-
   static uploadFile(url, parameter, options) {
-    const { baseUrl } = options;
-    const urls = this.transformUrl(baseUrl || this.baseUrl, url);
-    // const data = {
-    //   ...urls,
-    //   parameter,
-    //   method: "POST"
-    //   // ...options,
-    // };
+    const urls = this.transformUrl(this.baseUrl, url);
+    options = {
+      ...urls,
+      parameter,
+      method: "POST",
+      ...options
+    };
 
-    const {
+    let {
       headers = {},
       requestId = this.guid(),
       isPromise = true,
@@ -239,13 +226,16 @@ export default class Request {
       method
       // url,
     } = options;
-    const error = Request.error || options.error || (() => {});
+    let error = Request.error || options.error || (() => {});
 
-    const requestInterceptors = options?.interceptors?.request;
-
-    Request?.interceptors?.request || ((config) => config);
-    const responseInterceptors = options?.interceptors?.response;
-    Request?.interceptors?.response || ((response) => response);
+    let requestInterceptors =
+      options?.interceptors?.request ||
+      Request?.interceptors?.request ||
+      ((config) => config);
+    let responseInterceptors =
+      options?.interceptors?.response ||
+      Request?.interceptors?.response ||
+      ((response) => response);
 
     const keys = Object.keys(parameter);
     const formData = new FormData();
@@ -269,7 +259,11 @@ export default class Request {
                 ["request-id"]: requestId
               },
               success: async (...ags) => {
-                ags = await responseInterceptors(ags);
+                ags = await responseInterceptors(ags).catch(() => {
+                  error(...ags);
+                  reject(ags);
+                });
+
                 success(...ags);
                 resolve(...ags);
               },
@@ -302,18 +296,14 @@ export default class Request {
   }
 }
 
-// 配置项
-// 配置默认前缀
+//配置项
+//配置默认前缀
 Request.baseUrl = baseUrl;
 // 设置默认请求头
 Request.defaultHeaders = {
   // token: localStorage.getItem("token"),
   // "content-type": "application/x-www-form-urlencoded",  //文件上传
   "Content-Type": "application/json;charset=utf-8"
-  // accept: "application/json, text/plain, */*",
-  // "accept-language": "zh-CN,zh;q=0.9",
-  // "cache-control": "no-cache",
-  // pragma: "no-cache"
 };
 // 错误拦截提示
 Request.error = (errorInfo) => {
@@ -330,13 +320,12 @@ Request.error = (errorInfo) => {
 Request.interceptors = {
   // 请求拦截
   request: async (config) => {
-    const { urlSuffix } = config;
     config = {
       ...config,
       headers: {
         ...config.headers,
         // 登录拦截
-        token: await token.get(urlSuffix)
+        token: await token.get(config)
       }
     };
     // return Promise.reject({
@@ -344,52 +333,50 @@ Request.interceptors = {
     // });
     return config;
   },
-  // 响应拦截
-  response: (response) => {
-    // const { code } = response[0] || {};
-    // if (code != 200) {
-    //   Request.error(response)
-    //   return Promise.reject(response)
-    // }
+  //响应拦截
+  response: async (response) => {
+    const { code } = response[0] || {};
+    if (code !== 200) {
+      Request.error(response);
+
+      return Promise.reject(response);
+    }
     return response[0];
   }
 }; //
 
-// 导出Graphql请求
+//导出Graphql请求
 export class Graphql {
   constructor(options) {
     this.options = options;
     const { url } = options;
     this.url = url;
   }
-
   // 查询
   query(parameter, options = {}) {
     this.options = {
       ...this.options,
       ...options
     };
-    // const { error = () => {} } = this.options;
-    // return Request.get(this.url, parameter, this.options);
-    return Request.post(this.url, parameter, this.options);
-  }
 
+    return Request.get(this.url, parameter, this.options);
+    // return Request.post(this.url, parameter, this.options);
+  }
   // 突变
-  mutate(parameter, options) {
+  mutation(parameter, options) {
     this.options = {
       ...this.options,
       ...options
     };
-    // const { error = () => {} } = this.options;
+
     return Request.post(this.url, parameter, this.options);
   }
-
   static gql(/* arguments */) {
-    const args = Array.prototype.slice.call(arguments);
-    const literals = args[0];
-    let result = typeof literals === "string" ? literals : literals[0];
+    var args = Array.prototype.slice.call(arguments);
+    var literals = args[0];
+    var result = typeof literals === "string" ? literals : literals[0];
 
-    for (let i = 1; i < args.length; i++) {
+    for (var i = 1; i < args.length; i++) {
       if (args[i] && args[i].kind && args[i].kind === "Document") {
         result += args[i].loc.source.body;
       } else {
@@ -400,7 +387,6 @@ export class Graphql {
     }
     return result;
   }
-
   // static gql(chunks) {
   //   var variables = [];
   //   for (var _i = 1; _i < arguments.length; _i++) {
@@ -408,25 +394,29 @@ export class Graphql {
   //   }
   //   return chunks.reduce(  (accumulator, chunk, index)=> { return "" + accumulator + chunk + (index in variables ? variables[index] : ''); }, '');
   // }
-  // Graphql 错误请求
+  //Graphql 错误请求
   static error(errorInfo) {
     return errorInfo;
   }
-
   static interceptors = {
     // 请求拦截
-    request: (config) => config,
-    // 响应拦截
-    response: (response) => response
+    request: (config) => {
+      return config;
+    },
+    //响应拦截
+    response: (response) => {
+      return response;
+    }
   };
 }
 
-export const { gql } = Graphql;
+export const gql = Graphql.gql;
 
 // Graphql 配置项 start
-// Graphql 错误请求
+//Graphql 错误请求
 Graphql.error = (errorInfo) => {
   const { code, message } = errorInfo[0] || {};
+
   if (!code) {
     errorMessage("系统错误");
   } else {
@@ -444,20 +434,19 @@ Graphql.interceptors.response = (response) => {
   const options = response[2] || {};
   const { code } = data;
   if (code && code !== 200) {
-    Graphql.error(response);
     return Promise.reject(response);
   }
-  for (const key in data) {
-    if (Object.prototype.hasOwnProperty.call(data, key)) {
+  for (let key in data) {
+    if (data.hasOwnProperty(key)) {
       const { code } = data[key];
       if (code !== 200) {
-        Graphql.error([data[key]]);
+        response[0] = data[key];
         return Promise.reject(response);
       }
     }
   }
   const { filterData } = options;
-  return filterData ? filterGraphqlData(data) : response;
+  return Promise.resolve(filterData ? filterGraphqlData(data) : response);
 };
 // Graphql 配置项 end
 
@@ -472,11 +461,13 @@ export const GraphqlClient = new Graphql({
     // request: (config) => {
     //   return Graphql.interceptors.request(config);
     // },
-    // 响应拦截
-    response: (response) => Graphql.interceptors.response(response)
+    //响应拦截
+    response: (response) => {
+      return Graphql.interceptors.response(response);
+    }
   },
   // 错误请求
-  error: (errorInfo) => {
-    Graphql.error(errorInfo);
+  error: (error) => {
+    Graphql.error(error);
   }
 });

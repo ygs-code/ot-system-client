@@ -37,8 +37,7 @@ export default class Cmd {
       options.stdio = "pipe";
 
       let proc = spawn(command, params, options);
-      // console.log('proc===', proc)
-
+    
       proc.stdout.on("data", (data) => {
         let dataStr = String(data);
         if (options.logPrefix) {

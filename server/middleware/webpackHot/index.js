@@ -1,21 +1,23 @@
-import webpack from "webpack";
 import fs from "fs";
-import path from "path";
-import webpackDevMiddleware from "webpack-dev-middleware";
-import webpackHotServerMiddleware from "webpack-hot-server-middleware";
-import webpackHotMiddleware from "webpack-hot-middleware";
-import ReactLoadableSSRAddon from "react-loadable-ssr-addon";
-import { createProxyMiddleware } from "http-proxy-middleware";
-import koaProxy from "koa2-proxy-middleware";
 import bodyparser from "koa-bodyparser";
 import historyApiFallback from "koa-history-api-fallback";
+// import ReactLoadableSSRAddon from "react-loadable-ssr-addon";
+// import { createProxyMiddleware } from "http-proxy-middleware";
+import koaProxy from "koa2-proxy-middleware";
+import path from "path";
+import webpack from "webpack";
+import webpackDevMiddleware from "webpack-dev-middleware";
+import webpackHotMiddleware from "webpack-hot-middleware";
+import webpackHotServerMiddleware from "webpack-hot-server-middleware";
+
 // import connectHistoryApiFallback from "connect-history-api-fallback";
 import { compiler, config } from "@/webpack";
-import { writeFile } from "@/webpack/utils";
+// import { writeFile } from "@/webpack/utils";
 
 let {
   NODE_ENV, // 环境参数
-  target // 环境参数
+  target, // 环境参数
+  port
 } = process.env; // 环境参数
 
 const isSsr = target === "ssr";
@@ -31,40 +33,50 @@ class WebpackHot {
     this.init();
   }
   async init() {
-    var _this = this;
-
-    for (let [index, item] of config[0].plugins.entries()) {
-      if (item instanceof ReactLoadableSSRAddon) {
-        item.apply = function apply(compiler) {
-          const PLUGIN_NAME = "ReactLoadableSSRAddon";
-          // 写入文件
-          writeFile(this.options.filename, "{}");
-          // fs.writeFileSync(this.options.filename, "{}");
-          compiler.hooks.emit.tapAsync(PLUGIN_NAME, this.handleEmit.bind(this));
-        };
-        item.writeAssetsFile = function () {
-          const filePath = this.manifestOutputPath;
-          const fileDir = path.dirname(filePath);
-          const json = JSON.stringify(this.manifest, null, 2);
-          try {
-            if (!fs.existsSync(fileDir)) {
-              fs.mkdirSync(fileDir, { recursive: true });
-            }
-          } catch (err) {
-            if (err.code !== "EEXIST") {
-              throw err;
-            }
-          }
-          _this.compilerOptions.assetsManifest = json;
-          fs.writeFileSync(filePath, json);
-        };
-        config[0].plugins[index] = item;
-        break;
-      }
-    }
+    // var _this = this;
+    // for (let [index, item] of config[0].plugins.entries()) {
+    //   if (item instanceof ReactLoadableSSRAddon) {
+    //     item.apply = function apply(compiler) {
+    //       const PLUGIN_NAME = "ReactLoadableSSRAddon";
+    //       // 写入文件
+    //       writeFile(this.options.filename, "{}");
+    //       // fs.writeFileSync(this.options.filename, "{}");
+    //       compiler.hooks.emit.tapAsync(PLUGIN_NAME, this.handleEmit.bind(this));
+    //     };
+    //     item.writeAssetsFile = function () {
+    //       const filePath = this.manifestOutputPath;
+    //       const fileDir = path.dirname(filePath);
+    //       const json = JSON.stringify(this.manifest, null, 2);
+    //       try {
+    //         if (!fs.existsSync(fileDir)) {
+    //           fs.mkdirSync(fileDir, { recursive: true });
+    //         }
+    //       } catch (err) {
+    //         if (err.code !== "EEXIST") {
+    //           throw err;
+    //         }
+    //       }
+    //       _this.compilerOptions.assetsManifest = json;
+    //       fs.writeFileSync(filePath, json);
+    //     };
+    //     config[0].plugins[index] = item;
+    //     break;
+    //   }
+    // }
     // 编译
     this.compiler = webpack(isSsr ? config : config[0]);
     this.addMiddleware();
+  }
+
+  addWebpackHotMiddleware() {
+    this.app.use(async (ctx, next) => {
+      const { response, request, req, res } = ctx;
+      // console.log("req==", req);
+      // console.log("res==", res);
+      await webpackHotMiddleware(
+        this.compiler.compilers.find((compiler) => compiler.name === "client")
+      )(request, response, next);
+    });
   }
   addMiddleware() {
     if (!isSsr) {
@@ -78,7 +90,8 @@ class WebpackHot {
     this.setProxyMiddleware();
     // dev服务器
     this.addWebpackDevMiddleware();
-
+    // 热更新自动刷新，但是感觉问题
+    // this.addWebpackHotMiddleware();
     if (isSsr) {
       this.addWebpackHotServerMiddleware();
     }
@@ -90,9 +103,9 @@ class WebpackHot {
     this.app.use(
       _this.koaDevware(
         webpackDevMiddleware(_this.compiler, {
-          ...devServer
+          ...devServer,
           // noInfo: true,
-          // serverSideRender: true // 是否是服务器渲染
+          serverSideRender: true // 是否是服务器渲染
 
           // //设置允许跨域
           // headers: () => {

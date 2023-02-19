@@ -1,21 +1,21 @@
 /*
  * @Author: your name
  * @Date: 2020-12-03 17:37:54
- * @LastEditTime: 2022-08-05 16:52:54
- * @LastEditors: Yao guan shou
+ * @LastEditTime: 2021-08-16 19:37:41
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: /react-loading-ssr/client/assets/js/request/requestMessage.js
+ * @FilePath: /error-sytem/client/src/common/js/request/requestMessage.js
  */
-// import { message, Button, Space } from "antd";
+import { message } from "antd";
 
 export const error = (msg) => {
-  console.error(msg);
+  message.error(msg);
 };
 
 export const warning = (msg) => {
-  console.warning(msg);
+  message.warning(msg);
 };
 
 export const success = (msg) => {
-  console.success(msg);
+  message.success(msg);
 };

@@ -1,4 +1,3 @@
-
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
@@ -69,15 +68,21 @@ class WebpackPluginRouter {
         code.compilationErrors.push(errorMessage);
       }
 
-      if (cachePaths.has(path)) {
+
+      if (
+        cachePaths.has(path) &&
+        !(name[0] === "~" || cachePaths.get(path).name[0] === "~")
+      ) {
+        console.log("cachePaths===", cachePaths);
+        console.log("cachePaths.get(path)===", cachePaths.get(path));
         const { routesConfigPath: cacheRoutesConfigPath } =
           cachePaths.get(path);
         errorMessage = `[webpack-plugin-router]
- 路由path: ${path} 命名重名冲突，请重新修改 路由path: ${path} 
-   in ${cacheRoutesConfigPath}
-   in ${routesConfigPath}  
- ✖ 1 problem (1 error, 0 warnings)                     
-`;
+       路由path: ${path} 命名重名冲突，请重新修改 路由path: ${path}
+         in ${cacheRoutesConfigPath}
+         in ${routesConfigPath}
+       ✖ 1 problem (1 error, 0 warnings)
+      `;
         if (
           compilation &&
           compilation.errors &&
@@ -106,23 +111,28 @@ class WebpackPluginRouter {
         routesConfigPath: routesConfigPath
       });
       if (children && children.length) {
-        const { routesComponentConfig, loadableComponent, routePaths } =
-          this.mapRoutesConfig(
-            children,
-            routesConfigPath,
-            code,
-            compilation,
-            cacheNames,
-            cachePaths,
-            path
-          );
-        code.loadableComponent = loadableComponent;
+        const {
+          routesComponentConfig = "",
+          syncComponent = "",
+          routePaths = ""
+        } = this.mapRoutesConfig(
+          children,
+          routesConfigPath,
+          code,
+          compilation,
+          cacheNames,
+          cachePaths,
+          path
+        );
+        code.syncComponent = syncComponent;
         code.routesComponentConfig = routesComponentConfig;
         code.routePaths = routePaths;
       }
       // import("client/pages/marketing/pages/DiscountCoupon/index.js")  Loadable${this.firstToUpper(name)}
-      code.loadableComponent = `${code.loadableComponent || ""}`
-      code.routesComponentConfig = `${code.routesComponentConfig || ""}
+      code.syncComponent += `
+import ${this.firstToUpper(name)} from "client${entry}"`;
+
+      code.routesComponentConfig += `
                     {  
                      path: "${path}",
                      exact: ${exact ? true : false},
@@ -131,11 +141,15 @@ class WebpackPluginRouter {
                      Component:lazy(
                            () => import(/* webpackChunkName:"${name}" */ "client${entry}")
                       ),
+                    //  syncComponent:${this.firstToUpper(name)},
                      level:${level},
                      routesConfigPath:"${routesConfigPath}",
                    },`;
 
-      code.routePaths = `${code.routePaths || ""}
+      code.routePaths +=
+        name[0] === "~"
+          ? ""
+          : `
   ${name}:"${path}",`;
     }
     return code;
@@ -146,7 +160,7 @@ class WebpackPluginRouter {
 
     const code = {
       routesComponentConfig: "",
-      loadableComponent: "",
+      syncComponent: "",
       importRoutesConfigCode: "",
       exportRoutesConfigCode: "",
       routePaths: "",
@@ -167,7 +181,7 @@ class WebpackPluginRouter {
   ...${fileName},`;
       code.importRoutesConfigCode += `import ${fileName} from "client/${path}";\n`;
 
-      const { routesComponentConfig, loadableComponent, routePaths } =
+      const { routesComponentConfig, syncComponent, routePaths } =
         this.mapRoutesConfig(
           config,
           routesConfigPath,
@@ -176,7 +190,7 @@ class WebpackPluginRouter {
           cacheNames,
           cachePaths
         );
-      code.loadableComponent = loadableComponent;
+      code.syncComponent = syncComponent;
       code.routesComponentConfig = routesComponentConfig;
       code.routePaths = routePaths;
     }
@@ -184,9 +198,16 @@ class WebpackPluginRouter {
     return code;
   }
   getCode(routesConfigs, compilation) {
+    let {
+      NODE_ENV, // 环境参数
+      target // 环境参数
+    } = process.env; // 环境参数
+
+    NODE_ENV == "development";
+
     const {
       routesComponentConfig = "",
-      loadableComponent = "",
+      syncComponent = "",
       importRoutesConfigCode = "",
       routePaths = "",
       compilationErrors = [],
@@ -195,14 +216,16 @@ class WebpackPluginRouter {
 
     let routesComponentFile = `
 // 按需加载插件
-import { lazy } from "client/router/react-router-dom";
+import { lazy } from "client/router/react-lazy-router-dom";
 `;
 
     routesComponentFile += importRoutesConfigCode;
 
-    routesComponentFile += loadableComponent;
+    //
+    // routesComponentFile += NODE_ENV === "development" ? syncComponent : "";
 
     routesComponentFile += `
+
 let routesComponentConfig=[`;
 
     routesComponentFile += routesComponentConfig;
@@ -239,7 +262,6 @@ export default routesComponentConfig;
       let routesConfigs = [];
       readFile(entry, (value) => {
         const { path, filename } = value;
-        watch.includes();
         if (watch.includes(filename)) {
           const content = require(path).default;
           routesConfigs.push({

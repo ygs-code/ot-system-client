@@ -10,15 +10,22 @@
 export default [
   {
     path: "/",
-    exact: true,
-    name: "home",
-    entry: "/pages/Home/index.js",
+    exact: false,
+    name: "index",
+    entry: "/pages/Index/index.js",
     level: 1
   },
   {
-    path: "/user",
-    name: "user",
-    entry: "/pages/User/index.js",
+    path: "/log-in",
+    exact: true,
+    name: "logIn",
+    entry: "/pages/LogIn/index.js",
+    level: 1
+  },
+  {
+    path: "/register",
+    name: "register",
+    entry: "/pages/Register/index.js",
     level: 1
   }
 ];

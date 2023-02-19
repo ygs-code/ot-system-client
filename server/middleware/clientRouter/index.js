@@ -1,3 +1,4 @@
+import React from "react";
 import { renderToString } from "react-dom/server";
 import { getBundles } from "react-loadable-ssr-addon";
 import Helmet from "react-helmet";
@@ -5,8 +6,8 @@ import { matchPath } from "react-lazy-router-dom";
 import store from "client/redux";
 import routesComponent from "client/router/routesComponent";
 import { getMemoryHistory } from "client/router/history";
-import { findTreeData, getBaseInitState } from "client/utils";
-import createApp from "client/App";
+import { findTreeData } from "client/utils";
+import App from "client/App";
 import { stringToObject } from "client/utils";
 // import otherModules from "./otherModules";
 import path, { resolve } from "path";
@@ -25,7 +26,6 @@ let {
 //   是否是测试开发环境
 const isEnvDevelopment = NODE_ENV === "development";
 
-// const createApp = require("client/App").default;
 // 创建 store
 // const store = createStore({});
 
@@ -52,7 +52,6 @@ class ClientRouter {
   async init() {
     const { ctx, next } = this.context;
 
-    const modules = new Set();
     let template = fs.readFileSync(
       path.join(
         path.join(
@@ -64,49 +63,108 @@ class ClientRouter {
       "utf-8"
     );
 
-    let isMatchRoute = this.getMatch(
+    let isMatchRoutes = this.getMatch(
       routesComponent,
       ctx.req._parsedUrl.pathname
     );
 
-    if (isMatchRoute) {
-      const { Component } = isMatchRoute;
-      /* eslint-disable   */
-      const routeComponent = await Component();
-      /* eslint-enable   */
-      const { WrappedComponent: { getInitPropsState, getMetaProps } = {} } =
-        routeComponent;
+    if (isMatchRoutes.length) {
+      // 路由注入到react中
+      let history = getMemoryHistory({ initialEntries: [ctx.req.url] });
+      history = {
+        ...history
+        // ...isMatchRoute
+      };
 
-      let data = null;
+      const { isExact, path, url, params } = history;
+      let props = {
+        ...history,
+        dispatch,
+        state: getState(),
+        match: {
+          isExact,
+          path,
+          url,
+          params
+        }
+      };
 
-      await getBaseInitState(dispatch, getState());
+      let syncRouteComponent = [];
+      let metaProps = {};
+      for (let item of isMatchRoutes) {
+        const { Component } = item;
 
-      if (getInitPropsState) {
-        // 拉去请求或者查询sql等操作
-        data = await getInitPropsState();
-        await dispatch[isMatchRoute.name].setInitState({
-          initState: data
+        const syncComponent = await Component();
+        const { WrappedComponent: { getInitPropsState, getMetaProps } = {} } =
+          syncComponent;
+
+        metaProps = getMetaProps
+          ? {
+              ...metaProps,
+              ...getMetaProps()
+            }
+          : metaProps;
+
+        if (getInitPropsState) {
+          // 拉去请求或者查询sql等操作
+          await getInitPropsState(
+            // 注入props
+            props
+          );
+        }
+
+        syncRouteComponent.push({
+          ...item,
+          Component: syncComponent
         });
       }
 
+      // syncRouteComponent
+      //     // 同步路由配置
+      //     routesComponent: [
+      //       {
+      //         ...isMatchRoute,
+      //         Component: syncComponent
+      //       }
+      //     ]
+
+      // const { Component } = isMatchRoutes;
+
+      // const syncComponent = await Component();
+
+      // delete history.Component;
+      // delete history.syncComponent;
+      // const { WrappedComponent: { getInitPropsState, getMetaProps } = {} } =
+      //   syncComponent;
+
+      // await getBaseInitState(dispatch, getState(), props);
+
+      // if (getInitPropsState) {
+      //   // 拉去请求或者查询sql等操作
+      //   await getInitPropsState(
+      //     // 注入props
+      //     props
+      //   );
+      // }
+
       // 渲染html
-      let renderedHtml = await this.makeup({
-        ctx,
+      let renderedHtml = await this.reactToHtml({
         store,
         template,
-        isMatchRoute,
-        modules,
-        routeComponent
+        history,
+        isMatchRoutes,
+        routesComponent: syncRouteComponent
       });
 
       renderedHtml = ejs.render(renderedHtml, {
         htmlWebpackPlugin: {
           options: {
             ...stringToObject(htmlWebpackPluginOptions),
-            ...(getMetaProps ? getMetaProps() : {})
+            ...metaProps
           }
         }
       });
+      // console.log('renderedHtml ====',renderedHtml)
       ctx.body = renderedHtml;
     }
     next();
@@ -122,20 +180,24 @@ class ClientRouter {
     return path.replace(reg, "/");
   }
   // 创建标签
-  async createTags({ modules, isMatchRoute }) {
+  async createTags({ isMatchRoutes }) {
     let { assetsManifest } = this.options;
 
     if (assetsManifest) {
       assetsManifest = JSON.parse(assetsManifest);
     } else {
-      // 变成一个js去引入
-      assetsManifest = await import("@/dist/client/assets-manifest.json");
+      try {
+        // 变成一个js去引入
+        assetsManifest = await import("@/dist/client/assets-manifest.json");
+      } catch (error) {}
     }
 
+    
     const modulesToBeLoaded = [
       ...assetsManifest.entrypoints,
-      "client" + isMatchRoute.entry,
-      ...Array.from(modules)
+      ...isMatchRoutes.map((item) => {
+        return "client" + item.entry;
+      })
     ];
 
     let bundles = getBundles(assetsManifest, modulesToBeLoaded);
@@ -151,8 +213,8 @@ class ClientRouter {
 
     return { scripts, styles };
   }
-  // 解析html
-  prepHTML(
+  // 拼装html页面
+  assemblyHTML(
     template,
     {
       html,
@@ -170,70 +232,62 @@ class ClientRouter {
       '<div id="root">',
       `<div id="root">${rootString}`
     );
+
     template = template.replace(
       "</head>",
-      `</head> \n <script>window.__INITIAL_STATE__ =${JSON.stringify(
-        initState
-      )}</script>`
+      `</head> \n <script>
+      window.__INITIAL_STATE__ =${JSON.stringify(initState)}</script>`
     );
     template = template.replace("</body>", `${scripts}</body>`);
     return template;
   }
   // 获取路由
   getMatch(routesArray, url) {
+    let routers = [];
     for (let router of routesArray) {
       let $router = matchPath(url, {
         path: router.path,
         exact: router.exact
       });
 
+   
+
       if ($router) {
-        return {
+        routers.push({
           ...router,
           ...$router
-        };
+        });
       }
     }
+
+    return routers;
   }
-  // 创建react文本
-  async makeup({
-    ctx,
+  // 创建react转换成HTMl
+  async reactToHtml({
+    // ctx,
     store,
     template,
-    isMatchRoute,
-    modules,
-    routeComponent
+    isMatchRoutes,
+    // syncComponent,
+    history,
+    routesComponent
   }) {
     let initState = store.getState();
-
-    let history = getMemoryHistory({ initialEntries: [ctx.req.url] });
-    history = {
-      ...history,
-      ...isMatchRoute
-    };
-
-    let context = [];
-    let location = ctx.req.url;
-
+   
     let rootString = renderToString(
-      createApp({
-        store,
-        context,
-        history,
-        modules,
-        location,
-        routesComponent: [
-          {
-            ...isMatchRoute,
-            Component: routeComponent
-          }
-        ]
-      })
+      <App
+        {...{
+          store,
+          history,
+          // 同步路由配置
+          routesComponent
+        }}
+      />
     );
-    let { scripts, styles } = await this.createTags({ modules, isMatchRoute });
+    let { scripts, styles } = await this.createTags({ isMatchRoutes });
 
     const helmet = Helmet.renderStatic();
-    let renderedHtml = this.prepHTML(template, {
+    let renderedHtml = this.assemblyHTML(template, {
       html: helmet.htmlAttributes.toString(),
       head:
         helmet.title.toString() +
@@ -244,6 +298,7 @@ class ClientRouter {
       styles,
       initState
     });
+    // console.log('renderedHtml===',renderedHtml)
     return renderedHtml;
   }
 }

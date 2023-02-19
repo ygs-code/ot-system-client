@@ -1,5 +1,5 @@
 {
-    "delay": 1000,
+    "delay": 1500,
     "watch": [
         "dist/*",
         "dist/**",

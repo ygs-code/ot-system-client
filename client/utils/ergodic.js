@@ -1,34 +1,17 @@
 import { CheckDataType } from "./CheckDataType";
-// 递归treeData 会给 treeData 添加index 索引
-const recursionTreeData = (parameter, _index = null) => {
-  const {
-    treeData = [],
-    childrenCallback = () => {},
-    itemCallback = () => {}
-  } = parameter;
-  return treeData.map((item, index) => {
-    if (item.children && item.children.length >= 1) {
-      item = {
-        ...item,
-        children: recursionTreeData(
-          {
-            treeData: item.children,
-            childrenCallback,
-            itemCallback
-          },
-          _index === null ? `${index}` : `${_index}-${index}`
-        ),
-        index: _index === null ? `${index}` : `${_index}-${index}`
-      };
-      childrenCallback(item);
+
+const recursionTreeData = (
+  treeData,
+  callback = () => {},
+  nextLevelKey = "children"
+) => {
+  for (let item of treeData) {
+    if (item[nextLevelKey] && item[nextLevelKey].length >= 1) {
+      recursionTreeData(item[nextLevelKey], callback, nextLevelKey);
     }
-    item = {
-      ...item,
-      index: _index === null ? `${index}` : `${_index}-${index}`
-    };
-    itemCallback(item);
-    return item;
-  });
+
+    callback(item);
+  }
 };
 
 // 过滤数据 可以用于搜索，包括父层的数据树形结构
@@ -37,15 +20,9 @@ const filterTreeData = (
   filterCallback = () => true, // 条件的回调函数
   nexKey = "children",
   _index = null
-) =>
-  data.filter((item, index) => {
+) => {
+  return data.filter((item, index) => {
     if (item[nexKey] && item[nexKey].length >= 1) {
-      item[nexKey] = filterTreeData(
-        item[nexKey],
-        filterCallback,
-        nexKey,
-        _index === null ? `${index}` : `${_index}-${index}`
-      );
       if (
         filterCallback(
           item,
@@ -54,13 +31,22 @@ const filterTreeData = (
       ) {
         return true;
       }
+      item.children = filterTreeData(
+        item[nexKey],
+        filterCallback,
+        nexKey,
+        _index === null ? `${index}` : `${_index}-${index}`
+      );
       return item[nexKey] && item[nexKey].length >= 1;
     }
+
     return filterCallback(
       item,
       _index === null ? `${index}` : `${_index}-${index}`
     );
   });
+};
+
 // 复杂类型数据，深拷贝
 const deepCopy = (
   source, // 来源数据
@@ -84,21 +70,20 @@ const deepCopy = (
 const findTreeData = (
   treeData, // 树形数组或者数组数据
   value, // 需要查找的value
-  key, // 需要查找数组对象的key
-  nextKey = "children"
+  key, //需要查找数组对象的key
+  nextKey = "children", // 下一级的key，这个不用传
+  findValue = null //获取到的值，这个不用传
 ) => {
-  let findValue = null;
-  for (const item of treeData) {
-    if (item[key] === value) {
+  for (let item of treeData) {
+    if (value !== undefined && item[key] !== undefined && item[key] === value) {
       return item;
     }
     if (item && item[nextKey] && item[nextKey].length >= 1) {
-      findValue = findTreeData(item[nextKey], value, key, nextKey);
+      findValue = findTreeData(item[nextKey], value, key, nextKey, findValue);
     }
   }
   return findValue;
 };
-
 // 深度比较两个数据
 const diffData = (oldData, newData) => {
   let flag = true;
@@ -136,4 +121,44 @@ const diffData = (oldData, newData) => {
   }
   return flag;
 };
-export { recursionTreeData, filterTreeData, deepCopy, diffData, findTreeData };
+// 用于 查找 树 形结构数据，形成一个路劲数组
+const findTreePath = (options, path = []) => {
+  const {
+    treeData,
+    value,
+    valueKey,
+    nextKey = "children",
+    callback = () => {}
+  } = options;
+
+  for (var i = 0; i < treeData.length; i++) {
+    var tempPath = [...path];
+    tempPath.push(treeData[i]);
+    if (treeData[i][valueKey] === value) {
+      return tempPath;
+    }
+    if (treeData[i][nextKey] && treeData[i][nextKey].length) {
+      const reuslt = findTreePath(
+        {
+          treeData: treeData[i][nextKey],
+          value,
+          valueKey,
+          callback
+        },
+        tempPath
+      );
+      if (reuslt) {
+        callback(reuslt);
+        return reuslt;
+      }
+    }
+  }
+};
+export {
+  deepCopy,
+  diffData,
+  filterTreeData,
+  findTreeData,
+  findTreePath,
+  recursionTreeData
+};

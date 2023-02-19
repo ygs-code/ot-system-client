@@ -108,8 +108,7 @@ class watchFile {
 // new watchFile(
 //     'C:/Users/86185/Desktop/React-universal-ssr-master/server',
 //     (value) => {
-//         // console.log('path===', path);
-//         console.log('value===', value);
+ 
 //     }
 // );
 module.exports = watchFile;
