@@ -24,23 +24,22 @@ module.exports = {
     // contentBase: "assets",
     hot: true,
     // historyApiFallback: true,
-    host:"0.0.0.0",
+    host: "0.0.0.0",
     liveReload: true, // 编译之后是否自动刷新浏览器
     writeToDisk: true, // isSsr || isEnvProduction, // 写入硬盘
     // port: 5000,
-    compress:true,  //浏览器请求静态资源时压缩一下，打开浏览器的检查时可以看到bundle.js的content-encoding是gzip，浏览器自动解压
+    compress: true, //浏览器请求静态资源时压缩一下，打开浏览器的检查时可以看到bundle.js的content-encoding是gzip，浏览器自动解压
     proxy: [
       {
         context: "/api",
         target: "http://localhost:3002",
         changeOrigin: true,
-         secure: false,
+        secure: false
         // pathRewrite: {
         //   "^/api/v1/common/upload/": "/",
         // },
-      },
-    ],
-  
+      }
+    ]
   },
   watch: true,
   watchOptions: {
@@ -66,7 +65,6 @@ module.exports = {
             loader: "css-loader",
             options: {
               sourceMap: true
-
             }
           },
           {
@@ -164,8 +162,6 @@ module.exports = {
       // both options are optional
       filename: "static/css/[name].[contenthash:8].css",
       chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
-    }),
-
-
+    })
   ]
 };

@@ -331,10 +331,39 @@ module.exports = {
         //     },
         // },
       },
+
+      // "file" loader makes sure those assets get served by WebpackDevServer.
+      // When you `import` an asset, you get its (virtual) filename.
+      // In production, they would get copied to the `build` folder.
+      // This loader doesn't use a "test" so it will catch all modules
+      // that fall through the other loaders.
+      // {
+      //   loader: require.resolve("file-loader"),
+      //   // Exclude `js` files to keep "css" loader working as it injects
+      //   // its runtime that would otherwise be processed through "file" loader.
+      //   // Also exclude `html` and `json` extensions so they get processed
+      //   // by webpacks internal loaders.
+      //   exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+      //   options: {
+      //     name: "static/[name].[hash:8].[ext]"
+      //   }
+      // },
+      // ** STOP ** Are you adding a new loader?
+      // Make sure to add the new loader(s) before the "file" loader.
+
       {
-        test: /\.(svg|woff2?|ttf|eot|jpe?g|png|gif)(\?.*)?$/i,
+        test: /\.(svg|woff2?|woff|ttf|eot|otf|jpe?g|png|gif)(\?.*)?$/i,
         // exclude: /node_modules/,
-        use: cacheLoader("url-loader")
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 1024,
+              name: "static/img/[sha512:hash:base64:7].[ext]"
+            }
+          }
+        ]
+        // cacheLoader("url-loader")
         //  {
         //     loader: 'url-loader',
         //     options: {
@@ -378,7 +407,7 @@ module.exports = {
       fix: true //自动修复
     }),
 
-     // 清理文件
+    // 清理文件
     new CleanWebpackPlugin(),
 
     // 使用此插件有助于缓解OSX上的开发人员不遵循严格的路径区分大小写的情况，
@@ -408,24 +437,6 @@ module.exports = {
           loader: "babel-loader",
           options: {
             // cacheDirectory: true,
-          }
-        }
-      ],
-      // 输出执行日志
-      // verbose: true,
-      // 使用共享线程池
-      threadPool: happyThreadPool
-    }),
-
-    new HappyPack({
-      id: "url-loader",
-      //添加loader
-      use: [
-        {
-          loader: "url-loader",
-          options: {
-            limit: 1024,
-            name: "img/[sha512:hash:base64:7].[ext]"
           }
         }
       ],

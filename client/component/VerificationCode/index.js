@@ -7,25 +7,18 @@
  * @FilePath: /error-sytem/admin/src/common/component/VerificationCode/index.js
  */
 import TextField from "@mui/material/TextField";
-import { Form, Input } from "antd";
+// import { Form, Input } from "antd";
 import { getVerifyCode } from "client/assets/js/request/index";
 import FormItem from "client/component/FormItem";
 import { checkVerificationCode } from "client/utils";
 import React, { useCallback, useEffect, useState } from "react";
 
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 }
-};
+// const tailLayout = {
+//   wrapperCol: { offset: 8, span: 16 }
+// };
 
 const Index = (props) => {
-  const {
-    form: {
-      getFieldDecorator = () => {},
-      getFieldProps = () => {},
-      validateFields = () => {},
-      getFieldError = () => {}
-    } = {}
-  } = props;
+  const { form = {} } = props;
 
   const [verifyCodeData, setVerifyCodeData] = useState({});
 
@@ -63,7 +56,7 @@ const Index = (props) => {
           }
         ]}
         label="验证码"
-        form={props.form}
+        form={form}
         name="verificationCode">
         <TextField
           className="input-w"
