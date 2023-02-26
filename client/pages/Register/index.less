@@ -2,6 +2,14 @@
   width: 100vw;
   height: 100vh;
   background: url("../../static/img/back.jpeg");
+  background-repeat: no-repeat;
+
+  // 居中
+  background-position: center center;
+
+  /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
+  background-attachment: fixed;
+  background-size: cover;
 
   .content {
     width: 340px;

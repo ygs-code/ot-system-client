@@ -2,9 +2,11 @@ import "client/assets/css/base.less";
 import "./index.less";
 
 import { Button, Paper, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
 import { message } from "antd";
 import { createUser } from "client/assets/js/request/index";
 import FormItem from "client/component/FormItem";
+import Grain from "client/component/Grain";
 import VerificationCode from "client/component/VerificationCode";
 import { addRouterApi, toComponent } from "client/router";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
@@ -38,6 +40,7 @@ const Index = (props) => {
 
   return (
     <div className="log-in">
+      <Grain />
       <div className="content center">
         <Paper elevation={3} className="paper">
           <h3>《OT协同办公系统》 </h3>
@@ -62,7 +65,7 @@ const Index = (props) => {
             form={form}
             name="name">
             <TextField
-              className="input-w"
+              className="full-width"
               required
               placeholder="请输入用户名"
               variant="outlined"
@@ -93,6 +96,7 @@ const Index = (props) => {
               required
               placeholder="请输入手机号"
               variant="outlined"
+              size="small"
             />
           </FormItem>
 

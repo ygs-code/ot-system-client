@@ -22,23 +22,17 @@ const Index = (props) => {
     style = {}
   } = props;
 
-  return (
-    <div className={className} style={style}>
-      {getFieldDecorator(name, {
-        validateFirst: true, // 只校验一次
-        initialValue,
-        rules,
-        ...decoratorProps
-      })(
-        cloneElement(children, {
-          helperText: getFieldError(name)
-            ? getFieldError(name).join(",")
-            : null,
-          label,
-          error: getFieldError(name) || null
-        })
-      )}
-    </div>
+  return getFieldDecorator(name, {
+    validateFirst: true, // 只校验一次
+    initialValue,
+    rules,
+    ...decoratorProps
+  })(
+    cloneElement(children, {
+      helperText: getFieldError(name) ? getFieldError(name).join(",") : null,
+      label,
+      error: getFieldError(name) || null
+    })
   );
 };
 

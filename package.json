@@ -70,6 +70,7 @@
         "@mui/icons-material": "^5.11.9",
         "@mui/material": "^5.11.9",
         "@mui/styled-engine-sc": "^5.11.9",
+        "@mui/x-date-pickers": "^5.0.20",
         "@rematch/core": "1.2.0",
         "@webpack-cli/serve": "^1.7.0",
         "antd": "^4.24.4",

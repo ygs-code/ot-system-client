@@ -1,7 +1,35 @@
 .log-in {
+  position: relative;
   width: 100vw;
   height: 100vh;
   background: url("../../static/img/back.jpeg");
+  background-repeat: no-repeat;
+
+  // 居中
+  background-position: center center;
+
+  /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
+  background-attachment: fixed;
+  background-size: cover;
+
+  .back {
+    position: fixed;
+    z-index: 2;
+    width: 0;
+    height: 0;
+    left: 0;
+    top: 0;
+  }
+
+  span.pixal {
+    position: fixed;
+    left: -5px;
+    top: -5px;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+  }
 
   .content {
     width: 340px;

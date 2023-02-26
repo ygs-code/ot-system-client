@@ -5,16 +5,18 @@ import { Button, Paper, TextField } from "@mui/material";
 import { message } from "antd";
 import { login } from "client/assets/js/request/index";
 import FormItem from "client/component/FormItem";
+import Grain from "client/component/Grain";
 import VerificationCode from "client/component/VerificationCode";
 import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
 import { createForm } from "rc-form";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const Index = (props) => {
   const { pushRoute, routePaths, form } = props;
   const { validateFields } = form;
+  const [count, setCount] = useState(0);
 
   const onFinish = async (values) => {
     const {
@@ -42,15 +44,24 @@ const Index = (props) => {
       if (!error) {
         onFinish(values);
       } else {
-        console.error(error);
+        // console.error(error);
+
+        setTimeout(() => {
+          setCount(count + 1);
+        }, 100);
       }
     });
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    return () => {
+      debugger;
+    };
+  }, []);
 
   return (
     <div className="log-in">
+      <Grain />
       <div className="content center">
         <Paper elevation={3} className="paper">
           <h3>《OT协同办公系统》 </h3>
@@ -123,8 +134,9 @@ const Index = (props) => {
             <Button
               className="submit"
               variant="contained"
-              onClick={() => {
+              onClick={(event) => {
                 onSubmit();
+                event.preventDefault();
               }}>
               登录
             </Button>
@@ -132,8 +144,9 @@ const Index = (props) => {
             <Button
               variant="outlined"
               className="submit"
-              onClick={() => {
+              onClick={(event) => {
                 pushRoute(routePaths.register);
+                event.preventDefault();
               }}>
               注册
             </Button>
