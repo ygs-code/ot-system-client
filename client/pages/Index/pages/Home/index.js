@@ -64,7 +64,7 @@ export default setBreadcrumbAndTitle({
         {
           label: "角色名称",
           name: "name",
-          type: "radio",
+          type: "textarea",
           span: 1,
           rules: [
             {
@@ -95,7 +95,7 @@ export default setBreadcrumbAndTitle({
           type: "input"
         },
         {
-          label: "年纪",
+          label: "select",
           name: "age",
           type: "select",
           options: [
@@ -121,6 +121,52 @@ export default setBreadcrumbAndTitle({
           label: "切换",
           name: "switch",
           type: "switch"
+        },
+        {
+          label: "checkbox",
+          name: "checkbox",
+          type: "checkbox",
+          options: [
+            {
+              label: "1-10岁",
+              value: "1-10"
+            },
+            {
+              label: "11-20岁",
+              value: "11-20"
+            },
+            {
+              label: "21-30岁",
+              value: "21-30"
+            },
+            {
+              label: "31-40岁",
+              value: "31-40"
+            }
+          ]
+        },
+        {
+          label: "radio",
+          name: "radio",
+          type: "radio",
+          options: [
+            {
+              label: "1-10岁",
+              value: "1-10"
+            },
+            {
+              label: "11-20岁",
+              value: "11-20"
+            },
+            {
+              label: "21-30岁",
+              value: "21-30"
+            },
+            {
+              label: "31-40岁",
+              value: "31-40"
+            }
+          ]
         }
       ];
     };

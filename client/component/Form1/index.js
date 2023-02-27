@@ -14,9 +14,10 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  FormLabel,
   InputLabel,
   MenuItem,
-  Paper,
+  RadioGroup,
   Select,
   Switch,
   TextField
@@ -62,7 +63,8 @@ const ItemChild = (props) => {
     required,
     options = [],
     label,
-    name
+    name,
+    error
   } = props;
 
   type = type ? type.toLowerCase() : type;
@@ -94,33 +96,33 @@ const ItemChild = (props) => {
         // onChange={onChange}
       />
     ),
-    inputnumber: (
-      <InputNumber
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></InputNumber>
-    ),
+    // inputnumber: (
+    //   <InputNumber
+    //     {...formProps}
+    //     disabled={readOnly || disabled}
+    //     value={value}
+    //     onChange={onChange}></InputNumber>
+    // ),
     radio: (
-      <Radio
-        disabled={readOnly || disabled}
-        className="full-width"
-        // required={true}
-        // placeholder="请输入用户名/手机号/邮箱"
-        variant="outlined"
-        size="small"
-        {...formProps}
-        // value={value}
-        // checked={value}
-        // onChange={(v) => {
-        //   console.log("v======", v);
-        // }}
-        // checked={selectedValue === "a"}
-        // onChange={handleChange}
-        // value="a"
-        // name="radio-buttons"
-        // inputProps={{ "aria-label": "A" }}
-      />
+      <FormControl>
+        <FormLabel id="demo-radio-buttons-group-label">{label}</FormLabel>
+        <RadioGroup
+          aria-labelledby="demo-radio-buttons-group-label"
+          defaultValue="female"
+          name="radio-buttons-group">
+          {options.map((item) => {
+            const { label, checked, value } = item;
+            return (
+              <FormControlLabel
+                key={value}
+                value={value}
+                control={<Radio />}
+                label={label}
+              />
+            );
+          })}
+        </RadioGroup>
+      </FormControl>
     ),
     rate: (
       <Rate
@@ -160,18 +162,18 @@ const ItemChild = (props) => {
         value={value}
         onChange={onChange}></Slider>
     ),
-    timepicker: (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <TimePicker
-          label={label}
-          // value={value}
-          // onChange={(newValue) => {
-          //   setValue(newValue);
-          // }}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </LocalizationProvider>
-    ),
+    // timepicker: (
+    //   <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //     <TimePicker
+    //       label={label}
+    //       // value={value}
+    //       // onChange={(newValue) => {
+    //       //   setValue(newValue);
+    //       // }}
+    //       renderInput={(params) => <TextField {...params} />}
+    //     />
+    //   </LocalizationProvider>
+    // ),
     transfer: (
       <Transfer
         {...formProps}
@@ -180,9 +182,33 @@ const ItemChild = (props) => {
         onChange={onChange}></Transfer>
     ),
     checkbox: (
-      <FormGroup>
-        <FormControlLabel control={<Checkbox defaultChecked />} label={label} />
-      </FormGroup>
+      <FormControl
+        required
+        error={error}
+        component="fieldset"
+        sx={{ m: 3 }}
+        variant="standard">
+        <FormLabel component="legend">{label}</FormLabel>
+        <FormGroup>
+          {options.map((item) => {
+            const { label, checked, value } = item;
+
+            return (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checked}
+                    onChange={() => {}}
+                    name={value}
+                  />
+                }
+                label={label}
+                key={value}
+              />
+            );
+          })}
+        </FormGroup>
+      </FormControl>
     )
   };
 
@@ -205,7 +231,7 @@ const $ItemChild = (props) => {
     component,
     render,
     onChange = () => {},
-    value,
+    value = "",
     required
   } = props;
   type = type ? type.toLowerCase() : type;
