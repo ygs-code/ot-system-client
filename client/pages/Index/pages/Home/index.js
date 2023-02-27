@@ -1,9 +1,52 @@
 import "./index.less";
 
+import TextField from "@mui/material/TextField";
 import { SearchForm } from "client/component/Form1";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
 import React, { memo } from "react";
+
+const Html = () => (
+  <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
+    <div className="ant-row ant-form-item-row">
+      <div className="ant-col ant-col-4 ant-form-item-label">
+        <label
+          htmlFor="basic_name"
+          className="ant-form-item-required"
+          title="用户名称">
+          用户名称
+        </label>
+      </div>
+
+      <div className="ant-col ant-col-8 ant-form-item-control">
+        <div className="ant-form-item-control-input">
+          <div className="ant-form-item-control-input-content">
+            <TextField
+              id="outlined-basic"
+              label="用户名称"
+              variant="outlined"
+              size="small"
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "nowrap" }}>
+          <div
+            id="basic_name_help"
+            className="ant-form-item-explain ant-form-item-explain-connected"
+            role="alert">
+            <div className="ant-form-item-explain-error">请输入用户名称</div>
+          </div>
+          <div style={{ width: "0", height: "24px" }}></div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="ant-form-item-margin-offset"
+      style={{ marginBottom: "-24px" }}></div>
+  </div>
+);
+
 // 权限控制
 export default setBreadcrumbAndTitle({
   //设置面包屑和标题
@@ -83,7 +126,9 @@ export default setBreadcrumbAndTitle({
     };
     return (
       <div className="home">
-        <div className="title">《欢迎来到TO协同系统》</div>
+        {/*
+         <div className="title">《欢迎来到TO协同系统》</div>
+         */}
         <SearchForm
           {...props}
           onConfirm={() => {}}
@@ -98,6 +143,9 @@ export default setBreadcrumbAndTitle({
             // this.loadTableData();
           }}
         />
+        <div>
+          <Html />
+        </div>
       </div>
     );
   })

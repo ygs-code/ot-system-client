@@ -9,6 +9,59 @@
 
 import React, { cloneElement } from "react";
 
+const Item = (props) => {
+  const { value, onChange, span = 24, children, errors, label } = props;
+
+  return (
+    <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
+      <div className="ant-row ant-form-item-row">
+        {/*
+
+        <div className="ant-col ant-col-4 ant-form-item-label">
+          <label
+            htmlFor="basic_name"
+            className="ant-form-item-required"
+            title="用户名称">
+            用户名称
+          </label>
+        </div>
+      */}
+
+        <div className={`ant-col ant-col-${span} ant-form-item-control`}>
+          <div className="ant-form-item-control-input">
+            <div className="ant-form-item-control-input-content">
+              {cloneElement(children, {
+                // helperText: getFieldError(name)
+                //   ? getFieldError(name).join(",")
+                //   : null,
+                label,
+                error: errors,
+                value,
+                onChange
+              })}
+            </div>
+          </div>
+
+          {errors ? (
+            <div style={{ display: "flex", flexWrap: "nowrap" }}>
+              <div
+                id="basic_name_help"
+                className="ant-form-item-explain ant-form-item-explain-connected"
+                role="alert">
+                <div className="ant-form-item-explain-error">{errors}</div>
+              </div>
+              <div style={{ width: "0", height: "24px" }}></div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div
+        className="ant-form-item-margin-offset"
+        style={{ marginBottom: "-24px" }}></div>
+    </div>
+  );
+};
+
 const Index = (props) => {
   const {
     name = "",
@@ -21,19 +74,14 @@ const Index = (props) => {
     className = "",
     style = {}
   } = props;
+  const errors = getFieldError(name) ? getFieldError(name).join(",") : null;
 
   return getFieldDecorator(name, {
     validateFirst: true, // 只校验一次
     initialValue,
     rules,
     ...decoratorProps
-  })(
-    cloneElement(children, {
-      helperText: getFieldError(name) ? getFieldError(name).join(",") : null,
-      label,
-      error: getFieldError(name) || null
-    })
-  );
+  })(<Item name={name} errors={errors} label={label} children={children} />);
 };
 
 export default Index;

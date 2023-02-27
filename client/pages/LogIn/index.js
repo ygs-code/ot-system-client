@@ -88,6 +88,7 @@ const Index = (props) => {
             ]}
             label="用户名/手机号/邮箱"
             form={form}
+            span={24}
             name="name">
             <TextField
               className="input-w"
@@ -101,6 +102,7 @@ const Index = (props) => {
             label="密码"
             name="password"
             className="margin-top-10"
+            span={24}
             rules={[
               {
                 required: true,
