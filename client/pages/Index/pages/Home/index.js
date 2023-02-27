@@ -92,7 +92,11 @@ export default setBreadcrumbAndTitle({
         {
           label: "角色ID",
           name: "id",
-          type: "input"
+          type: "input",
+          props: {
+            require: true,
+            placeholder: "请输入用户名/手机号/邮箱"
+          }
         },
         {
           label: "select",
@@ -115,12 +119,20 @@ export default setBreadcrumbAndTitle({
               label: "31-40岁",
               value: "31-40"
             }
-          ]
+          ],
+          props: {
+            require: true,
+            placeholder: "请输入用户名/手机号/邮箱"
+          }
         },
         {
           label: "切换",
           name: "switch",
-          type: "switch"
+          type: "switch",
+          props: {
+            require: true,
+            placeholder: "请输入用户名/手机号/邮箱"
+          }
         },
         {
           label: "checkbox",
@@ -143,7 +155,11 @@ export default setBreadcrumbAndTitle({
               label: "31-40岁",
               value: "31-40"
             }
-          ]
+          ],
+          props: {
+            require: true,
+            placeholder: "请输入用户名/手机号/邮箱"
+          }
         },
         {
           label: "radio",
@@ -166,7 +182,11 @@ export default setBreadcrumbAndTitle({
               label: "31-40岁",
               value: "31-40"
             }
-          ]
+          ],
+          props: {
+            require: true,
+            placeholder: "请输入用户名/手机号/邮箱"
+          }
         }
       ];
     };

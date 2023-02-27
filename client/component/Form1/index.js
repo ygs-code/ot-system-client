@@ -74,6 +74,7 @@ const ItemChild = (props) => {
   const mapTpye = {
     textarea: (
       <TextField
+        error
         disabled={readOnly || disabled}
         className="full-width"
         multiline
@@ -85,6 +86,7 @@ const ItemChild = (props) => {
     ),
     input: (
       <TextField
+        error
         disabled={readOnly || disabled}
         className="full-width"
         // required={true}
@@ -104,12 +106,15 @@ const ItemChild = (props) => {
     //     onChange={onChange}></InputNumber>
     // ),
     radio: (
-      <FormControl>
-        <FormLabel id="demo-radio-buttons-group-label">{label}</FormLabel>
+      <FormControl error>
+        <FormLabel error id="demo-row-radio-buttons-group-label">
+          {label}
+        </FormLabel>
         <RadioGroup
-          aria-labelledby="demo-radio-buttons-group-label"
-          defaultValue="female"
-          name="radio-buttons-group">
+          error
+          row
+          aria-labelledby="demo-row-radio-buttons-group-label"
+          name="row-radio-buttons-group">
           {options.map((item) => {
             const { label, checked, value } = item;
             return (
@@ -132,9 +137,12 @@ const ItemChild = (props) => {
         onChange={onChange}></Rate>
     ),
     select: (
-      <FormControl fullWidth size="small">
-        <InputLabel id={`${label}-simple-select-label`}>{label}</InputLabel>
+      <FormControl fullWidth size="small" error={true}>
+        <InputLabel error id={`${label}-simple-select-label`}>
+          {label}
+        </InputLabel>
         <Select
+          error
           labelId={`${label}-simple-select-label`}
           id={`${label}-simple-select`}
           label={label}
@@ -151,9 +159,14 @@ const ItemChild = (props) => {
       </FormControl>
     ),
     switch: (
-      <FormGroup>
-        <FormControlLabel control={<Switch />} label={label} />
-      </FormGroup>
+      <FormControl error>
+        <FormLabel error id="demo-row-radio-buttons-group-label">
+          {label}
+        </FormLabel>
+        <FormGroup error>
+          <FormControlLabel control={<Switch />} label={label} />
+        </FormGroup>
+      </FormControl>
     ),
     slider: (
       <Slider
@@ -182,19 +195,20 @@ const ItemChild = (props) => {
         onChange={onChange}></Transfer>
     ),
     checkbox: (
-      <FormControl
-        required
-        error={error}
-        component="fieldset"
-        sx={{ m: 3 }}
-        variant="standard">
-        <FormLabel component="legend">{label}</FormLabel>
-        <FormGroup>
+      <FormControl error>
+        <FormLabel error id="demo-row-radio-buttons-group-label">
+          {label}
+        </FormLabel>
+        <RadioGroup
+          row
+          aria-labelledby="demo-row-radio-buttons-group-label"
+          name="row-radio-buttons-group">
           {options.map((item) => {
             const { label, checked, value } = item;
-
             return (
               <FormControlLabel
+                key={value}
+                value={value}
                 control={
                   <Checkbox
                     checked={checked}
@@ -203,11 +217,10 @@ const ItemChild = (props) => {
                   />
                 }
                 label={label}
-                key={value}
               />
             );
           })}
-        </FormGroup>
+        </RadioGroup>
       </FormControl>
     )
   };
