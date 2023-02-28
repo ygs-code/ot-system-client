@@ -89,7 +89,9 @@ class Index extends FormPage {
               maxLength: 20,
               readOnly
             },
-
+            itemProps: {
+              extra: "23432432443asdf"
+            },
             rules: [
               {
                 required: true,
