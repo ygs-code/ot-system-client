@@ -10,19 +10,22 @@ import "./index.less";
 
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import {
+  Box,
   Checkbox,
+  Chip,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
   InputLabel,
+  ListItemText,
   MenuItem,
+  OutlinedInput,
   RadioGroup,
   Select,
   Switch,
   TextField
 } from "@mui/material";
-import Box from "@mui/material/Box";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -52,6 +55,306 @@ import React, {
 } from "react";
 
 const { Password, TextArea } = Input;
+const FromRadio = (props) => {
+  const { error, label, options = [], value, onChange } = props;
+
+  return (
+    <FormControl
+      onChange={({ target }) => {
+        onChange(target.value);
+      }}
+      error={error}>
+      <FormLabel error={error}>{label}</FormLabel>
+      <RadioGroup error={error} row>
+        {options.map((item) => {
+          const { label, checked, value: $value } = item;
+          return (
+            <FormControlLabel
+              key={$value}
+              value={$value}
+              control={<Radio checked={$value === value} />}
+              label={label}
+            />
+          );
+        })}
+      </RadioGroup>
+    </FormControl>
+  );
+};
+
+// const FromSelect = (props) => {
+//   const {
+//     error,
+//     label,
+//     options = [],
+//     value = [],
+//     onChange,
+//     formProps = {},
+//     required
+//   } = props;
+//   const ITEM_HEIGHT = 48;
+//   const ITEM_PADDING_TOP = 8;
+//   const MenuProps = {
+//     PaperProps: {
+//       style: {
+//         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//         width: 250
+//       }
+//     }
+//   };
+
+//   return (
+//     <FormControl fullWidth size="small" error={error}>
+//       <InputLabel error={error} id={`${label}-simple-select-label`}>
+//         {required ? label + " *" : label}
+//       </InputLabel>
+//       <Select
+//         onChange={({ target }) => {
+//           onChange(target.value);
+//         }}
+//         error={error}
+//         labelId={`${label}-simple-select-label`}
+//         id={`${label}-simple-select`}
+//         label={required ? label + " *" : label}
+//         value={value}
+//         {...formProps}>
+//         {options.map((item) => {
+//           const { label, value: $value } = item;
+//           return (
+//             <MenuItem key={$value} value={$value}>
+//               {label}
+//             </MenuItem>
+//           );
+//         })}
+//       </Select>
+//     </FormControl>
+//   );
+// };
+
+const FromMultipleSelect = (props) => {
+  const {
+    error,
+    label,
+    options = [],
+    value = [],
+    onChange,
+    formProps = {},
+    required
+  } = props;
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250
+      }
+    }
+  };
+
+  return (
+    <FormControl fullWidth size="small" error={error}>
+      <InputLabel error={error} id={`${label}-simple-select-label`}>
+        {required ? label + " *" : label}
+      </InputLabel>
+      <Select
+        onChange={({ target }) => {
+          onChange(target.value);
+        }}
+        error={error}
+        labelId={`${label}-simple-select-label`}
+        id={`${label}-simple-select`}
+        label={required ? label + " *" : label}
+        value={value}
+        {...formProps}
+        multiple
+        // input={<OutlinedInput label="Tag" />}
+        // renderValue={(selected) => selected.join(", ")}
+
+        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value) => (
+              <Chip key={value} label={value} />
+            ))}
+          </Box>
+        )}
+        MenuProps={MenuProps}>
+        {options.map((item) => {
+          const { label, value: $value } = item;
+          return (
+            <MenuItem key={$value} value={$value}>
+              {/*label*/}
+              <Checkbox checked={value.indexOf($value) > -1} />
+              <ListItemText primary={label} />
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
+  );
+};
+// const FromMultipleSelect = (props) => {
+//   const {
+//     error,
+//     label,
+//     options = [],
+//     value = [],
+//     onChange,
+//     formProps = {},
+//     required
+//   } = props;
+//   const ITEM_HEIGHT = 48;
+//   const ITEM_PADDING_TOP = 8;
+//   const MenuProps = {
+//     PaperProps: {
+//       style: {
+//         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//         width: 250
+//       }
+//     }
+//   };
+
+//   return (
+//     <FormControl fullWidth size="small" error={error}>
+//       <InputLabel error={error} id={`${label}-simple-select-label`}>
+//         {required ? label + " *" : label}
+//       </InputLabel>
+//       <Select
+//         onChange={({ target }) => {
+//           onChange(target.value);
+//         }}
+//         error={error}
+//         labelId={`${label}-simple-select-label`}
+//         id={`${label}-simple-select`}
+//         label={required ? label + " *" : label}
+//         value={value}
+//         {...formProps}
+//         multiple
+//         // input={<OutlinedInput label="Tag" />}
+//         // renderValue={(selected) => selected.join(", ")}
+
+//         input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+//         renderValue={(selected) => (
+//           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+//             {selected.map((value) => (
+//               <Chip key={value} label={value} />
+//             ))}
+//           </Box>
+//         )}
+//         MenuProps={MenuProps}>
+//         {options.map((item) => {
+//           const { label, value: $value } = item;
+//           return (
+//             <MenuItem key={$value} value={$value}>
+//               {/*label*/}
+//               <Checkbox checked={value.indexOf($value) > -1} />
+//               <ListItemText primary={label} />
+//             </MenuItem>
+//           );
+//         })}
+//       </Select>
+//     </FormControl>
+//   );
+// };
+
+const FromSwitch = (props) => {
+  const {
+    error,
+    label,
+    options = [],
+    value,
+    onChange,
+    formProps = {},
+    required
+  } = props;
+
+  return (
+    <FormControl
+      error={error}
+      onChange={({ target }) => {
+        // console.log("target=====", target);
+        // debugger;
+      }}>
+      <FormLabel
+        onChange={({ target }) => {
+          // console.log("target=====", target);
+          // debugger;
+        }}>
+        {required ? label + " *" : label}
+      </FormLabel>
+      <FormGroup
+        onChange={(v) => {
+          // console.log("target=====", v);
+          // debugger;
+        }}>
+        {options.map((item, index) => {
+          const { label, value: $value } = item;
+          return (
+            <FormControlLabel
+              key={index}
+              value={$value}
+              label={label}
+              onChange={({ target }) => {
+                onChange(target.checked);
+              }}
+              control={<Switch checked={value} />}
+            />
+          );
+        })}
+      </FormGroup>
+    </FormControl>
+  );
+};
+
+const FromCheckbox = (props) => {
+  const {
+    error,
+    label,
+    options = [],
+    value = [],
+    onChange,
+    formProps = {},
+    required
+  } = props;
+
+  return (
+    <FormControl
+      onChange={({ target }) => {
+        const { value: $value, checked } = target;
+        if (checked) {
+          value.push($value);
+        } else {
+          let index = value.findIndex((item) => {
+            return item === $value;
+          });
+          if (index >= 0) {
+            value.splice(index, 1);
+          }
+        }
+        onChange([...value]);
+      }}
+      error={error}>
+      <FormLabel>{required ? label + " *" : label}</FormLabel>
+      <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label">
+        {options.map((item) => {
+          const { label, checked, value } = item;
+          return (
+            <FormControlLabel
+              key={value}
+              value={value}
+              label={label}
+              control={
+                <Checkbox checked={checked} onChange={() => {}} name={value} />
+              }
+            />
+          );
+        })}
+      </RadioGroup>
+    </FormControl>
+  );
+};
+
 const ItemChild = (props) => {
   let {
     type = "",
@@ -60,7 +363,7 @@ const ItemChild = (props) => {
     render,
     onChange = () => {},
     value,
-    required,
+
     options = [],
     label,
     name,
@@ -69,7 +372,7 @@ const ItemChild = (props) => {
 
   type = type ? type.toLowerCase() : type;
 
-  const { readOnly, disabled } = formProps;
+  const { readOnly, disabled, required } = formProps;
 
   const mapTpye = {
     textarea: (
@@ -105,30 +408,7 @@ const ItemChild = (props) => {
     //     value={value}
     //     onChange={onChange}></InputNumber>
     // ),
-    radio: (
-      <FormControl error>
-        <FormLabel error id="demo-row-radio-buttons-group-label">
-          {label}
-        </FormLabel>
-        <RadioGroup
-          error
-          row
-          aria-labelledby="demo-row-radio-buttons-group-label"
-          name="row-radio-buttons-group">
-          {options.map((item) => {
-            const { label, checked, value } = item;
-            return (
-              <FormControlLabel
-                key={value}
-                value={value}
-                control={<Radio />}
-                label={label}
-              />
-            );
-          })}
-        </RadioGroup>
-      </FormControl>
-    ),
+    radio: <FromRadio label={label} options={options} error={error} />,
     rate: (
       <Rate
         {...formProps}
@@ -137,36 +417,36 @@ const ItemChild = (props) => {
         onChange={onChange}></Rate>
     ),
     select: (
-      <FormControl fullWidth size="small" error={true}>
-        <InputLabel error id={`${label}-simple-select-label`}>
-          {label}
-        </InputLabel>
-        <Select
-          error
-          labelId={`${label}-simple-select-label`}
-          id={`${label}-simple-select`}
-          label={label}
-          {...formProps}>
-          {options.map((item) => {
-            const { label, value } = item;
-            return (
-              <MenuItem key={value} value={value}>
-                {label}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
+      <FromSelect
+        fullWidth
+        size="small"
+        error={error}
+        label={label}
+        options={options}
+        {...formProps}
+      />
     ),
+
+    multipleSelect: (
+      <FromMultipleSelect
+        fullWidth
+        size="small"
+        error={error}
+        label={label}
+        options={options}
+        {...formProps}
+      />
+    ),
+
     switch: (
-      <FormControl error>
-        <FormLabel error id="demo-row-radio-buttons-group-label">
-          {label}
-        </FormLabel>
-        <FormGroup error>
-          <FormControlLabel control={<Switch />} label={label} />
-        </FormGroup>
-      </FormControl>
+      <FromSwitch
+        fullWidth
+        size="small"
+        error={error}
+        label={label}
+        options={options}
+        {...formProps}
+      />
     ),
     slider: (
       <Slider
@@ -195,33 +475,14 @@ const ItemChild = (props) => {
         onChange={onChange}></Transfer>
     ),
     checkbox: (
-      <FormControl error>
-        <FormLabel error id="demo-row-radio-buttons-group-label">
-          {label}
-        </FormLabel>
-        <RadioGroup
-          row
-          aria-labelledby="demo-row-radio-buttons-group-label"
-          name="row-radio-buttons-group">
-          {options.map((item) => {
-            const { label, checked, value } = item;
-            return (
-              <FormControlLabel
-                key={value}
-                value={value}
-                control={
-                  <Checkbox
-                    checked={checked}
-                    onChange={() => {}}
-                    name={value}
-                  />
-                }
-                label={label}
-              />
-            );
-          })}
-        </RadioGroup>
-      </FormControl>
+      <FromCheckbox
+        fullWidth
+        size="small"
+        error={error}
+        label={label}
+        options={options}
+        {...formProps}
+      />
     )
   };
 
@@ -235,116 +496,6 @@ const ItemChild = (props) => {
     : type in mapTpye
     ? mapTpye[type]
     : null;
-};
-
-const $ItemChild = (props) => {
-  let {
-    type = "",
-    props: formProps = {},
-    component,
-    render,
-    onChange = () => {},
-    value = "",
-    required
-  } = props;
-  type = type ? type.toLowerCase() : type;
-
-  const { readOnly, disabled } = formProps;
-
-  const mapTpye = {
-    textarea: (
-      <TextArea
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}
-        rows={4}
-      />
-    ),
-    input: (
-      <TextField
-        disabled={readOnly || disabled}
-        className="full-width"
-        required={required}
-        // placeholder="请输入用户名/手机号/邮箱"
-        variant="outlined"
-        size="small"
-        {...formProps}
-      />
-    ),
-    inputnumber: (
-      <InputNumber
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></InputNumber>
-    ),
-    radio: (
-      <Radio
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Radio>
-    ),
-    rate: (
-      <Rate
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Rate>
-    ),
-    select: (
-      <Select
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Select>
-    ),
-    switch: (
-      <Switch
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Switch>
-    ),
-    slider: (
-      <Slider
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Slider>
-    ),
-    timepicker: (
-      <TimePicker
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></TimePicker>
-    ),
-    transfer: (
-      <Transfer
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Transfer>
-    ),
-    checkbox: (
-      <Checkbox
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Checkbox>
-    ),
-    password: (
-      <Password
-        {...formProps}
-        disabled={readOnly || disabled}
-        value={value}
-        onChange={onChange}></Password>
-    )
-  };
-
-  return type in mapTpye ? mapTpye[type] : null;
 };
 
 const BaseForm = (props) => {
@@ -495,8 +646,17 @@ const SearchForm = createForm()((props) => {
     form
   } = props;
 
-  console.log("props=======", props);
-  debugger;
+  const { validateFields } = form;
+
+  const onSubmit = async () => {
+    validateFields((error, values) => {
+      if (!error) {
+        onFinish(values);
+      } else {
+        console.error(error);
+      }
+    });
+  };
 
   // const [form] = Form.useForm();
 
@@ -571,7 +731,6 @@ const SearchForm = createForm()((props) => {
         rules = [],
         options = []
       } = item;
-      console.log("item=====", item);
 
       fieldsVonde.push(
         <div key={index} className={`span span-${span}`}>
@@ -622,7 +781,11 @@ const SearchForm = createForm()((props) => {
             )}
           </a>
         )}
-        <Button type="primary" htmlType="submit">
+        <Button
+          type="primary"
+          onClick={() => {
+            onSubmit();
+          }}>
           搜索
         </Button>
         <Button htmlType="button" onClick={onFill}>

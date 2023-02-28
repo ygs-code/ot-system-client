@@ -68,7 +68,7 @@ export default setBreadcrumbAndTitle({
           span: 1,
           rules: [
             {
-              required: true,
+              // required: true,
               message: "请输入用户名或手机号或邮箱"
             },
             {
@@ -85,7 +85,7 @@ export default setBreadcrumbAndTitle({
             }
           ],
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
           }
         },
@@ -94,14 +94,77 @@ export default setBreadcrumbAndTitle({
           name: "id",
           type: "input",
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
-          }
+          },
+          rules: [
+            {
+              required: true,
+              message: "请输入用户名或手机号或邮箱"
+            },
+            {
+              validator: (rule, value) => {
+                if (
+                  checkUser(value) ||
+                  checkPhone(value) ||
+                  checkEmail(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("格式不正确请重新输入");
+              }
+            }
+          ]
         },
+        // {
+        //   label: "select",
+        //   name: "age",
+        //   type: "select",
+        //   options: [
+        //     {
+        //       label: "1-10岁",
+        //       value: "1-10"
+        //     },
+        //     {
+        //       label: "11-20岁",
+        //       value: "11-20"
+        //     },
+        //     {
+        //       label: "21-30岁",
+        //       value: "21-30"
+        //     },
+        //     {
+        //       label: "31-40岁",
+        //       value: "31-40"
+        //     }
+        //   ],
+        //   rules: [
+        //     {
+        //       required: true,
+        //       message: "请输入用户名或手机号或邮箱"
+        //     },
+        //     {
+        //       validator: (rule, value) => {
+        //         if (
+        //           checkUser(value) ||
+        //           checkPhone(value) ||
+        //           checkEmail(value)
+        //         ) {
+        //           return Promise.resolve();
+        //         }
+        //         return Promise.reject("格式不正确请重新输入");
+        //       }
+        //     }
+        //   ],
+        //   props: {
+        //     required: true,
+        //     placeholder: "请输入用户名/手机号/邮箱"
+        //   }
+        // },
         {
-          label: "select",
-          name: "age",
-          type: "select",
+          label: "multipleSelect",
+          name: "multipleSelect",
+          type: "multipleSelect",
           options: [
             {
               label: "1-10岁",
@@ -120,19 +183,108 @@ export default setBreadcrumbAndTitle({
               value: "31-40"
             }
           ],
+          rules: [
+            {
+              required: true,
+              message: "请输入用户名或手机号或邮箱"
+            },
+            {
+              validator: (rule, value) => {
+                if (
+                  checkUser(value) ||
+                  checkPhone(value) ||
+                  checkEmail(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("格式不正确请重新输入");
+              }
+            }
+          ],
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
           }
         },
+        // {
+        //   label: "multipleSelect",
+        //   name: "multipleSelect",
+        //   type: "multipleSelect",
+        //   options: [
+        //     {
+        //       label: "1-10岁",
+        //       value: "1-10"
+        //     },
+        //     {
+        //       label: "11-20岁",
+        //       value: "11-20"
+        //     },
+        //     {
+        //       label: "21-30岁",
+        //       value: "21-30"
+        //     },
+        //     {
+        //       label: "31-40岁",
+        //       value: "31-40"
+        //     }
+        //   ],
+        //   rules: [
+        //     {
+        //       required: true,
+        //       message: "请输入用户名或手机号或邮箱"
+        //     },
+        //     {
+        //       validator: (rule, value) => {
+        //         if (
+        //           checkUser(value) ||
+        //           checkPhone(value) ||
+        //           checkEmail(value)
+        //         ) {
+        //           return Promise.resolve();
+        //         }
+        //         return Promise.reject("格式不正确请重新输入");
+        //       }
+        //     }
+        //   ],
+        //   props: {
+        //     required: true,
+        //     placeholder: "请输入用户名/手机号/邮箱"
+        //   }
+        // },
+
         {
           label: "切换",
           name: "switch",
           type: "switch",
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
-          }
+          },
+          rules: [
+            {
+              required: true,
+              message: "请输入用户名或手机号或邮箱"
+            },
+            {
+              validator: (rule, value) => {
+                console.log("value============", value);
+                if (
+                  checkUser(value) ||
+                  checkPhone(value) ||
+                  checkEmail(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("格式不正确请重新输入");
+              }
+            }
+          ],
+          options: [
+            {
+              label: "switch",
+              value: true
+            }
+          ]
         },
         {
           label: "checkbox",
@@ -157,9 +309,27 @@ export default setBreadcrumbAndTitle({
             }
           ],
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
-          }
+          },
+          rules: [
+            {
+              required: true,
+              message: "请输入用户名或手机号或邮箱"
+            },
+            {
+              validator: (rule, value) => {
+                if (
+                  checkUser(value) ||
+                  checkPhone(value) ||
+                  checkEmail(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("格式不正确请重新输入");
+              }
+            }
+          ]
         },
         {
           label: "radio",
@@ -183,8 +353,26 @@ export default setBreadcrumbAndTitle({
               value: "31-40"
             }
           ],
+          rules: [
+            {
+              required: true,
+              message: "请输入用户名或手机号或邮箱"
+            },
+            {
+              validator: (rule, value) => {
+                if (
+                  checkUser(value) ||
+                  checkPhone(value) ||
+                  checkEmail(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("格式不正确请重新输入");
+              }
+            }
+          ],
           props: {
-            require: true,
+            required: true,
             placeholder: "请输入用户名/手机号/邮箱"
           }
         }
