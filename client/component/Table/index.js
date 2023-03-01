@@ -9,6 +9,7 @@
 
 import "./index.less";
 
+import { PaginationItem, TablePagination } from "@mui/material";
 import { Pagination, Table } from "antd";
 import React, { useEffect, useState } from "react";
 
@@ -117,6 +118,9 @@ const Index = (props) => {
           ...$rowSelection
         };
 
+  console.log("pageNum==", pageNum);
+  console.log("pageSize==", pageSize);
+  console.log("total==", total);
   return (
     <div className="table-box">
       <div className="table">
@@ -130,6 +134,43 @@ const Index = (props) => {
       </div>
 
       <div className="pagination-box">
+        <TablePagination
+          component="div"
+          labelRowsPerPage="每页行数"
+          count={total}
+          page={pageNum}
+          rowsPerPage={pageSize}
+          labelDisplayedRows={({ from, to, count }) => {
+            return `${from}–${to} 总条数 ${
+              count !== -1 ? count : `more than ${to}`
+            }`;
+          }}
+          renderItem={(item) => <PaginationItem {...item} />}
+          getItemAriaLabel={(type, page, selected) => {
+            return {
+              type: "page",
+
+              page: 1,
+              selected: true
+            };
+          }}
+          onPageChange={(event, newPage) => {
+            if (newPage <= 0) {
+              return false;
+            }
+            onChange({
+              pageNum: newPage,
+              pageSize
+            });
+          }}
+          onRowsPerPageChange={({ target }) => {
+            onChange({
+              pageNum,
+              pageSize: target.value
+            });
+          }}
+        />
+
         <Pagination
           className="ant-pagination ant-table-pagination ant-table-pagination-right ant-table-pagination-right"
           showSizeChanger

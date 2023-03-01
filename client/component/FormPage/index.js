@@ -8,7 +8,7 @@
  */
 import "./index.less";
 
-import { Button } from "antd";
+import { Button, Paper, TextField } from "@mui/material";
 import Form from "client/component/Form1";
 import React, { PureComponent } from "react";
 
@@ -95,12 +95,16 @@ export default class extends PureComponent {
     return (
       <div className="button-box">
         {!readOnly ? (
-          <Button type="primary" loading={loading} onClick={this.onValidaForm}>
+          <Button
+            variant="contained"
+            loading={loading}
+            onClick={this.onValidaForm}>
             确认
           </Button>
         ) : null}
         <Button
           loading={loading}
+          variant="outlined"
           onClick={() => {
             history.back();
           }}>

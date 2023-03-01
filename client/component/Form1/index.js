@@ -556,7 +556,7 @@ const BaseForm = createForm()((props) => {
   return (
     <div className="base-form">
       {initialValuesFlag ? (
-        <Box sx={{ width: "100%" }}>
+        <Box sx={{ width: "500px" }}>
           {fields.map((item, index) => {
             const {
               type,
