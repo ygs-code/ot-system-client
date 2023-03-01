@@ -9,55 +9,19 @@
 
 import React, { cloneElement } from "react";
 
-let html = (
-  <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
-    <div className="ant-row ant-form-item-row">
-      <div className="ant-col ant-col-4 ant-form-item-label">
-        <label
-          htmlFor="basic_name"
-          className="ant-form-item-required"
-          title="用户名称">
-          用户名称
-        </label>
-      </div>
-      <div className="ant-col ant-col-8 ant-form-item-control">
-        <div className="ant-form-item-control-input">
-          <div className="ant-form-item-control-input-content">
-            <span className="ant-input-affix-wrapper ant-input-affix-wrapper-status-error">
-              <input
-                maxLength="20"
-                className="ant-input ant-input-status-error"
-                type="text"
-                value=""
-              />
-              <span className="ant-input-suffix">
-                <span className="ant-input-show-count-suffix">0 / 20</span>
-              </span>
-            </span>
-          </div>
-        </div>
-        <div style="display: flex; flex-wrap: nowrap;">
-          <div
-            id="basic_name_help"
-            className="ant-form-item-explain ant-form-item-explain-connected"
-            role="alert">
-            <div className="ant-form-item-explain-error" style="">
-              请输入用户名称
-            </div>
-          </div>
-          <div style="width: 0px; height: 24px;"></div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="ant-form-item-margin-offset"
-      style="margin-bottom: -24px;"></div>
-  </div>
-);
-
 const Item = (props) => {
-  const { value, onChange, span = 24, children, errors, label, extra } = props;
-
+  const {
+    value,
+    onChange,
+    span = 24,
+    children,
+    errors,
+    label,
+    extra,
+    name
+  } = props;
+  console.log("children====", children);
+  debugger;
   return (
     <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
       <div className="ant-row ant-form-item-row">
@@ -80,6 +44,7 @@ const Item = (props) => {
                 // helperText: getFieldError(name)
                 //   ? getFieldError(name).join(",")
                 //   : null,
+                name,
                 label,
                 error: !!errors,
                 value,
@@ -121,8 +86,6 @@ const Index = (props) => {
     rules = [],
     extra
   } = props;
-
-  console.log("extra======", extra);
 
   const errors = getFieldError(name) ? getFieldError(name).join(",") : null;
 

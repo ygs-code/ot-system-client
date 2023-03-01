@@ -9,7 +9,7 @@
 import "./index.less";
 
 import { Button } from "antd";
-import Form from "client/component/Form";
+import Form from "client/component/Form1";
 import React, { PureComponent } from "react";
 
 export default class extends PureComponent {

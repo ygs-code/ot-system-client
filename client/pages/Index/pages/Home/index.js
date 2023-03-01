@@ -74,13 +74,13 @@ export default setBreadcrumbAndTitle({
             },
             {
               validator: (rule, value) => {
-                if (
-                  checkUser(value) ||
-                  checkPhone(value) ||
-                  checkEmail(value)
-                ) {
-                  return Promise.resolve();
-                }
+                // if (
+                //   checkUser(value) ||
+                //   checkPhone(value) ||
+                //   checkEmail(value)
+                // ) {
+                //   return Promise.resolve();
+                // }
                 return Promise.reject("格式不正确请重新输入");
               }
             }
@@ -209,96 +209,6 @@ export default setBreadcrumbAndTitle({
             placeholder: "请输入用户名/手机号/邮箱"
           }
         },
-        // {
-        //   label: "multipleSelect",
-        //   name: "names",
-        //   type: "multipleSelect",
-        //   options: [
-        //     {
-        //       label: "1-10岁",
-        //       value: "1-10"
-        //     },
-        //     {
-        //       label: "11-20岁",
-        //       value: "11-20"
-        //     },
-        //     {
-        //       label: "21-30岁",
-        //       value: "21-30"
-        //     },
-        //     {
-        //       label: "31-40岁",
-        //       value: "31-40"
-        //     }
-        //   ],
-        //   rules: [
-        //     {
-        //       required: true,
-        //       message: "请输入用户名或手机号或邮箱"
-        //     },
-        //     {
-        //       validator: (rule, value) => {
-        //         if (
-        //           checkUser(value) ||
-        //           checkPhone(value) ||
-        //           checkEmail(value)
-        //         ) {
-        //           return Promise.resolve();
-        //         }
-        //         return Promise.reject("格式不正确请重新输入");
-        //       }
-        //     }
-        //   ],
-        //   props: {
-        //     required: true,
-        //     placeholder: "请输入用户名/手机号/邮箱"
-        //   }
-        // },
-        // {
-        //   label: "multipleSelect",
-        //   name: "multipleSelect",
-        //   type: "multipleSelect",
-        //   options: [
-        //     {
-        //       label: "1-10岁",
-        //       value: "1-10"
-        //     },
-        //     {
-        //       label: "11-20岁",
-        //       value: "11-20"
-        //     },
-        //     {
-        //       label: "21-30岁",
-        //       value: "21-30"
-        //     },
-        //     {
-        //       label: "31-40岁",
-        //       value: "31-40"
-        //     }
-        //   ],
-        //   rules: [
-        //     {
-        //       required: true,
-        //       message: "请输入用户名或手机号或邮箱"
-        //     },
-        //     {
-        //       validator: (rule, value) => {
-        //         if (
-        //           checkUser(value) ||
-        //           checkPhone(value) ||
-        //           checkEmail(value)
-        //         ) {
-        //           return Promise.resolve();
-        //         }
-        //         return Promise.reject("格式不正确请重新输入");
-        //       }
-        //     }
-        //   ],
-        //   props: {
-        //     required: true,
-        //     placeholder: "请输入用户名/手机号/邮箱"
-        //   }
-        // },
 
         {
           label: "切换",
@@ -315,7 +225,6 @@ export default setBreadcrumbAndTitle({
             },
             {
               validator: (rule, value) => {
-                console.log("value============", value);
                 if (
                   checkUser(value) ||
                   checkPhone(value) ||

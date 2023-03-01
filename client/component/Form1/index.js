@@ -18,6 +18,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  getImageListItemBarUtilityClass,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -25,6 +26,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Skeleton,
   Slider,
   Switch,
   TextField
@@ -52,14 +54,18 @@ import { createForm } from "rc-form";
 import React, {
   Children,
   cloneElement,
+  createElement,
   useCallback,
   useEffect,
+  useMemo,
   useState
 } from "react";
 
 // const { Password, TextArea } = Input;
 const FromRadio = (props) => {
-  const { error, label, options = [], value, onChange, required } = props;
+  const { error, label, options = [], value, onChange, formProps = {} } = props;
+
+  const { required } = formProps;
 
   return (
     <FormControl
@@ -90,11 +96,14 @@ const FromSelect = (props) => {
     error,
     label,
     options = [],
-    value = [],
+    value,
     onChange,
     formProps = {},
-    required
+    name
   } = props;
+
+  const { required } = formProps;
+
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -107,8 +116,11 @@ const FromSelect = (props) => {
   };
 
   return (
-    <FormControl fullWidth size="small" error={error}>
-      <InputLabel error={error} id={`${label}-simple-select-label`}>
+    <FormControl value={value} fullWidth size="small" error={error}>
+      <InputLabel
+        value={value}
+        error={error}
+        id={`${name}-simple-select-label`}>
         {required ? label + " *" : label}
       </InputLabel>
       <Select
@@ -116,10 +128,18 @@ const FromSelect = (props) => {
           onChange(target.value);
         }}
         error={error}
-        labelId={`${label}-simple-select-label`}
-        id={`${label}-simple-select`}
+        labelId={`${name}-simple-select-label`}
+        id={`${name}-simple-select`}
         label={required ? label + " *" : label}
         value={value}
+        defaultValue={value}
+        // displayEmpty
+        name={name}
+        // inputProps={{ "aria-label": "Without label" }}
+        // inputProps={{
+        //   name: name,
+        //   id: `${name}-simple-select-label`
+        // }}
         {...formProps}>
         {options.map((item) => {
           const { label, value: $value } = item;
@@ -141,9 +161,10 @@ const FromMultipleSelect = (props) => {
     options = [],
     value = [],
     onChange,
-    formProps = {},
-    required
+    formProps = {}
   } = props;
+
+  const { required } = formProps;
 
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -196,15 +217,9 @@ const FromMultipleSelect = (props) => {
 };
 
 const FromSwitch = (props) => {
-  const {
-    error,
-    label,
-    options = [],
-    value,
-    onChange,
-    formProps = {},
-    required
-  } = props;
+  const { error, label, options = [], value, onChange, formProps = {} } = props;
+
+  const { required } = formProps;
 
   return (
     <FormControl
@@ -242,11 +257,10 @@ const FromCheckbox = (props) => {
     options = [],
     value = [],
     onChange,
-    formProps = {},
-    required
+    formProps = {}
   } = props;
+  const { required } = formProps;
 
-  [].includes;
   return (
     <FormControl
       onChange={({ target }) => {
@@ -308,8 +322,65 @@ const FromTextField = (props) => {
   );
 };
 
+const FromRender = (props) => {
+  const {
+    error,
+    label,
+    options = [],
+    value = [],
+    onChange,
+    formProps = {},
+    children,
+    initialValue
+  } = props;
+  const { required } = formProps;
+
+  return (
+    <FormControl error={error}>
+      <FormLabel>{required ? label + " *" : label}</FormLabel>
+      {createElement(children, {
+        ...props,
+        render: undefined,
+        value: value === undefined ? initialValue : value
+      })}
+    </FormControl>
+  );
+};
+
+const FromComponent = (props) => {
+  const {
+    error,
+    label,
+    options = [],
+    value = [],
+    onChange,
+    formProps = {},
+    children,
+    initialValue
+  } = props;
+  const { required } = formProps;
+
+  return (
+    <FormControl error={error}>
+      <FormLabel>{required ? label + " *" : label}</FormLabel>
+      {cloneElement(children, {
+        ...props,
+        render: undefined,
+        value: value === undefined ? initialValue : value
+      })}
+    </FormControl>
+  );
+};
+
 const ItemChild = (props) => {
-  let { type = "", props: formProps = {}, component, render } = props;
+  let {
+    type = "",
+    props: formProps = {},
+    component,
+    render,
+    value,
+    initialValue
+  } = props;
 
   type = type ? type.toLowerCase() : type;
 
@@ -411,152 +482,208 @@ const ItemChild = (props) => {
     )
   };
 
-  return render
-    ? render({
-        ...props,
-        render: undefined
-      })
-    : component
-    ? component
-    : type in mapTpye
-    ? mapTpye[type]
-    : null;
+  return render ? (
+    <FromRender {...props}>{render}</FromRender>
+  ) : // render({
+  //     ...props,
+  //     render: undefined,
+  //     value: value === undefined ? initialValue : value
+  //   })
+  component ? (
+    <FromComponent {...props}>{component}</FromComponent>
+  ) : type in mapTpye ? (
+    mapTpye[type]
+  ) : null;
 };
 
-// const BaseForm = (props) => {
-//   const {
-//     fields = [],
-//     formProps = {},
-//     onReady = () => {},
-//     children = [],
-//     onConfirm = () => {},
-//     // onReset = () => {},
-//     initialValues = {}
-//   } = props;
+const BaseForm = createForm()((props) => {
+  const {
+    fields = [],
+    formProps = {},
+    onReady = () => {},
+    children = [],
+    onConfirm = () => {},
+    // onReset = () => {},
+    initialValues = {},
+    form
+  } = props;
+  const [initialValuesFlag, setInitialValuesFlag] = useState(false);
+  const [values, setInitialValues] = useState({});
+  const { setFieldsValue } = form;
 
-//   const [form] = Form.useForm();
-//   const [formInitialValues, setFormInitialValues] = useState({});
+  console.log("fields=====", fields);
 
-//   const transformInitialValues = useCallback(async (initialValues) => {
-//     if (CheckDataType.isFunction(initialValues)) {
-//       return initialValues(form);
-//     }
-//     if (CheckDataType.isPromise(initialValues)) {
-//       return await initialValues(form);
-//     }
+  const transformInitialValues = useCallback(async (initialValues) => {
+    if (CheckDataType.isFunction(initialValues)) {
+      return initialValues(form);
+    }
+    if (CheckDataType.isPromise(initialValues)) {
+      return await initialValues(form);
+    }
 
-//     return initialValues;
-//   }, []);
-//   const getInitialValues = useCallback(async () => {
-//     const vavlues = await transformInitialValues(initialValues);
-//     setFormInitialValues(vavlues);
-//   }, []);
+    return initialValues;
+  }, []);
+  const getInitialValues = useCallback(async () => {
+    const values = await transformInitialValues(initialValues);
+    setInitialValues(values);
+    setInitialValuesFlag(true);
+    // setFieldsValue(vavlues);
+  }, []);
 
-//   useEffect(() => {
-//     getInitialValues();
-//   }, []);
+  useEffect(() => {
+    getInitialValues();
+  }, []);
 
-//   // initialValues
-//   const onFinish = (values) => {
-//     console.log("Success:", values);
-//     onConfirm(values);
-//   };
+  const getValue = useCallback(
+    (name) => {
+      return values[name];
+    },
+    [values]
+  );
 
-//   const onFinishFailed = (errorInfo) => {
-//     console.log("Failed:", errorInfo);
-//   };
-//   useEffect(() => {
-//     onReady(form);
-//   }, [form]);
+  const onFinish = (values) => {
+    console.log("Success:", values);
+    onConfirm(values);
+  };
 
-//   return (
-//     <div className="base-form">
-//       <Form
-//         key={JSON.stringify(formInitialValues)}
-//         form={form}
-//         name="basic"
-//         labelCol={{
-//           span: 4
-//         }}
-//         wrapperCol={{
-//           span: 8
-//         }}
-//         initialValues={formInitialValues}
-//         onFinish={onFinish}
-//         onFinishFailed={onFinishFailed}
-//         {...formProps}>
-//         {fields.map((item, index) => {
-//           const {
-//             type,
-//             title,
-//             items = [],
-//             render,
-//             itemProps = {},
-//             label,
-//             name,
-//             props = {},
-//             options = [],
-//             rules
-//           } = item;
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+  useEffect(() => {
+    onReady(form);
+  }, [form]);
 
-//           return type !== "section" ? (
-//             <Form.Item
-//               rules={rules}
-//               label={label}
-//               name={name}
-//               {...itemProps}
-//               key={index}>
-//               <ItemChild
-//                 type={type}
-//                 props={props}
-//                 options={options}
-//                 render={render}></ItemChild>
-//             </Form.Item>
-//           ) : (
-//             <div className="section" key={index}>
-//               <div className="title">{title}</div>
-//               {items.map(($item, index) => {
-//                 const {
-//                   render,
-//                   itemProps = {},
-//                   label,
-//                   name,
-//                   options = [],
-//                   props = {},
-//                   type,
-//                   rules
-//                 } = $item;
+  return (
+    <div className="base-form">
+      {initialValuesFlag ? (
+        <Box sx={{ width: "100%" }}>
+          {fields.map((item, index) => {
+            const {
+              type,
+              title,
+              items = [],
+              render,
+              itemProps = {},
+              label,
+              name,
+              props = {},
+              options = [],
+              rules,
+              extra,
+              component
+            } = item;
+            const { initialValue = getValue(name) } = item;
 
-//                 return (
-//                   <Form.Item
-//                     label={label}
-//                     name={name}
-//                     rules={rules}
-//                     {...itemProps}
-//                     key={index}>
-//                     <ItemChild
-//                       type={type}
-//                       props={props}
-//                       options={options}
-//                       render={render}></ItemChild>
-//                   </Form.Item>
-//                 );
-//               })}
-//             </div>
-//           );
-//         })}
+            return type !== "section" ? (
+              <div className="item" key={index}>
+                <FormItem
+                  initialValue={initialValue}
+                  extra={extra}
+                  rules={rules}
+                  form={form}
+                  label={label}
+                  name={name}>
+                  {ItemChild({
+                    type,
+                    props,
+                    options,
+                    label,
+                    name,
+                    render,
+                    initialValue,
+                    component
+                  })}
+                </FormItem>
+              </div>
+            ) : (
+              <div className="section" key={index}>
+                <div className="title">{title}</div>
+                {items.map(($item, $index) => {
+                  const {
+                    render,
+                    itemProps = {},
+                    label,
+                    name,
+                    options = [],
+                    props = {},
+                    type,
+                    rules,
+                    extra,
+                    component
+                    // initialValue = getValue(name)
+                  } = $item;
+                  const { initialValue = getValue(name) } = $item;
+                  return (
+                    <div key={`${index}_${$index}`} className="item">
+                      <FormItem
+                        initialValue={initialValue}
+                        extra={extra}
+                        rules={rules}
+                        form={form}
+                        label={label}
+                        name={name}>
+                        {ItemChild({
+                          type,
+                          props,
+                          options,
+                          label,
+                          name,
+                          render,
+                          initialValue,
+                          component
+                        })}
+                      </FormItem>
+                    </div>
 
-//         {/* 子节点 */}
-//         {Children.map(
-//           CheckDataType.isFunction(children) ? children() : children,
-//           (child) => {
-//             return cloneElement(child, props);
-//           }
-//         )}
-//       </Form>
-//     </div>
-//   );
-// };
+                    // <Form.Item
+                    //   label={label}
+                    //   name={name}
+                    //   rules={rules}
+                    //   {...itemProps}
+                    //   key={index}>
+                    //   <ItemChild
+                    //     type={type}
+                    //     props={props}
+                    //     options={options}
+                    //     render={render}></ItemChild>
+                    // </Form.Item>
+                  );
+                })}
+              </div>
+            );
+          })}
+          {/* 子节点 */}
+          {Children.map(
+            CheckDataType.isFunction(children) ? children() : children,
+            (child) => {
+              return cloneElement(child, props);
+            }
+          )}
+        </Box>
+      ) : (
+        <>
+          {fields.reduce((acc, item, index) => {
+            const { type, items = [] } = item;
+            if (type == "section") {
+              for (let [$index, $item] of items.entries()) {
+                acc.push(
+                  <Skeleton
+                    className="item"
+                    height={40}
+                    key={`${index}_${$index}`}
+                  />
+                );
+              }
+            } else {
+              acc.push(<Skeleton className="item" height={35} key={index} />);
+            }
+            return acc;
+          }, [])}
+        </>
+      )}
+    </div>
+  );
+});
 
 const SearchForm = createForm()((props) => {
   const {
@@ -582,8 +709,6 @@ const SearchForm = createForm()((props) => {
       }
     });
   };
-
-  // const [form] = Form.useForm();
 
   const [formInitialValues, setFormInitialValues] = useState({});
 
@@ -657,12 +782,15 @@ const SearchForm = createForm()((props) => {
         props,
         rules = [],
         options = [],
-        extra
+        extra,
+        render,
+        initialValue
       } = item;
 
       fieldsVonde.push(
         <div key={index} className={`span span-${span}`}>
           <FormItem
+            initialValue={initialValue}
             extra={extra}
             rules={rules}
             form={form}
@@ -673,17 +801,9 @@ const SearchForm = createForm()((props) => {
               props,
               options,
               label,
-              name
+              name,
+              render
             })}
-            {/* <ItemChild type={type} props={props}></ItemChild> */}
-            {/*
-            <TextField
-              className="full-width"
-              required
-              placeholder="请输入用户名/手机号/邮箱"
-              variant="outlined"
-              size="small"
-            /> */}
           </FormItem>
         </div>
       );
@@ -737,5 +857,5 @@ const SearchForm = createForm()((props) => {
   );
 });
 // BaseForm.SearchForm=SearchForm
-// export default BaseForm;
+export default BaseForm;
 export { SearchForm };

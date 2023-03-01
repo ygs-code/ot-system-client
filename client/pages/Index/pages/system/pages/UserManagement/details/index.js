@@ -8,6 +8,11 @@ import { mapRedux } from "client/redux";
 import { addRouterApi, routePaths } from "client/router";
 import React from "react";
 
+const Node = (props) => {
+  const { value } = props;
+
+  return <div> {value}</div>;
+};
 class Index extends FormPage {
   constructor(props) {
     super(props);
@@ -72,12 +77,12 @@ class Index extends FormPage {
           {
             label: "用户ID",
             name: "id",
+            component: <Node />,
+            // render: (props) => {
+            //   const { value } = props;
 
-            render: (props) => {
-              const { value } = props;
-
-              return <div>{value}</div>;
-            },
+            //   return <div> 阿斯蒂芬是的范德萨发 {value}</div>;
+            // },
             rules: []
           },
           {
@@ -137,6 +142,17 @@ class Index extends FormPage {
             label: "用户类型",
             name: "type",
             type: "select",
+            initialValue: 1,
+            options: [
+              {
+                label: "管理员",
+                value: 1
+              },
+              {
+                label: "会员",
+                value: 2
+              }
+            ],
             props: {
               readOnly,
               options: [
