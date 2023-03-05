@@ -22,7 +22,7 @@ module.exports = {
       {
         test: /\.css$/i,
         // 排除文件,因为这些包已经编译过，无需再次编译  不排除bootstrap
-        exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
+        // exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
         use: [
           // 'thread-loader',
           MiniCssExtractPlugin.loader,
@@ -53,7 +53,7 @@ module.exports = {
       {
         test: /\.less$/i,
         // 排除文件,因为这些包已经编译过，无需再次编译  不排除bootstrap
-        exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
+        // exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
         use: [
           // 'thread-loader',
           // compiles Less to CSS

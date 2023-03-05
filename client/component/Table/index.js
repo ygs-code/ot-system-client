@@ -8,8 +8,12 @@
  */
 
 import "./index.less";
+import "ag-grid-enterprise";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
 import { PaginationItem, TablePagination } from "@mui/material";
+import { AgGridColumn, AgGridReact } from "ag-grid-react";
 import { Pagination, Table } from "antd";
 import React, { useEffect, useState } from "react";
 
@@ -123,6 +127,45 @@ const Index = (props) => {
   console.log("total==", total);
   return (
     <div className="table-box">
+      <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
+        <AgGridReact
+          rowSelection="multiple"
+          gridOptions={{
+            columnDefs: [
+              { headerName: "Make", field: "make" },
+              { headerName: "Model", field: "model" },
+              {
+                headerName: "Price",
+                field: "price",
+                pinned: "right",
+                width: "200px"
+              }
+            ]
+            // defaultColDef: {
+            //   // set every column width
+            //   width: 100,
+            //   // make every column editable
+            //   editable: true,
+            //   // make every column use 'text' filter by default
+            //   filter: "agTextColumnFilter"
+            // }
+          }}
+          defaultColDef={{
+            // set every column width
+            width: "400px",
+            // make every column editable
+            editable: true,
+            // make every column use 'text' filter by default
+            filter: "agTextColumnFilter"
+          }}
+          // 重写getColumns
+          rowData={[
+            { make: "Toyota", model: "Celica", price: 35000 },
+            { make: "Ford", model: "Mondeo", price: 32000 },
+            { make: "Porsche", model: "Boxter", price: 72000 }
+          ]}></AgGridReact>
+      </div>
+
       <div className="table">
         <Table
           {...tableProps}

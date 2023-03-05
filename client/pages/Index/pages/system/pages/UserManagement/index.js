@@ -156,7 +156,8 @@ class Index extends Component {
         dataIndex: "actions",
         key: "actions",
         width: 300,
-        render: (text, row) => {
+        render: ({ row = {} } = {}) => {
+          console.log("row=======", row);
           const { id } = row;
 
           return (
