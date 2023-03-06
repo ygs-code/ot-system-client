@@ -9,7 +9,7 @@
 
 import "./index.less";
 
-import { SearchForm } from "client/component/Form";
+import { SearchForm } from "client/component/Form1";
 import Table from "client/component/Table";
 import React from "react"; // , { memo, PureComponent }
 

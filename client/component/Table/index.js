@@ -8,14 +8,66 @@
  */
 
 import "./index.less";
-import "ag-grid-enterprise";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import { PaginationItem, TablePagination } from "@mui/material";
-import { AgGridColumn, AgGridReact } from "ag-grid-react";
-import { Pagination, Table } from "antd";
+import { Pagination, PaginationItem, TablePagination } from "@mui/material";
 import React, { useEffect, useState } from "react";
+
+const Table = (props) => {
+  const { columns = [], dataSource = [] } = props;
+  console.log("props==", props);
+  return (
+    <div className="ant-table-wrapper">
+      <div className="ant-spin-nested-loading">
+        <div className="ant-spin-container">
+          <div className="ant-table">
+            <div className="ant-table-container">
+              <div className="ant-table-content">
+                <table style={{ tableLayout: "auto" }}>
+                  <thead className="ant-table-thead">
+                    <tr>
+                      {columns.map((item, index) => {
+                        const { dataIndex, key, title } = item;
+                        return (
+                          <th
+                            key={key || dataIndex || index}
+                            className="ant-table-cell">
+                            {title}
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody className="ant-table-tbody">
+                    {dataSource.map((item, index) => {
+                      return (
+                        <tr
+                          data-row-key={index}
+                          className="ant-table-row ant-table-row-level-0">
+                          {columns.map(($item, $index) => {
+                            const { dataIndex, render } = $item;
+                            return (
+                              <td
+                                key={`${index}_${$index}`}
+                                className="ant-table-cell">
+                                {render
+                                  ? render(item[dataIndex], item)
+                                  : item[dataIndex]}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Index = (props) => {
   const {
@@ -127,45 +179,6 @@ const Index = (props) => {
   console.log("total==", total);
   return (
     <div className="table-box">
-      <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
-        <AgGridReact
-          rowSelection="multiple"
-          gridOptions={{
-            columnDefs: [
-              { headerName: "Make", field: "make" },
-              { headerName: "Model", field: "model" },
-              {
-                headerName: "Price",
-                field: "price",
-                pinned: "right",
-                width: "200px"
-              }
-            ]
-            // defaultColDef: {
-            //   // set every column width
-            //   width: 100,
-            //   // make every column editable
-            //   editable: true,
-            //   // make every column use 'text' filter by default
-            //   filter: "agTextColumnFilter"
-            // }
-          }}
-          defaultColDef={{
-            // set every column width
-            width: "400px",
-            // make every column editable
-            editable: true,
-            // make every column use 'text' filter by default
-            filter: "agTextColumnFilter"
-          }}
-          // 重写getColumns
-          rowData={[
-            { make: "Toyota", model: "Celica", price: 35000 },
-            { make: "Ford", model: "Mondeo", price: 32000 },
-            { make: "Porsche", model: "Boxter", price: 72000 }
-          ]}></AgGridReact>
-      </div>
-
       <div className="table">
         <Table
           {...tableProps}
@@ -177,56 +190,12 @@ const Index = (props) => {
       </div>
 
       <div className="pagination-box">
-        <TablePagination
-          component="div"
-          labelRowsPerPage="每页行数"
-          count={total}
-          page={pageNum}
-          rowsPerPage={pageSize}
-          labelDisplayedRows={({ from, to, count }) => {
-            return `${from}–${to} 总条数 ${
-              count !== -1 ? count : `more than ${to}`
-            }`;
-          }}
-          renderItem={(item) => <PaginationItem {...item} />}
-          getItemAriaLabel={(type, page, selected) => {
-            return {
-              type: "page",
-
-              page: 1,
-              selected: true
-            };
-          }}
-          onPageChange={(event, newPage) => {
-            if (newPage <= 0) {
-              return false;
-            }
-            onChange({
-              pageNum: newPage,
-              pageSize
-            });
-          }}
-          onRowsPerPageChange={({ target }) => {
-            onChange({
-              pageNum,
-              pageSize: target.value
-            });
-          }}
-        />
-
         <Pagination
           className="ant-pagination ant-table-pagination ant-table-pagination-right ant-table-pagination-right"
-          showSizeChanger
-          showQuickJumper
-          defaultCurrent={pageNum}
-          current={pageNum}
-          defaultPageSize={pageSize}
-          total={total}
-          showTotal={(total) => `总共 ${total} 条`}
-          // rowKey={rowKey}
-          rowKey={(record) => record.uid}
-          {...paginationProps}
-          onChange={(pageNum, pageSize) => {
+          count={Math.ceil(total / 10)}
+          page={pageNum}
+          rowsPerPage={pageSize}
+          onChange={(event, pageNum) => {
             onChange({
               pageNum,
               pageSize

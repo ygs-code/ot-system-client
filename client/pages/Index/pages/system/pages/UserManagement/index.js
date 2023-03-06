@@ -47,42 +47,43 @@ class Index extends Component {
       {
         label: "用户Email",
         name: "email",
-        type: "input",
+        type: "input"
 
-        render: (props) => {
-          return <Input {...props}></Input>;
-        }
+        // render: (props) => {
+        //   const { value, onChange } = props;
+        //   console.log("props======", props);
+        //   return <Input onChange={onChange} value={value}></Input>;
+        // }
       },
       {
         label: "用户手机",
         name: "phone",
-        type: "input",
-        render: (props) => {
-          return <Input {...props}></Input>;
-        }
+        type: "input"
+        // render: (props) => {
+        //   const { value, onChange } = props;
+        //   return <Input onChange={onChange} value={value}></Input>;
+        // }
       },
       {
         label: "用户类型",
         name: "type",
         type: "select",
-        props: {
-          options: [
-            {
-              label: "全部类型",
-              value: ""
-            },
-            {
-              label: "管理员",
-              value: "1"
-            },
-            {
-              label: "会员",
-              value: "2"
-            }
-          ]
-        },
+        props: {},
         itemProps: {},
-        options: {}
+        options: [
+          {
+            label: "全部类型",
+            value: "all"
+          },
+          {
+            label: "管理员",
+            value: "1"
+          },
+          {
+            label: "会员",
+            value: "2"
+          }
+        ]
       }
     ];
   };

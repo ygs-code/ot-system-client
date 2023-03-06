@@ -101,6 +101,7 @@ const FromSelect = (props) => {
     formProps = {},
     name
   } = props;
+  console.log("props==", props);
 
   const { required } = formProps;
 
@@ -327,7 +328,7 @@ const FromRender = (props) => {
     error,
     label,
     options = [],
-    value = [],
+    value,
     onChange,
     formProps = {},
     children,
@@ -352,7 +353,7 @@ const FromComponent = (props) => {
     error,
     label,
     options = [],
-    value = [],
+    value,
     onChange,
     formProps = {},
     children,
@@ -788,7 +789,7 @@ const SearchForm = createForm()((props) => {
       } = item;
 
       fieldsVonde.push(
-        <div key={index} className={`span span-${span}`}>
+        <div key={index} className={`span margin-top-10  span-${span}`}>
           <FormItem
             initialValue={initialValue}
             extra={extra}
@@ -815,7 +816,7 @@ const SearchForm = createForm()((props) => {
     <div className="search-base-form-box">
       {renderFields(props)}
 
-      <div className={`buttons`}>
+      <div className={`buttons margin-top-10`}>
         {shrinkLength >= fields.length ? null : (
           <a
             style={{ fontSize: 12 }}

@@ -18,12 +18,13 @@ const Item = (props) => {
     errors,
     label,
     extra,
-    name
+    name,
+    className
   } = props;
-  console.log("children====", children);
-  debugger;
+
   return (
-    <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
+    <div
+      className={`ant-form-item ant-form-item-with-help ant-form-item-has-error ${className}`}>
       <div className="ant-row ant-form-item-row">
         {/*
 
@@ -84,7 +85,8 @@ const Index = (props) => {
     decoratorProps = {},
     initialValue,
     rules = [],
-    extra
+    extra,
+    className = ""
   } = props;
 
   const errors = getFieldError(name) ? getFieldError(name).join(",") : null;
@@ -101,6 +103,7 @@ const Index = (props) => {
       errors={errors}
       label={label}
       children={children}
+      className={className}
     />
   );
 };
