@@ -42,6 +42,7 @@ const Table = (props) => {
                       return (
                         <tr
                           data-row-key={index}
+                          key={index}
                           className="ant-table-row ant-table-row-level-0">
                           {columns.map(($item, $index) => {
                             const { dataIndex, render } = $item;

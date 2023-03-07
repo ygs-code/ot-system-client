@@ -18,7 +18,7 @@ import React, { useCallback, useEffect, useState } from "react";
 // };
 
 const Index = (props) => {
-  const { form = {} } = props;
+  const { form = {}, className = "" } = props;
 
   const [verifyCodeData, setVerifyCodeData] = useState({});
 
@@ -39,7 +39,7 @@ const Index = (props) => {
   return (
     <>
       <FormItem
-        className="margin-top-10"
+        className={className}
         // initialValue={123}
         rules={[
           {
@@ -67,7 +67,7 @@ const Index = (props) => {
       </FormItem>
 
       <div
-        className="margin-top-10"
+        className="padding-top-10"
         onClick={() => {
           verifyCode();
         }}

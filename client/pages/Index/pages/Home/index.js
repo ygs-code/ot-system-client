@@ -2,9 +2,10 @@ import "./index.less";
 
 import TextField from "@mui/material/TextField";
 import { SearchForm } from "client/component/Form1";
+import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
-import React, { memo } from "react";
+import React, { memo, useEffect, useRef } from "react";
 
 const Html = () => (
   <div className="ant-form-item ant-form-item-with-help ant-form-item-has-error">
@@ -58,6 +59,12 @@ export default setBreadcrumbAndTitle({
   title: "主页"
 })(
   memo((props) => {
+    const message = useRef(null);
+
+    useEffect(() => {
+      message.current.success("123123");
+    }, [message, message.current]);
+
     let shrinkLength = 5;
     const getSearchFields = () => {
       return [
@@ -337,6 +344,7 @@ export default setBreadcrumbAndTitle({
     };
     return (
       <div className="home">
+        <Message ref={message} />
         {/*
          <div className="title">《欢迎来到TO协同系统》</div>
          */}

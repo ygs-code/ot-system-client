@@ -1,6 +1,4 @@
-node_modules
 
-package-lock.json
 
 yarn-error.log
 
@@ -18,3 +16,15 @@ dist/
 
 *.lock
 
+
+
+
+package-lock.json
+
+dist/ 
+dist/* 
+dist/**/* 
+
+node_modules/ 
+node_modules/* 
+node_modules/**/* 
