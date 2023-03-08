@@ -14,5 +14,6 @@ export default {
   home: "/home",
   index: "/",
   logIn: "/log-in",
-  register: "/register"
+  register: "/register",
+  drawer: "/drawer"
 };

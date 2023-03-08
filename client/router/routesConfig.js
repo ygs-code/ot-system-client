@@ -27,5 +27,12 @@ export default [
     name: "register",
     entry: "/pages/Register/index.js",
     level: 1
+  },
+  {
+    path: "/drawer",
+    exact: false,
+    name: "drawer",
+    entry: "/pages/Drawer/index.js",
+    level: 1
   }
 ];

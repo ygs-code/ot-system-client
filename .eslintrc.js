@@ -60,6 +60,26 @@ module.exports = {
   //   "warn" or 1 - 将规则视为一个警告（不会影响退出码）,只警告，不会退出程序
   //   "error" or 2 - 将规则视为一个错误 (退出码为1)，报错并退出程序
   rules: {
+    "react/destructuring-assignment": [2, "always"], // 需要解构 this.state 和 this.props 解构。此规则强制使用解构而不是通过成员表达式访问属性。
+    //用于从数组索引或对象属性创建变量，称为解构。此规则强制使用解构而不是通过成员表达式访问属性。
+    "prefer-destructuring": [
+      "error",
+      {
+        VariableDeclarator: {
+          // 变量说明
+          array: false,
+          object: true
+        },
+        AssignmentExpression: {
+          // 赋值表达式
+          array: false,
+          object: false
+        }
+      },
+      {
+        enforceForRenamedProperties: false
+      }
+    ],
     "import/first": "error",
     "import/newline-after-import": "error",
     "import/no-duplicates": "error",
@@ -91,7 +111,7 @@ module.exports = {
     // 'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off', // 上线环境用打印就报警告, 开发环境关闭此规则
     // 'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off', // debugger可以终止代码执行
     // 'no-multiple-empty-lines': 'off', // 不允许有连续多行空行(关闭规则)
-    "no-undef":"error", // 不能有未定义的变量
+    "no-undef": "error", // 不能有未定义的变量
     eqeqeq: ["warn", "always"], //  == 判断
     // 'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     // 'no-void': 2, //禁用void操作符

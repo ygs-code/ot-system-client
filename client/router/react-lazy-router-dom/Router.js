@@ -38,13 +38,14 @@ class Router extends Component {
   }
   componentDidMount() {
     this._isMounted = true;
+    const { staticContext, history } = this.props;
 
     if (this.unlisten) {
       this.unlisten();
     }
 
-    if (!this.props.staticContext) {
-      this.unlisten = this.props.history.listen(({ location }) => {
+    if (!staticContext) {
+      this.unlisten = history.listen(({ location }) => {
         if (this._isMounted) {
           this.setState({
             location: location

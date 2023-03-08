@@ -55,8 +55,8 @@ const Index = memo((props) => {
     }
   } = props;
 
-  const { validateFields } = form;
-  const [count, setCount] = useState(0);
+  const { getFieldValue, validateFields } = form;
+
   const message = useRef(null);
 
   const onFinish = async (values) => {
