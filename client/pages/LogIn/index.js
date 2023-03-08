@@ -16,7 +16,7 @@ import {
   Typography
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import word from "client/assets/img/word2.jpg";
+import word from "client/assets/img/word1.png";
 import { login } from "client/assets/js/request/index";
 import FormItem from "client/component/FormItem";
 import Grain from "client/component/Grain";
