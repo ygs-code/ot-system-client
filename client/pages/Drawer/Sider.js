@@ -1,44 +1,12 @@
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MailIcon from "@mui/icons-material/Mail";
-import MenuIcon from "@mui/icons-material/Menu";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import {
-  AppBar,
-  Box,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography
-} from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
-import React, {
-  Children,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState
-} from "react";
+import { Drawer, SwipeableDrawer } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import React, { Children, useCallback, useEffect, useState } from "react";
 import { stabilization } from "utils";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar
-}));
-const openedMixin = (theme, drawerWidth) => {
+const $stabilization = stabilization();
+const openedMixin = (theme, width) => {
   return {
-    width: drawerWidth,
+    width,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
@@ -60,9 +28,12 @@ const closedMixin = (theme) => {
     }
   };
 };
+
 const MuiDrawer = styled(Drawer, {
   shouldForwardProp: (prop) => prop !== "open"
-})(({ theme, open, width }) => {
+})((props) => {
+  const { theme, open, width } = props;
+
   return {
     width,
     flexShrink: 0,
@@ -78,21 +49,23 @@ const MuiDrawer = styled(Drawer, {
     })
   };
 });
-const Sider = (props) => {
+
+export default (props) => {
   const { width, open, children, onChange = () => {} } = props;
   const [windosWidth, setWindosWidth] = useState(
     document.documentElement.clientWidth
   );
-  useState;
-  const theme = useTheme();
 
+  /*
+   小于950是平板
+   小于600是手机
+
+
+  */
   const getWindosWidth = useCallback(async () => {
-    await stabilization(300);
+    await $stabilization(300);
     setWindosWidth(document.documentElement.clientWidth);
   }, []);
-  console.log("chlidern======", children);
-  console.log("props======", props);
-  console.log("windosWidth======", windosWidth);
 
   useEffect(() => {
     window.addEventListener("resize", getWindosWidth);
@@ -101,24 +74,78 @@ const Sider = (props) => {
     };
   }, []);
 
-  return (
-    <Drawer
-      sx={{
-        width,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
+  if (windosWidth >= 950) {
+    return (
+      <MuiDrawer width={width} key={"box"} variant="permanent" open={open}>
+        {Children.map(children, (child) => {
+          return <>{child}</>;
+        })}
+      </MuiDrawer>
+    );
+  } else if (windosWidth < 950 && windosWidth >= 600) {
+    return (
+      <Drawer
+        key={"main"}
+        sx={{
           width,
-          boxSizing: "border-box"
-        }
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width,
+            boxSizing: "border-box"
+          }
+        }}
+        variant="persistent"
+        anchor="left"
+        open={open}>
+        {Children.map(children, (child) => {
+          return <>{child}</>;
+        })}
+      </Drawer>
+    );
+  }
+  return (
+    <SwipeableDrawer
+      anchor={"top"}
+      open={open}
+      onClose={() => {
+        onChange(false);
       }}
-      variant="persistent"
-      anchor="left"
-      open={open}>
+      onOpen={() => {
+        onChange(true);
+      }}>
       {Children.map(children, (child) => {
         return <>{child}</>;
       })}
-    </Drawer>
+    </SwipeableDrawer>
   );
-};
 
-export default Sider;
+  // return (
+  //   <>
+  //     {windosWidth >= 950 ? (
+  //       <MuiDrawer width={width} key={"box"} variant="permanent" open={open}>
+  //         {Children.map(children, (child) => {
+  //           return <>{child}</>;
+  //         })}
+  //       </MuiDrawer>
+  //     ) : (
+  //       <Drawer
+  //         key={"main"}
+  //         sx={{
+  //           width,
+  //           flexShrink: 0,
+  //           "& .MuiDrawer-paper": {
+  //             width,
+  //             boxSizing: "border-box"
+  //           }
+  //         }}
+  //         variant="persistent"
+  //         anchor="left"
+  //         open={open}>
+  //         {Children.map(children, (child) => {
+  //           return <>{child}</>;
+  //         })}
+  //       </Drawer>
+  //     )}
+  //   </>
+  // );
+};
