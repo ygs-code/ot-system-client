@@ -1,5 +1,6 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CloseIcon from "@mui/icons-material/Close";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
@@ -19,37 +20,16 @@ import {
   Typography
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import React, { memo } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
+import { stabilization } from "utils";
 
+import Dropdown from "./Dropdown";
+import Header from "./Header";
 import Main from "./Main";
 import Sider from "./Sider";
 
-const width = 240;
-
-const openedMixin = (theme) => {
-  return {
-    width: width,
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    }),
-    overflowX: "hidden"
-  };
-};
-
-const closedMixin = (theme) => {
-  return {
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    overflowX: "hidden",
-    width: `calc(${theme.spacing(7)} + 1px)`,
-    [theme.breakpoints.up("sm")]: {
-      width: `calc(${theme.spacing(8)} + 1px)`
-    }
-  };
-};
+const $stabilization = stabilization();
+// let width = 240;
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -62,7 +42,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const MuiAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== "open"
-})(({ theme, open }) => {
+})(({ theme, open, width }) => {
   return {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
@@ -81,64 +61,64 @@ const MuiAppBar = styled(AppBar, {
   };
 });
 
-const MuiDrawer = styled(Drawer, {
-  shouldForwardProp: (prop) => prop !== "open"
-})(({ theme, open }) => {
-  return {
-    width: width,
-    flexShrink: 0,
-    whiteSpace: "nowrap",
-    boxSizing: "border-box",
-    ...(open && {
-      ...openedMixin(theme),
-      "& .MuiDrawer-paper": openedMixin(theme)
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      "& .MuiDrawer-paper": closedMixin(theme)
-    })
-  };
-});
-
 export default memo((props) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [width, setWidth] = React.useState(
+    document.documentElement.clientWidth < 600 ? 0 : 240
+  );
+
+  const [windosWidth, setWindosWidth] = useState(
+    document.documentElement.clientWidth
+  );
+
+  /*
+   小于950是平板
+   小于600是手机
+  */
+  const getWindosWidth = useCallback(async () => {
+    await $stabilization(300);
+    if (document.documentElement.clientWidth < 600) {
+      setWidth(0);
+    } else {
+      setWidth(240);
+    }
+
+    setWindosWidth(document.documentElement.clientWidth);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", getWindosWidth);
+    return () => {
+      window.removeEventListener("resize", getWindosWidth);
+    };
+  }, []);
+
   console.log("props======", props);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const onChangeDrawerOpen = useCallback(async () => {
+    setOpen(!open);
+  }, [open]);
 
   return (
     <Box sx={{ display: "flex" }}>
+      <Header
+        open={open}
+        width={width}
+        windosWidth={windosWidth}
+        onChange={onChangeDrawerOpen}
+      />
       <CssBaseline />
-      <MuiAppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: "none" })
-            }}>
-            <MenuIcon />
-          </IconButton>
 
-          <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
-          </Typography>
-        </Toolbar>
-      </MuiAppBar>
-
-      <Sider open={open} width={width}>
+      <Sider
+        open={open}
+        width={width}
+        windosWidth={windosWidth}
+        onChange={(flag) => {
+          onChangeDrawerOpen();
+        }}>
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton onClick={onChangeDrawerOpen}>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
             ) : (
@@ -194,7 +174,8 @@ export default memo((props) => {
           ))}
         </List>
       </Sider>
-      <Main open={open} width={width}>
+      <Main open={open} width={width} windosWidth={windosWidth}>
+        <Dropdown />
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus
         non enim praesent elementum facilisis leo vel. Risus at ultrices mi

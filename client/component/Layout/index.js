@@ -1,102 +1,201 @@
-import "./index.less";
-
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CloseIcon from "@mui/icons-material/Close";
+import MailIcon from "@mui/icons-material/Mail";
+import MenuIcon from "@mui/icons-material/Menu";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
 import {
-  Layout
-  //  Menu,
-  // Select
-} from "antd";
+  AppBar,
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography
+} from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
 import Header from "client/component/Header";
-import Menu from "client/component/Menu";
-import { mapRedux } from "client/redux";
-import { addRouterApi } from "client/router";
 import React, {
   Children,
   cloneElement,
-  memo,
   useCallback,
   useEffect,
   useState
 } from "react";
-// import token from "@/common/js/request/token";
-const { Sider } = Layout;
+import { stabilization } from "utils";
 
-// 权限跳转登录页面可以在这控制
-const Index = memo((props) => {
-  const {
-    state: {
-      breadcrumb: { items = [] } = {},
-      user: { userInfo: { user: { name, phone } = {} } = {} } = {}
-    } = {},
-    children
-  } = props;
+import Main from "./Main";
+import Sider from "./Sider";
 
-  // useEffect(() => {
-  //   // 登录拦截
-  //   if (!token.get()) {
-  //     token.clearQueue();
-  //     push("/logLn");
-  //   }
-  //   // hello()
+const $stabilization = stabilization();
+// let width = 240;
 
-  //   return () => {};
-  // }, [token.get()]);
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar
+}));
 
-  const [collapsed, setCollapsed] = useState(false);
+const MuiAppBar = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== "open"
+})(({ theme, open, width }) => {
+  return {
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    }),
+
+    ...(open && {
+      marginLeft: width,
+      width: `calc(100% - ${width}px)`,
+      transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen
+      })
+    })
+  };
+});
+
+const Index = (props) => {
+  const { children, state: { user: { userInfo = {} } = {} } = {} } = props;
+  console.log("props=========", props);
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+  const [width, setWidth] = React.useState(
+    document.documentElement.clientWidth < 600 ? 0 : 240
+  );
+
+  const [windosWidth, setWindosWidth] = useState(
+    document.documentElement.clientWidth
+  );
+
+  /*
+   小于950是平板
+   小于600是手机
+  */
+  const getWindosWidth = useCallback(async () => {
+    await $stabilization(300);
+    if (document.documentElement.clientWidth < 600) {
+      setWidth(0);
+    } else {
+      setWidth(240);
+    }
+
+    setWindosWidth(document.documentElement.clientWidth);
+  }, []);
 
   useEffect(() => {
-    const adminCollapsed = sessionStorage.getItem("adminCollapsed");
-
-    setCollapsed(adminCollapsed === 1 ? true : false);
-
-    return () => {};
+    window.addEventListener("resize", getWindosWidth);
+    return () => {
+      window.removeEventListener("resize", getWindosWidth);
+    };
   }, []);
-  const toggle = useCallback(() => {
-    setCollapsed(!collapsed);
-    sessionStorage.setItem("adminCollapsed", !collapsed ? "1" : "0");
-  }, [collapsed]);
+
+  const onChangeDrawerOpen = useCallback(async () => {
+    setOpen(!open);
+  }, [open]);
 
   return (
-    <Layout className="root-layout">
-      {/*左侧菜单*/}
+    <Box sx={{ display: "flex" }}>
+      {/*顶部*/}
+      <Header
+        user={{ ...userInfo }}
+        open={open}
+        width={width}
+        windosWidth={windosWidth}
+        onChange={onChangeDrawerOpen}
+        onClick={(type) => {
+          console.log("type=", type);
+        }}
+      />
+      <CssBaseline />
+
+      {/*菜单*/}
       <Sider
-        width="250"
-        className="sider"
-        trigger={null}
-        collapsible
-        collapsed={collapsed}>
-        {/*菜单*/}
-        <Menu collapsed={collapsed} {...props} />
+        open={open}
+        width={width}
+        windosWidth={windosWidth}
+        onChange={(flag) => {
+          onChangeDrawerOpen();
+        }}>
+        <DrawerHeader>
+          <IconButton onClick={onChangeDrawerOpen}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </IconButton>
+        </DrawerHeader>
+
+        <Divider />
+        <List>
+          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+            <ListItem key={text} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5
+                }}>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center"
+                  }}>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {["All mail", "Trash", "Spam"].map((text, index) => (
+            <ListItem key={text} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5
+                }}>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center"
+                  }}>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       </Sider>
 
-      <Layout className="site-layout">
-        {/*顶部*/}
-        <Header
-          // avatar="头像地址"
-          nickname={name}
-          areaCode={name}
-          mobile={phone}
-          collapsed={collapsed}
-          onClick={(type) => {
-            console.log("type=", type);
-          }}
-          onChangeCollapsed={() => {
-            toggle();
-          }}
-          breadcrumb={items}></Header>
-
-        {/*中间子页面*/}
-        <div className="children-page-box">
-          <div className="children-page">
-            {Children.map(children, (child) => {
-              return cloneElement(child, props);
-              // return child;
-            })}
-          </div>
-        </div>
-      </Layout>
-    </Layout>
+      {/*中间子页面*/}
+      <Main open={open} width={width} windosWidth={windosWidth}>
+        {Children.map(children, (child) => {
+          return cloneElement(child, props);
+          // return child;
+        })}
+      </Main>
+    </Box>
   );
-});
+};
 
 // 装饰器
 export const layout = (Component) => {
@@ -104,11 +203,10 @@ export const layout = (Component) => {
     render() {
       return (
         <Index {...this.props}>
-          <Component />
+          <Component {...this.props} />
         </Index>
       );
     }
   };
 };
-
-export default mapRedux()(addRouterApi(Index));
+export default Index;

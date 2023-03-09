@@ -1,5 +1,3 @@
-import "./index.less";
-
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
@@ -34,17 +32,10 @@ const MuiAppBar = styled(AppBar, {
   };
 });
 export default memo((props) => {
-  const {
-    open,
-    width,
-    onChange = () => {},
-    windosWidth,
-    user,
-    onClick = () => {}
-  } = props;
+  const { open, width, onChange = () => {}, windosWidth } = props;
 
   return (
-    <div className="header">
+    <>
       <CssBaseline />
       <MuiAppBar position="fixed" open={open} width={width}>
         <Toolbar>
@@ -60,13 +51,16 @@ export default memo((props) => {
             {open ? <CloseIcon /> : <MenuIcon />}
           </IconButton>
 
-          <div className="right-header">
-            <div className="account-menu-box">
-              <AccountMenu user={user} onClick={onClick} />
+          <Typography variant="h6" noWrap component="div">
+            <div
+              style={{
+                float: "right"
+              }}>
+              <AccountMenu />
             </div>
-          </div>
+          </Typography>
         </Toolbar>
       </MuiAppBar>
-    </div>
+    </>
   );
 });

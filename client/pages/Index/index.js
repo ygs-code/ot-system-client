@@ -26,8 +26,9 @@ const Index = (props) => {
   }, []);
   return (
     <Skeleton active loading={loading}>
-      <Layout>
+      <Layout {...props}>
         <Routers
+          {...props}
           level={2}
           history={history}
           routesComponent={routesComponent}
