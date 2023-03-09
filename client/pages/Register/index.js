@@ -93,6 +93,7 @@ const Index = memo((props) => {
 
   return (
     <ThemeProvider theme={theme}>
+      <Message ref={message} />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
