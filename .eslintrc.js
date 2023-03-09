@@ -77,7 +77,7 @@ module.exports = {
         }
       },
       {
-        enforceForRenamedProperties: false
+        enforceForRenamedProperties: false //强制重命名属性
       }
     ],
     "import/first": "error",

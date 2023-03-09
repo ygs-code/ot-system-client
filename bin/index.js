@@ -17,6 +17,7 @@ import { stabilization } from "../client/utils";
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 
+const $stabilization=stabilization()
 // 如果是开发环境 先拷贝 服务器文件到 dist
 let {
   NODE_ENV, // 环境参数
@@ -70,7 +71,7 @@ class Bin {
         if (iSportTake(port)) {
           await kill(port, "tcp");
         }
-        stabilization(1500, async () => {
+        $stabilization(1500, async () => {
           this.counter = this.counter >= 10 ? 2 : this.counter + 1;
           if (this.counter === 1) {
             const cmd = isSsr
