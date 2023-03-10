@@ -9,15 +9,12 @@ import {
   Box,
   CssBaseline,
   Divider,
-  Drawer,
   IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography
+  ListItemText
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import Header from "client/component/Header";
