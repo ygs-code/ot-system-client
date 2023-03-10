@@ -29,7 +29,6 @@ import Main from "./Main";
 import Sider from "./Sider";
 
 const $stabilization = stabilization();
-// let width = 240;
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
