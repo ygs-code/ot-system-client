@@ -15,6 +15,7 @@ export default [
     entry: "/pages/Index/index.js",
     level: 1
   },
+
   {
     path: "/log-in",
     exact: true,
