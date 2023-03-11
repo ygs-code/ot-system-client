@@ -11,6 +11,7 @@ export default {
   rolePermissionDetails: "/system/role-permission/details/:action/:id?",
   rolePermission: "/system/role-permission",
   system: "/system",
+  home: "/home",
   desktop: "/desktop",
   index: "/",
   logIn: "/log-in",

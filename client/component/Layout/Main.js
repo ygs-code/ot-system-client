@@ -32,7 +32,14 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   })
 );
 export default (props) => {
-  const { width, open, children, onChange = () => {}, windosWidth } = props;
+  const {
+    width,
+    open,
+    children,
+    onChange = () => {},
+    windosWidth,
+    p = 3
+  } = props;
   // const [windosWidth, setWindosWidth] = useState(
   //   document.documentElement.clientWidth
   // );
@@ -54,7 +61,7 @@ export default (props) => {
   // }, []);
 
   return windosWidth >= 950 ? (
-    <Box component="main" key={"box"} sx={{ flexGrow: 1, p: 3 }}>
+    <Box component="main" key={"box"} sx={{ flexGrow: 1, p }}>
       <DrawerHeader />
       {Children.map(children, (child) => {
         return <>{child}</>;

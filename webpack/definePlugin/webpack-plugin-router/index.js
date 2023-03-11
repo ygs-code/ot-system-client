@@ -68,7 +68,6 @@ class WebpackPluginRouter {
         code.compilationErrors.push(errorMessage);
       }
 
-
       if (
         cachePaths.has(path) &&
         !(name[0] === "~" || cachePaths.get(path).name[0] === "~")
@@ -300,6 +299,7 @@ export default routesComponentConfig;
       const { path, filename } = value;
       if (filename === "routesConfig.js") {
         const content = require(path).default;
+        console.log("content=====", content);
         routesConfigs.push({
           path,
           config: content

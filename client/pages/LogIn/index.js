@@ -54,6 +54,7 @@ const Index = memo((props) => {
     }
   } = props;
 
+  console.log("routePaths==", routePaths);
   const { validateFields } = form;
   const [count, setCount] = useState(0);
   const message = useRef(null);
