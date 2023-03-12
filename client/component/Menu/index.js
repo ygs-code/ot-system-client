@@ -10,9 +10,11 @@ import MailIcon from "@mui/icons-material/Mail";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
 import TreeView from "@mui/lab/TreeView";
+import { formLabelClasses } from "@mui/material";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { findTreeData } from "client/utils";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 
@@ -92,12 +94,29 @@ StyledTreeItem.propTypes = {
 export default (props) => {
   const { onChange = () => {}, open } = props;
   const [expanded, setExpanded] = useState([]);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState(["2"]);
   const menus = [
     {
-      key: "1",
-      title: "文档",
-      icon: DescriptionIcon
+      key: "0",
+      title: "office文档",
+      icon: DescriptionIcon,
+      children: [
+        {
+          key: "0-0",
+          title: "word文档",
+          icon: DescriptionIcon
+        },
+        {
+          key: "0-1",
+          title: "excel工作表",
+          icon: DescriptionIcon
+        },
+        {
+          key: "0-2",
+          title: "ppt演示稿",
+          icon: DescriptionIcon
+        }
+      ]
     }
   ];
   console.log("selected=====", selected);
@@ -118,8 +137,9 @@ export default (props) => {
             labelText={title}
             labelIcon={icon}
             labelInfo={labelInfo}
-            color="#1a73e8"
-            bgColor="#e8f0fe">
+            // color="#1a73e8"
+            // bgColor="#e8f0fe"
+          >
             {runderTreeItem(children)}
           </StyledTreeItem>
         );
@@ -141,10 +161,18 @@ export default (props) => {
   return (
     <TreeView
       onNodeSelect={(event, selected) => {
-        console.log("selected=====", selected);
-        debugger;
+        const { children = [] } = findTreeData(
+          menus, // 树形数组或者数组数据
+          selected, // 需要查找的value
+          "key" //需要查找数组对象的key
+        );
+
+        if (children.length) {
+          return false;
+        }
         setSelected([selected]);
       }}
+      defaultSelected={selected}
       selected={selected}
       onNodeToggle={(event, expanded) => {
         if (expanded.length) {

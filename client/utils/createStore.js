@@ -1,5 +1,3 @@
-import {
-    SubscribePublished
-} from './SubscribePublished'
+import { SubscribePublished } from "./SubscribePublished";
 
-export const IndateStore = SubscribePublished('indate');
+export const IndateStore = SubscribePublished("indate");
