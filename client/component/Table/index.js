@@ -26,7 +26,7 @@ const Table = (props) => {
                   <thead className="ant-table-thead">
                     <tr>
                       {columns.map((item, index) => {
-                        const { dataIndex, key, title } = item;
+                        const { dataIndex, key, title, width } = item;
                         return (
                           <th
                             key={key || dataIndex || index}
@@ -45,11 +45,20 @@ const Table = (props) => {
                           key={index}
                           className="ant-table-row ant-table-row-level-0">
                           {columns.map(($item, $index) => {
-                            const { dataIndex, render } = $item;
+                            const {
+                              dataIndex,
+                              render,
+                              width,
+                              style = {}
+                            } = $item;
                             return (
                               <td
                                 key={`${index}_${$index}`}
-                                className="ant-table-cell">
+                                className="ant-table-cell"
+                                style={{
+                                  ...style,
+                                  ...(width ? { width } : {})
+                                }}>
                                 {render
                                   ? render(item[dataIndex], item)
                                   : item[dataIndex]}

@@ -15,6 +15,22 @@ export default [
     entry: "/pages/Index/index.js",
     level: 1
   },
+
+  {
+    path: "/",
+    exact: true,
+    name: "~index", // 特殊路由  / 路径入口
+    entry: "/pages/Index/pages/office/pages/Document",
+    level: 2
+  },
+
+  {
+    path: "/home",
+    exact: false,
+    name: "home",
+    entry: "/pages/Home/index.js",
+    level: 1
+  },
   {
     path: "/log-in",
     exact: true,

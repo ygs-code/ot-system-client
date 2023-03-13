@@ -94,7 +94,7 @@ StyledTreeItem.propTypes = {
 export default (props) => {
   const { onChange = () => {}, open } = props;
   const [expanded, setExpanded] = useState([]);
-  const [selected, setSelected] = useState(["2"]);
+  const [selected, setSelected] = useState(["0-0"]);
   const menus = [
     {
       key: "0",
@@ -137,6 +137,7 @@ export default (props) => {
             labelText={title}
             labelIcon={icon}
             labelInfo={labelInfo}
+            key={key}
             // color="#1a73e8"
             // bgColor="#e8f0fe"
           >
@@ -148,6 +149,7 @@ export default (props) => {
       return (
         <StyledTreeItem
           nodeId={key}
+          key={key}
           labelText={title}
           labelIcon={icon}
           labelInfo={labelInfo}
