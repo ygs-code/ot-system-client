@@ -1,10 +1,9 @@
 import "./index.less";
 
-import TextField from "@mui/material/TextField";
 import { SearchForm } from "client/component/Form1";
 import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
-import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
+import { checkEmail, checkPhone, checkUser } from "client/utils";
 import React, { memo, useEffect, useRef } from "react";
 
 // 权限控制
@@ -39,7 +38,7 @@ export default setBreadcrumbAndTitle({
               message: "请输入用户名或手机号或邮箱"
             },
             {
-              validator: (rule, value) => {
+              validator: () => {
                 // if (
                 //   checkUser(value) ||
                 //   checkPhone(value) ||
@@ -310,16 +309,22 @@ export default setBreadcrumbAndTitle({
         <SearchForm
           {...props}
           onConfirm={() => {}}
-          onReset={(searchParams) => {
-            // this.loadTableData(searchParams);
-          }}
+          onReset={() =>
+            // searchParams
+            {
+              // this.loadTableData(searchParams);
+            }
+          }
           shrinkLength={shrinkLength}
           fields={getSearchFields()}
           type="search"
-          onReady={(form) => {
-            // this.searchForm = form;
-            // this.loadTableData();
-          }}
+          onReady={() =>
+            // form
+            {
+              // this.searchForm = form;
+              // this.loadTableData();
+            }
+          }
         />
         <div></div>
       </div>

@@ -1,15 +1,12 @@
 import "client/assets/css/base.less";
 import "./index.less";
 
-// import { HowToRegIcon, LockOutlined } from "@mui/icons-material";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import {
   Avatar,
   Box,
   Button,
-  Checkbox,
   CssBaseline,
-  FormControlLabel,
   Grid,
   Link,
   Paper,
@@ -20,14 +17,13 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import word from "client/assets/img/word1.png";
 import { login } from "client/assets/js/request/index";
 import FormItem from "client/component/FormItem";
-import Grain from "client/component/Grain";
 import Message from "client/component/Message";
 import VerificationCode from "client/component/VerificationCode";
 import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
 import { createForm } from "rc-form";
-import React, { memo, useRef, useState } from "react";
+import React, { memo, useRef } from "react";
 
 function Copyright(props) {
   return (

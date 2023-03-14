@@ -1,20 +1,20 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import DescriptionIcon from "@mui/icons-material/Description";
-import MailIcon from "@mui/icons-material/Mail";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
+// import DescriptionIcon from "@mui/icons-material/Description";
+// import MailIcon from "@mui/icons-material/Mail";
+// import InboxIcon from "@mui/icons-material/MoveToInbox";
 import {
-  AppBar,
+  // AppBar,
   Box,
   CssBaseline,
   Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  rgbToHex
+  IconButton
+  // List,
+  // ListItem,
+  // ListItemButton,
+  // ListItemIcon,
+  // ListItemText,
+  // rgbToHex
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import Header from "client/component/Header";
@@ -42,26 +42,26 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar
 }));
 
-const MuiAppBar = styled(AppBar, {
-  shouldForwardProp: (prop) => prop !== "open"
-})(({ theme, open, width }) => {
-  return {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
+// const MuiAppBar = styled(AppBar, {
+//   shouldForwardProp: (prop) => prop !== "open"
+// })(({ theme, open, width }) => {
+//   return {
+//     zIndex: theme.zIndex.drawer + 1,
+//     transition: theme.transitions.create(["width", "margin"], {
+//       easing: theme.transitions.easing.sharp,
+//       duration: theme.transitions.duration.leavingScreen
+//     }),
 
-    ...(open && {
-      marginLeft: width,
-      width: `calc(100% - ${width}px)`,
-      transition: theme.transitions.create(["width", "margin"], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen
-      })
-    })
-  };
-});
+//     ...(open && {
+//       marginLeft: width,
+//       width: `calc(100% - ${width}px)`,
+//       transition: theme.transitions.create(["width", "margin"], {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.enteringScreen
+//       })
+//     })
+//   };
+// });
 
 const Index = (props) => {
   const { children, state: { user: { userInfo = {} } = {} } = {} } = props;
@@ -122,7 +122,7 @@ const Index = (props) => {
         open={open}
         width={width}
         windosWidth={windosWidth}
-        onChange={(flag) => {
+        onChange={() => {
           onChangeDrawerOpen();
         }}>
         <DrawerHeader>

@@ -6,8 +6,8 @@ import {
   AppBar,
   CssBaseline,
   IconButton,
-  Toolbar,
-  Typography
+  Toolbar
+  // Typography
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AccountMenu from "client/component/AccountMenu";

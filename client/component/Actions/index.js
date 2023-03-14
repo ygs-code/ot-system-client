@@ -53,9 +53,10 @@ const StyledMenu = styled((props) => (
   }
 }));
 
-export default function CustomizedMenus() {
+export default (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const { buttonText = "选项", options = [] } = props;
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -74,7 +75,7 @@ export default function CustomizedMenus() {
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}>
-        选项
+        {buttonText}
       </Button>
       <StyledMenu
         id="demo-customized-menu"
@@ -104,4 +105,4 @@ export default function CustomizedMenus() {
       </StyledMenu>
     </div>
   );
-}
+};

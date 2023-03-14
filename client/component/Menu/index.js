@@ -1,16 +1,16 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
-import ForumIcon from "@mui/icons-material/Forum";
-import InfoIcon from "@mui/icons-material/Info";
-import Label from "@mui/icons-material/Label";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import MailIcon from "@mui/icons-material/Mail";
-import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
+// import ForumIcon from "@mui/icons-material/Forum";
+// import InfoIcon from "@mui/icons-material/Info";
+// import Label from "@mui/icons-material/Label";
+// import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+// import MailIcon from "@mui/icons-material/Mail";
+// import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
 import TreeView from "@mui/lab/TreeView";
-import { formLabelClasses } from "@mui/material";
+// import { formLabelClasses } from "@mui/material";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -140,7 +140,9 @@ export default (props) => {
             key={key}
             // color="#1a73e8"
             // bgColor="#e8f0fe"
-          >
+            onClick={() => {
+              console.log("url===", url);
+            }}>
             {runderTreeItem(children)}
           </StyledTreeItem>
         );
@@ -155,6 +157,9 @@ export default (props) => {
           labelInfo={labelInfo}
           color="#1a73e8"
           bgColor="#e8f0fe"
+          onClick={() => {
+            console.log("url===", url);
+          }}
         />
       );
     });

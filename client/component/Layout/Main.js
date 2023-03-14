@@ -1,9 +1,15 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { Children, useCallback, useEffect, useState } from "react";
-import { stabilization } from "utils";
+import React, {
+  Children,
+  cloneElement
+  // useCallback,
+  // useEffect,
+  // useState
+} from "react";
+// import { stabilization } from "utils";
 
-const $stabilization = stabilization();
+// const $stabilization = stabilization();
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -64,14 +70,28 @@ export default (props) => {
     <Box component="main" key={"box"} sx={{ flexGrow: 1, p }}>
       <DrawerHeader />
       {Children.map(children, (child) => {
-        return <>{child}</>;
+        return (
+          <>
+            {cloneElement(child, {
+              windosWidth,
+              onChangeOpen: onChange
+            })}
+          </>
+        );
       })}
     </Box>
   ) : (
     <Main key={"main"} open={open} width={width}>
       <DrawerHeader />
       {Children.map(children, (child) => {
-        return <>{child}</>;
+        return (
+          <>
+            {cloneElement(child, {
+              windosWidth,
+              onChangeOpen: onChange
+            })}
+          </>
+        );
       })}
     </Main>
   );

@@ -1,11 +1,11 @@
 import "./index.less";
 
-import TextField from "@mui/material/TextField";
-import { SearchForm } from "client/component/Form1";
-import Message from "client/component/Message";
+// import TextField from "@mui/material/TextField";
+// import { SearchForm } from "client/component/Form1";
+// import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
-import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
-import React, { memo, useEffect, useRef } from "react";
+// import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
+import React, { memo } from "react";
 
 // 权限控制
 export default setBreadcrumbAndTitle({
@@ -17,7 +17,10 @@ export default setBreadcrumbAndTitle({
   ],
   title: "主页"
 })(
-  memo((props) => {
-    return <div className="home">主页</div>;
-  })
+  memo(() =>
+    // props
+    {
+      return <div className="home">主页</div>;
+    }
+  )
 );

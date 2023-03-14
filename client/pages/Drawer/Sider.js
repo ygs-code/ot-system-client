@@ -1,9 +1,9 @@
 import { Drawer, SwipeableDrawer } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { Children, useCallback, useEffect, useState } from "react";
-import { stabilization } from "utils";
+import React, { Children } from "react";
+// import { stabilization } from "utils";
 
-const $stabilization = stabilization();
+// const $stabilization = stabilization();
 const openedMixin = (theme, width) => {
   return {
     width,

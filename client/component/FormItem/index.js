@@ -102,9 +102,10 @@ const Index = (props) => {
       extra={extra}
       errors={errors}
       label={label}
-      children={children}
-      className={className}
-    />
+      // children={children}
+      className={className}>
+      {cloneElement(children)}
+    </Item>
   );
 };
 

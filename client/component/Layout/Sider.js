@@ -1,9 +1,15 @@
 import { Drawer, SwipeableDrawer } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { Children, useCallback, useEffect, useState } from "react";
-import { stabilization } from "utils";
+import React, {
+  Children,
+  cloneElement
+  // useCallback,
+  // useEffect,
+  // useState
+} from "react";
+// import { stabilization } from "utils";
 
-const $stabilization = stabilization();
+// const $stabilization = stabilization();
 const openedMixin = (theme, width) => {
   return {
     width,
@@ -113,38 +119,15 @@ export default (props) => {
         onChange(true);
       }}>
       {Children.map(children, (child) => {
-        return <>{child}</>;
+        return (
+          <>
+            {cloneElement(child, {
+              windosWidth,
+              onChangeOpen: onChange
+            })}
+          </>
+        );
       })}
     </SwipeableDrawer>
   );
-
-  // return (
-  //   <>
-  //     {windosWidth >= 950 ? (
-  //       <MuiDrawer width={width} key={"box"} variant="permanent" open={open}>
-  //         {Children.map(children, (child) => {
-  //           return <>{child}</>;
-  //         })}
-  //       </MuiDrawer>
-  //     ) : (
-  //       <Drawer
-  //         key={"main"}
-  //         sx={{
-  //           width,
-  //           flexShrink: 0,
-  //           "& .MuiDrawer-paper": {
-  //             width,
-  //             boxSizing: "border-box"
-  //           }
-  //         }}
-  //         variant="persistent"
-  //         anchor="left"
-  //         open={open}>
-  //         {Children.map(children, (child) => {
-  //           return <>{child}</>;
-  //         })}
-  //       </Drawer>
-  //     )}
-  //   </>
-  // );
 };

@@ -9,7 +9,7 @@
 
 import "./index.less";
 
-import { Pagination, PaginationItem, TablePagination } from "@mui/material";
+import { Pagination } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 const Table = (props) => {
@@ -26,10 +26,14 @@ const Table = (props) => {
                   <thead className="ant-table-thead">
                     <tr>
                       {columns.map((item, index) => {
-                        const { dataIndex, key, title, width } = item;
+                        const { dataIndex, key, title, width, style } = item;
                         return (
                           <th
                             key={key || dataIndex || index}
+                            style={{
+                              ...style,
+                              ...(width ? { width } : {})
+                            }}
                             className="ant-table-cell">
                             {title}
                           </th>
@@ -83,7 +87,7 @@ const Index = (props) => {
   const {
     columns,
     tableProps = {},
-    paginationProps = {},
+    // paginationProps = {},
     data: {
       list = [],
       pageNum = 1,

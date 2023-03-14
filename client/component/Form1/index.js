@@ -18,7 +18,6 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
-  getImageListItemBarUtilityClass,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -31,23 +30,6 @@ import {
   Switch,
   TextField
 } from "@mui/material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-// import {
-//   // Button,
-//   // Checkbox,
-//   Form
-//   // Input,
-//   // InputNumber,
-//   // Radio,
-//   // Rate,
-//   // Select,
-//   // Slider,
-//   // Switch,
-//   // TimePicker,
-//   // Transfer
-// } from "antd";
 import FormItem from "client/component/FormItem";
 import { CheckDataType } from "client/utils";
 import { createForm } from "rc-form";
@@ -57,7 +39,6 @@ import React, {
   createElement,
   useCallback,
   useEffect,
-  useMemo,
   useState
 } from "react";
 
@@ -76,7 +57,7 @@ const FromRadio = (props) => {
       <FormLabel error={error}>{required ? label + " *" : label}</FormLabel>
       <RadioGroup error={error} row>
         {options.map((item) => {
-          const { label, checked, value: $value } = item;
+          const { label, value: $value } = item;
           return (
             <FormControlLabel
               key={$value}
@@ -101,20 +82,19 @@ const FromSelect = (props) => {
     formProps = {},
     name
   } = props;
-  console.log("props==", props);
 
   const { required } = formProps;
 
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250
-      }
-    }
-  };
+  // const ITEM_HEIGHT = 48;
+  // const ITEM_PADDING_TOP = 8;
+  // const MenuProps = {
+  //   PaperProps: {
+  //     style: {
+  //       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+  //       width: 250
+  //     }
+  //   }
+  // };
 
   return (
     <FormControl value={value} fullWidth size="small" error={error}>
@@ -223,15 +203,11 @@ const FromSwitch = (props) => {
   const { required } = formProps;
 
   return (
-    <FormControl
-      error={error}
-      onChange={({ target }) => {
-        // console.log("target=====", target);
-      }}>
-      <FormLabel onChange={({ target }) => {}}>
+    <FormControl error={error} onChange={() => {}}>
+      <FormLabel onChange={() => {}}>
         {required ? label + " *" : label}
       </FormLabel>
-      <FormGroup onChange={(v) => {}}>
+      <FormGroup onChange={() => {}}>
         {options.map((item, index) => {
           const { label, value: $value } = item;
           return (
@@ -305,7 +281,7 @@ const FromCheckbox = (props) => {
 
 const FromTextField = (props) => {
   const { error, label, value = "", onChange, formProps = {} } = props;
-  const { readOnly, disabled, required, multiple } = formProps;
+  const { readOnly, disabled } = formProps;
   return (
     <TextField
       error={error}
@@ -327,9 +303,9 @@ const FromRender = (props) => {
   const {
     error,
     label,
-    options = [],
+    // options = [],
     value,
-    onChange,
+    // onChange,
     formProps = {},
     children,
     initialValue
@@ -352,9 +328,9 @@ const FromComponent = (props) => {
   const {
     error,
     label,
-    options = [],
+    // options = [],
     value,
-    onChange,
+    // onChange,
     formProps = {},
     children,
     initialValue
@@ -373,14 +349,14 @@ const FromComponent = (props) => {
   );
 };
 
-const ItemChild = (props) => {
+const itemChild = (props) => {
   let {
     type = "",
     props: formProps = {},
     component,
-    render,
-    value,
-    initialValue
+    render
+    // value,
+    // initialValue
   } = props;
 
   type = type ? type.toLowerCase() : type;
@@ -500,19 +476,17 @@ const ItemChild = (props) => {
 const BaseForm = createForm()((props) => {
   const {
     fields = [],
-    formProps = {},
+    // formProps = {},
     onReady = () => {},
     children = [],
-    onConfirm = () => {},
+    // onConfirm = () => {},
     // onReset = () => {},
     initialValues = {},
     form
   } = props;
   const [initialValuesFlag, setInitialValuesFlag] = useState(false);
   const [values, setInitialValues] = useState({});
-  const { setFieldsValue } = form;
-
-  console.log("fields=====", fields);
+  // const { setFieldsValue } = form;
 
   const transformInitialValues = useCallback(async (initialValues) => {
     if (CheckDataType.isFunction(initialValues)) {
@@ -542,14 +516,14 @@ const BaseForm = createForm()((props) => {
     [values]
   );
 
-  const onFinish = (values) => {
-    console.log("Success:", values);
-    onConfirm(values);
-  };
+  // const onFinish = (values) => {
+  //   console.log("Success:", values);
+  //   onConfirm(values);
+  // };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+  // const onFinishFailed = (errorInfo) => {
+  //   console.log("Failed:", errorInfo);
+  // };
   useEffect(() => {
     onReady(form);
   }, [form]);
@@ -564,7 +538,7 @@ const BaseForm = createForm()((props) => {
               title,
               items = [],
               render,
-              itemProps = {},
+              // itemProps = {},
               label,
               name,
               props = {},
@@ -584,7 +558,7 @@ const BaseForm = createForm()((props) => {
                   form={form}
                   label={label}
                   name={name}>
-                  {ItemChild({
+                  {itemChild({
                     type,
                     props,
                     options,
@@ -602,7 +576,7 @@ const BaseForm = createForm()((props) => {
                 {items.map(($item, $index) => {
                   const {
                     render,
-                    itemProps = {},
+                    // itemProps = {},
                     label,
                     name,
                     options = [],
@@ -623,7 +597,7 @@ const BaseForm = createForm()((props) => {
                         form={form}
                         label={label}
                         name={name}>
-                        {ItemChild({
+                        {itemChild({
                           type,
                           props,
                           options,
@@ -642,11 +616,11 @@ const BaseForm = createForm()((props) => {
                     //   rules={rules}
                     //   {...itemProps}
                     //   key={index}>
-                    //   <ItemChild
+                    //   <itemChild
                     //     type={type}
                     //     props={props}
                     //     options={options}
-                    //     render={render}></ItemChild>
+                    //     render={render}></itemChild>
                     // </Form.Item>
                   );
                 })}
@@ -665,8 +639,8 @@ const BaseForm = createForm()((props) => {
         <>
           {fields.reduce((acc, item, index) => {
             const { type, items = [] } = item;
-            if (type == "section") {
-              for (let [$index, $item] of items.entries()) {
+            if (type === "section") {
+              for (let [$index] of items.entries()) {
                 acc.push(
                   <Skeleton
                     className="item"
@@ -689,13 +663,13 @@ const BaseForm = createForm()((props) => {
 const SearchForm = createForm()((props) => {
   const {
     fields = [],
-    formProps = {},
+    // formProps = {},
     onReady = () => {},
     children = [],
     shrinkLength,
     onConfirm = () => {},
     onReset = () => {},
-    initialValues = {},
+    // initialValues = {},
     form
   } = props;
 
@@ -711,26 +685,26 @@ const SearchForm = createForm()((props) => {
     });
   };
 
-  const [formInitialValues, setFormInitialValues] = useState({});
+  // const [formInitialValues, setFormInitialValues] = useState({});
 
-  const transformInitialValues = useCallback(async (initialValues) => {
-    if (CheckDataType.isFunction(initialValues)) {
-      return initialValues(form);
-    }
-    if (CheckDataType.isPromise(initialValues)) {
-      return await initialValues(form);
-    }
+  // const transformInitialValues = useCallback(async (initialValues) => {
+  //   if (CheckDataType.isFunction(initialValues)) {
+  //     return initialValues(form);
+  //   }
+  //   if (CheckDataType.isPromise(initialValues)) {
+  //     return await initialValues(form);
+  //   }
 
-    return initialValues;
-  }, []);
-  const getInitialValues = useCallback(async () => {
-    const values = await transformInitialValues(initialValues);
-    setFormInitialValues(values);
-  }, []);
+  //   return initialValues;
+  // }, []);
+  // const getInitialValues = useCallback(async () => {
+  //   // const values = await transformInitialValues(initialValues);
+  //   // setFormInitialValues(values);
+  // }, []);
 
-  useEffect(() => {
-    getInitialValues();
-  }, []);
+  // useEffect(() => {
+  //   getInitialValues();
+  // }, []);
 
   const [expand, setExpand] = useState(false);
 
@@ -739,9 +713,9 @@ const SearchForm = createForm()((props) => {
     onConfirm(values);
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+  // const onFinishFailed = (errorInfo) => {
+  //   console.log("Failed:", errorInfo);
+  // };
 
   const onFill = () => {
     form.resetFields();
@@ -778,7 +752,7 @@ const SearchForm = createForm()((props) => {
         span = 1,
         label,
         name,
-        itemProps = {},
+        // itemProps = {},
         type,
         props,
         rules = [],
@@ -797,7 +771,7 @@ const SearchForm = createForm()((props) => {
             form={form}
             label={label}
             name={name}>
-            {ItemChild({
+            {itemChild({
               type,
               props,
               options,

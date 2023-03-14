@@ -1,8 +1,6 @@
-import { Input } from "antd";
 import { getUserList, getUserRoleList } from "client/assets/js/request";
 import Actions from "client/component/Actions";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
-import TableButton from "client/component/TableButton";
 import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
@@ -65,7 +63,6 @@ class Index extends Component {
   // 定义表头字段
   getColumns = () => {
     const { tabsValue } = this.state;
-    const { pushRoute, routePaths: { userRoleDetails } = {} } = this.props;
 
     return [
       [
@@ -85,9 +82,7 @@ class Index extends Component {
           dataIndex: "actions",
           key: "actions",
           width: 120,
-          render: (text, row) => {
-            const { id } = row;
-
+          render: () => {
             return <Actions />;
           }
         }

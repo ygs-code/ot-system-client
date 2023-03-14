@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { Children, useCallback, useEffect, useState } from "react";
-import { stabilization } from "utils";
+import React, { Children } from "react";
+// import { stabilization } from "utils";
 
-const $stabilization = stabilization();
+// const $stabilization = stabilization();
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -32,7 +32,13 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   })
 );
 export default (props) => {
-  const { width, open, children, onChange = () => {}, windosWidth } = props;
+  const {
+    width,
+    open,
+    children,
+    //  onChange = () => {},
+    windosWidth
+  } = props;
   // const [windosWidth, setWindosWidth] = useState(
   //   document.documentElement.clientWidth
   // );

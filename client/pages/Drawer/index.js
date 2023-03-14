@@ -1,23 +1,23 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import CloseIcon from "@mui/icons-material/Close";
+// import CloseIcon from "@mui/icons-material/Close";
 import MailIcon from "@mui/icons-material/Mail";
-import MenuIcon from "@mui/icons-material/Menu";
+// import MenuIcon from "@mui/icons-material/Menu";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import {
-  AppBar,
+  // AppBar,
   Box,
   CssBaseline,
   Divider,
-  Drawer,
+  // Drawer,
   IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography
+  ListItemText
+  // Toolbar,
+  // Typography
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import React, { memo, useCallback, useEffect, useState } from "react";
@@ -40,26 +40,26 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar
 }));
 
-const MuiAppBar = styled(AppBar, {
-  shouldForwardProp: (prop) => prop !== "open"
-})(({ theme, open, width }) => {
-  return {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
+// const MuiAppBar = styled(AppBar, {
+//   shouldForwardProp: (prop) => prop !== "open"
+// })(({ theme, open, width }) => {
+//   return {
+//     zIndex: theme.zIndex.drawer + 1,
+//     transition: theme.transitions.create(["width", "margin"], {
+//       easing: theme.transitions.easing.sharp,
+//       duration: theme.transitions.duration.leavingScreen
+//     }),
 
-    ...(open && {
-      marginLeft: width,
-      width: `calc(100% - ${width}px)`,
-      transition: theme.transitions.create(["width", "margin"], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen
-      })
-    })
-  };
-});
+//     ...(open && {
+//       marginLeft: width,
+//       width: `calc(100% - ${width}px)`,
+//       transition: theme.transitions.create(["width", "margin"], {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.enteringScreen
+//       })
+//     })
+//   };
+// });
 
 export default memo((props) => {
   const theme = useTheme();
@@ -114,7 +114,7 @@ export default memo((props) => {
         open={open}
         width={width}
         windosWidth={windosWidth}
-        onChange={(flag) => {
+        onChange={() => {
           onChangeDrawerOpen();
         }}>
         <DrawerHeader>
