@@ -1,10 +1,103 @@
+import {
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+  Select,
+  Skeleton,
+  Slider,
+  Switch,
+  TextField
+} from "@mui/material";
 import { getUserList, getUserRoleList } from "client/assets/js/request";
 import Actions from "client/component/Actions";
+import Dialog from "client/component/Dialog";
+import FormItem from "client/component/FormItem";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
 import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
-import React, { Component } from "react";
+import { createForm } from "rc-form";
+import React, { Component, useCallback, useState } from "react";
+
+const Create = createForm()((props) => {
+  const [open, setOpen] = useState(false);
+  const { form } = props;
+  const { validateFields } = form;
+
+  return (
+    <div>
+      <Dialog
+        confirm={() => {
+          validateFields((error, values) => {
+            if (!error) {
+              setOpen(false);
+            } else {
+              console.error(error);
+            }
+          });
+        }}
+        open={open}
+        cancel={() => {
+          setOpen(false);
+        }}
+        title="创建文档"
+        sx={{
+          width: 500,
+          height: 100
+        }}>
+        <FormItem
+          className="padding-top-15"
+          rules={[
+            {
+              required: true,
+              message: "请输入文档标题"
+            },
+            {
+              validator: (rule, value = "") => {
+                if (!value.trim()) {
+                  return Promise.reject("请输入文档标题");
+                }
+
+                return Promise.reject();
+              }
+            }
+          ]}
+          label="文档标题"
+          form={form}
+          // span={24}
+          name="name">
+          <TextField
+            required
+            fullWidth
+            placeholder="请输入文档标题"
+            variant="outlined"
+          />
+        </FormItem>
+      </Dialog>
+
+      <Button
+        variant="contained"
+        onClick={() => {
+          // validateValues();
+          setOpen(true);
+        }}>
+        创建文档
+      </Button>
+    </div>
+  );
+});
+
 // 权限控制
 @setBreadcrumbAndTitle({
   //设置面包屑和标题
@@ -21,7 +114,8 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabsValue: "0"
+      tabsValue: "0",
+      open: false
     };
   }
 
@@ -140,9 +234,10 @@ class Index extends Component {
   };
   componentDidMount() {}
   render() {
-    const { tabsValue } = this.state;
+    const { tabsValue, open } = this.state;
     return (
       <div className="table-page">
+        <Create />
         <Tabs
           onChange={(value) => {
             this.setState(
