@@ -19,28 +19,39 @@ import {
   Switch,
   TextField
 } from "@mui/material";
-import { getUserList, getUserRoleList } from "client/assets/js/request";
+import {
+  createDocument,
+  getUserList,
+  getUserRoleList
+} from "client/assets/js/request";
 import Actions from "client/component/Actions";
 import Dialog from "client/component/Dialog";
 import FormItem from "client/component/FormItem";
+import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
 import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
 import { createForm } from "rc-form";
-import React, { Component, useCallback, useState } from "react";
+import React, { Component, useRef, useState } from "react";
 
 const Create = createForm()((props) => {
   const [open, setOpen] = useState(false);
-  const { form } = props;
+  const { form, pushRoute } = props;
   const { validateFields } = form;
-
+  const message = useRef(null);
+  console.log("props11====", props);
   return (
     <div>
+      <Message ref={message} />
       <Dialog
         confirm={() => {
-          validateFields((error, values) => {
+          validateFields(async (error, values) => {
             if (!error) {
+              let data = await createDocument(values);
+              console.log("data===", data);
+
+              message.current.success("文档创建成功");
               setOpen(false);
             } else {
               console.error(error);
@@ -76,7 +87,7 @@ const Create = createForm()((props) => {
           label="文档标题"
           form={form}
           // span={24}
-          name="name">
+          name="title">
           <TextField
             required
             fullWidth
@@ -89,7 +100,6 @@ const Create = createForm()((props) => {
       <Button
         variant="contained"
         onClick={() => {
-          // validateValues();
           setOpen(true);
         }}>
         创建文档
@@ -237,7 +247,7 @@ class Index extends Component {
     const { tabsValue, open } = this.state;
     return (
       <div className="table-page">
-        <Create />
+        <Create {...this.props} />
         <Tabs
           onChange={(value) => {
             this.setState(

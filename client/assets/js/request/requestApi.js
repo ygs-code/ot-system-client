@@ -613,3 +613,24 @@ export const editRolePermission = (parameter = {}) => {
     }
   );
 };
+
+// 注册用户
+export const createDocument = (parameter = {}) => {
+  return mutation(
+    "createDocument",
+    `
+        mutation($parameter: CreateDocumentInput!) { 
+          createDocument(parameter: $parameter) {
+              code
+              message
+              data {
+                id
+              }
+            }
+        }
+    `,
+    {
+      parameter
+    }
+  );
+};

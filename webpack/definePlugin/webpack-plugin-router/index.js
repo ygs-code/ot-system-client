@@ -25,7 +25,7 @@ class WebpackPluginRouter {
     }
   }
 
-  firstToUpper(str) {
+  firstToUpper(str = "") {
     return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
   }
 
