@@ -7,22 +7,22 @@ export default [
     entry: "/pages/Index/pages/office/index.js",
     level: 2,
     children: [
-      // {
-      //   path: "/user-management",
-      //   name: "userManagement",
-      //   entry: "/pages/Index/pages/office/pages/UserManagement/index.js",
-      //   level: 2,
-      //   children: [
-      //     {
-      //       path: "/details/:action/:id?",
-      //       name: "userManagementDetails",
-      //       entry:
-      //         "/pages/Index/pages/office/pages/UserManagement/details/index.js",
-      //       level: 2,
-      //       children: []
-      //     }
-      //   ]
-      // }
+      {
+        path: "/document",
+        name: "officeDocument",
+        entry: "/pages/Index/pages/office/pages/Document/index.js",
+        level: 2
+        // children: [
+        //   {
+        //     path: "/details/:action/:id?",
+        //     name: "userManagementDetails",
+        //     entry:
+        //       "/pages/Index/pages/office/pages/UserManagement/details/index.js",
+        //     level: 2,
+        //     children: []
+        //   }
+        // ]
+      }
       // {
       //   path: "/role-management",
       //   name: "roleManagement",

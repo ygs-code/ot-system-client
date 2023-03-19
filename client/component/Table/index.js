@@ -93,7 +93,7 @@ const Index = (props) => {
       pageNum = 1,
       pageSize = 10,
       // pages,
-      total
+      total = 0
     } = {},
     // onChange = () => {},
     // onSelect = () => {}

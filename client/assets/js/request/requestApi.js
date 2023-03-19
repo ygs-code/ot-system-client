@@ -614,7 +614,7 @@ export const editRolePermission = (parameter = {}) => {
   );
 };
 
-// 注册用户
+// 创建文档
 export const createDocument = (parameter = {}) => {
   return mutation(
     "createDocument",
@@ -631,6 +631,49 @@ export const createDocument = (parameter = {}) => {
     `,
     {
       parameter
+    }
+  );
+};
+
+// 获取文档列表
+export const getDocumentList = (parameter = {}) => {
+  // const { type = "" } = parameter;
+
+  // const { type, pageName = 1, pageSize = 10 } = parameter;
+
+  return query(
+    "getDocumentList",
+    `
+    query($parameter: ListInfoInput!){
+      getDocumentList(parameter: $parameter) {
+          code
+          data {
+            hasNextPage
+            pageNum
+            pageSize
+            pages
+            total
+            list{
+              id
+              title
+              v
+              updateBy
+              createBy
+              content
+              type
+              createTime
+              updateTime
+            }
+          }
+          message
+        } 
+    }
+  `,
+    {
+      parameter
+    },
+    {
+      filterData: true
     }
   );
 };

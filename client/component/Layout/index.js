@@ -65,7 +65,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const Index = (props) => {
   const { children, state: { user: { userInfo = {} } = {} } = {} } = props;
-  console.log("props=========", props);
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = React.useState(

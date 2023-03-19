@@ -21,8 +21,8 @@ import {
 } from "@mui/material";
 import {
   createDocument,
-  getUserList,
-  getUserRoleList
+  getDocumentList,
+  getUserList
 } from "client/assets/js/request";
 import Actions from "client/component/Actions";
 import Dialog from "client/component/Dialog";
@@ -37,7 +37,7 @@ import React, { Component, useRef, useState } from "react";
 
 const Create = createForm()((props) => {
   const [open, setOpen] = useState(false);
-  const { form, pushRoute } = props;
+  const { form, pushRoute, confirm } = props;
   const { validateFields } = form;
   const message = useRef(null);
   console.log("props11====", props);
@@ -53,6 +53,7 @@ const Create = createForm()((props) => {
 
               message.current.success("文档创建成功");
               setOpen(false);
+              confirm();
             } else {
               console.error(error);
             }
@@ -124,7 +125,7 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabsValue: "0",
+      tabsValue: "all",
       open: false
     };
   }
@@ -140,23 +141,13 @@ class Index extends Component {
   getSearchFields() {
     const { tabsValue } = this.state;
     return [
-      [
-        {
-          label: "文档标题",
-          name: "title",
-          type: "input",
-          span: 1
-        }
-      ],
-      [
-        {
-          label: "文档标题",
-          name: "title",
-          type: "input",
-          span: 1
-        }
-      ]
-    ][tabsValue];
+      {
+        label: "文档标题",
+        name: "title",
+        type: "input",
+        span: 1
+      }
+    ];
   }
 
   // 定义Tab字段
@@ -169,58 +160,27 @@ class Index extends Component {
     const { tabsValue } = this.state;
 
     return [
-      [
-        {
-          title: "文档标题",
-          dataIndex: "title",
-          key: "title"
-        },
-        {
-          title: "创建人",
-          dataIndex: "createBy",
-          key: "createBy"
-        },
+      {
+        title: "文档标题",
+        dataIndex: "title",
+        key: "title"
+      },
+      {
+        title: "创建人",
+        dataIndex: "createBy",
+        key: "createBy"
+      },
 
-        {
-          title: "操作",
-          dataIndex: "actions",
-          key: "actions",
-          width: 120,
-          render: () => {
-            return <Actions />;
-          }
+      {
+        title: "操作",
+        dataIndex: "actions",
+        key: "actions",
+        width: 120,
+        render: () => {
+          return <Actions />;
         }
-      ],
-
-      [
-        {
-          title: "用户&角色ID",
-          dataIndex: "id",
-          key: "id"
-        },
-        {
-          title: "角色ID",
-          dataIndex: "roleId",
-          key: "roleId"
-        },
-        {
-          title: "用户ID",
-          dataIndex: "userId",
-          key: "userId"
-        },
-
-        {
-          title: "创建时间",
-          dataIndex: "createTime",
-          key: "createTime"
-        },
-        {
-          title: "更新时间",
-          dataIndex: "updateTime",
-          key: "updateTime"
-        }
-      ]
-    ][tabsValue];
+      }
+    ];
   };
 
   /**
@@ -229,12 +189,10 @@ class Index extends Component {
   tableDataLoader = async (searchParams = {}) => {
     const { tabsValue } = this.state;
 
-    const mapRequest = {
-      0: getUserList,
-      1: getUserRoleList
-    };
-
-    const { data } = await mapRequest[tabsValue](searchParams);
+    const { data } = await getDocumentList({
+      ...searchParams,
+      createBy: tabsValue
+    });
 
     return data;
   };
@@ -247,7 +205,12 @@ class Index extends Component {
     const { tabsValue, open } = this.state;
     return (
       <div className="table-page">
-        <Create {...this.props} />
+        <Create
+          {...this.props}
+          confirm={() => {
+            this.loadTableData();
+          }}
+        />
         <Tabs
           onChange={(value) => {
             this.setState(
@@ -265,11 +228,11 @@ class Index extends Component {
           items={[
             {
               label: "全部文档",
-              value: "0"
+              value: "all"
             },
             {
               label: "我的文档",
-              value: "1"
+              value: "my"
             }
           ]}></Tabs>
         {this.renderSearch({

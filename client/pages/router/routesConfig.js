@@ -24,6 +24,15 @@ export default [
     level: 2
   },
 
+  // 文档详情
+  {
+    path: "/office/document/details",
+    exact: true,
+    name: "officeDocumentDetails",
+    entry: "/pages/Index/pages/office/pages/Document/details/index.js",
+    level: 1
+  },
+
   {
     path: "/home",
     exact: false,
