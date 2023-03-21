@@ -1,4 +1,44 @@
 import { CheckDataType } from "./CheckDataType";
+
+function deepCopy(obj, cache = []) {
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+
+  const objType = Object.prototype.toString.call(obj).slice(8, -1);
+
+  // 考虑 正则对象的copy
+  if (objType === "RegExp") {
+    return new RegExp(obj);
+  }
+
+  // 考虑 Date 实例 copy
+  if (objType === "Date") {
+    return new Date(obj);
+  }
+
+  // 考虑 Error 实例 copy
+  if (objType === "Error") {
+    return new Error(obj);
+  }
+
+  const hit = cache.filter((c) => c.original === obj)[0];
+
+  if (hit) {
+    return hit.copy;
+  }
+
+  const copy = Array.isArray(obj) ? [] : {};
+
+  cache.push({ original: obj, copy });
+
+  Object.keys(obj).forEach((key) => {
+    copy[key] = deepCopy(obj[key], cache);
+  });
+
+  return copy;
+}
+
 // 递归treeData 会给 treeData 添加index 索引
 const recursionTreeData = (parameter, _index = null) => {
   let {
@@ -93,24 +133,24 @@ const filterTreeData = (
     );
   });
 };
-// 复杂类型数据，深拷贝
-const deepCopy = (
-  source, // 来源数据
-  target // 新的数据 如果是数组则为 [], 如果是对象传参则为{}
-) => {
-  target = target || {};
-  for (let i in source) {
-    if (source[i] && source.hasOwnProperty(i)) {
-      if (typeof source[i] === "object") {
-        target[i] = source[i] && source[i].constructor === Array ? [] : {};
-        deepCopy(source[i], target[i]);
-      } else {
-        target[i] = source[i];
-      }
-    }
-  }
-  return target;
-};
+// // 复杂类型数据，深拷贝
+// const deepCopy = (
+//   source, // 来源数据
+//   target // 新的数据 如果是数组则为 [], 如果是对象传参则为{}
+// ) => {
+//   target = target || {};
+//   for (let i in source) {
+//     if (source[i] && source.hasOwnProperty(i)) {
+//       if (typeof source[i] === "object") {
+//         target[i] = source[i] && source[i].constructor === Array ? [] : {};
+//         deepCopy(source[i], target[i]);
+//       } else {
+//         target[i] = source[i];
+//       }
+//     }
+//   }
+//   return target;
+// };
 
 // 搜索到树数据的某一条数据单条 不包括父层数据的
 const findTreeData = (

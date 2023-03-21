@@ -64,7 +64,15 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 // });
 
 const Index = (props) => {
-  const { children, state: { user: { userInfo = {} } = {} } = {} } = props;
+  const {
+    children,
+    state: { user: { userInfo = {} } = {} } = {},
+
+    menuProps = {},
+    mainProps = {},
+    headerProps = {},
+    siderProps = {}
+  } = props;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = React.useState(
@@ -104,7 +112,9 @@ const Index = (props) => {
   return (
     <Box sx={{ display: "flex" }}>
       {/*顶部*/}
+
       <Header
+        {...headerProps}
         user={{ ...userInfo }}
         open={open}
         width={width}
@@ -118,6 +128,7 @@ const Index = (props) => {
 
       {/*菜单*/}
       <Sider
+        {...siderProps}
         open={open}
         width={width}
         windosWidth={windosWidth}
@@ -137,10 +148,10 @@ const Index = (props) => {
         <Divider />
 
         <Menu
+          {...menuProps}
           onChange={(flag) => {
             setOpen(flag);
           }}
-          {...props}
           open={open}
           width={width}
           windosWidth={windosWidth}
@@ -148,7 +159,15 @@ const Index = (props) => {
       </Sider>
 
       {/*中间子页面*/}
-      <Main open={open} width={width} windosWidth={windosWidth}>
+      <Main
+        sx={{
+          height: "100vh",
+          overflow: "auto"
+        }}
+        menuProps={menuProps}
+        open={open}
+        width={width}
+        windosWidth={windosWidth}>
         {Children.map(children, (child) => {
           return cloneElement(child, props);
           // return child;

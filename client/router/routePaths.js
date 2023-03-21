@@ -1,8 +1,8 @@
 export default {
+  officeDocumentDetails: "/office/document/details/:action/:id?",
   officeDocument: "/office/document",
   office: "/office",
   index: "/",
-  officeDocumentDetails: "/office/document/details",
   home: "/home",
   logIn: "/log-in",
   register: "/register",

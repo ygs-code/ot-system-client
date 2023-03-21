@@ -11,17 +11,16 @@ export default [
         path: "/document",
         name: "officeDocument",
         entry: "/pages/Index/pages/office/pages/Document/index.js",
-        level: 2
-        // children: [
-        //   {
-        //     path: "/details/:action/:id?",
-        //     name: "userManagementDetails",
-        //     entry:
-        //       "/pages/Index/pages/office/pages/UserManagement/details/index.js",
-        //     level: 2,
-        //     children: []
-        //   }
-        // ]
+        level: 2,
+        children: [
+          {
+            path: "/details/:action/:id?",
+            name: "officeDocumentDetails",
+            entry: "/pages/Index/pages/office/pages/Document/details/index.js",
+            level: 2,
+            children: []
+          }
+        ]
       }
       // {
       //   path: "/role-management",

@@ -44,7 +44,9 @@ export default (props) => {
     children,
     onChange = () => {},
     windosWidth,
-    p = 3
+    p = 3,
+    menuProps = {},
+    sx = {}
   } = props;
   // const [windosWidth, setWindosWidth] = useState(
   //   document.documentElement.clientWidth
@@ -67,7 +69,11 @@ export default (props) => {
   // }, []);
 
   return windosWidth >= 950 ? (
-    <Box component="main" key={"box"} sx={{ flexGrow: 1, p }}>
+    <Box
+      component="main"
+      key={"box"}
+      sx={{ flexGrow: 1, p, ...sx }}
+      {...menuProps}>
       <DrawerHeader />
       {Children.map(children, (child) => {
         return (
@@ -81,7 +87,7 @@ export default (props) => {
       })}
     </Box>
   ) : (
-    <Main key={"main"} open={open} width={width}>
+    <Main key={"main"} open={open} width={width} sx={{ ...sx }} {...menuProps}>
       <DrawerHeader />
       {Children.map(children, (child) => {
         return (
