@@ -1,15 +1,15 @@
-import "./index.less";
-
 import { message } from "antd";
 import React, { memo, useEffect } from "react";
 import ReconnectingWebSocket from "reconnectingwebsocket";
 import ShareDB from "client/modules/otServe/lib/client";
 import Quill from "./quill";
-import { mapRedux } from "client/redux";
 import Cursors from "./cursors";
 import { stabilization } from "client/utils";
-import { type } from "rich-text";
 
+import { type } from "rich-text";
+ShareDB.types.register(type);
+
+var Quill = require("./quill");
 class Main {
   constructor({ quillElId, quillOptions = {} }) {
     // const { id, type } = getUrlParams(window.location.href);
@@ -120,10 +120,6 @@ class Main {
       userName, // 用户名称
       userId // 用户id
     } = this.options;
-    const {
-      types: { register }
-    } = ShareDB;
-    register(type);
     const { documentId, documentType, documentConnectionUrl } = this.options;
     this.shareDBSocket = new ReconnectingWebSocket(documentConnectionUrl);
 
@@ -386,109 +382,162 @@ class Main {
   }
 }
 
-export default mapRedux(["user"])((props) => {
-  const {
-    match: {
-      params: { action, id, type }
-    },
-    state: {
-      user: {
-        userInfo: {
-          user: { id: userId, name: userName }
-        }
-      }
+var usernameInputEl = document.getElementById("username-input");
+var usersListEl = document.getElementById("users-list");
+var sharedbSocketStateEl = document.getElementById("sharedb-socket-state");
+var sharedbSocketIndicatorEl = document.getElementById(
+  "sharedb-socket-indicator"
+);
+var socketStateEl = document.getElementById("cursors-socket-state");
+var socketIndicatorEl = document.getElementById("cursors-socket-indicator");
+
+usernameInputEl.value = chance.name();
+usernameInputEl.focus();
+usernameInputEl.select();
+
+function updateUserList(connections, localCursor) {
+  // Wipe the slate clean
+  usersListEl.innerHTML = null;
+
+  connections = connections.reduce((acc, item, index) => {
+    if (item.id == localCursor.id) {
+      acc.unshift(item);
+    } else {
+      acc.push(item);
     }
-  } = props;
-  console.log("props===", props);
-  useEffect(() => {
-    // 实例化 富文本
-    const main = new Main({
-      quillElId: "#editor",
-      quillOptions: {
-        theme: "snow",
-        modules: {
-          cursors: {
-            autoRegisterListener: false
-          },
-          history: {
-            userOnly: true
-          }
-        },
-        readOnly: true
-      }
-    });
-
-    main.init({
-      documentTitle: "ot协同文档",
-      documentId: id, // 文档id
-      documentType: type, // 文档类型
-      userName, // 用户名称
-      userId,
-      // 文档连接状态
-      onDocumentConnectionState: (state) => {
-        var indicatorColor;
-        // sharedbSocketStateEl.innerHTML = state;
-        switch (state.toString()) {
-          case "connecting":
-            indicatorColor = "silver";
-            break;
-          case "connected":
-            indicatorColor = "lime";
-            break;
-          case "disconnected":
-          case "closed":
-          case "stopped":
-            indicatorColor = "red";
-            break;
-        }
-        console.log('state=========',state)
-        // sharedbSocketIndicatorEl.style.backgroundColor = indicatorColor;
-      },
-      // 光标连接状态
-      onCursorConnectionState: (state) => {
-        var indicatorColor;
-        socketStateEl.innerHTML = state;
-        switch (state.toString()) {
-          case "connected":
-            indicatorColor = "lime";
-            break;
-          case "error":
-          case "closed":
-            indicatorColor = "red";
-            break;
-        }
-        socketIndicatorEl.style.backgroundColor = indicatorColor;
-      },
-      // 改变光标位置
-      onChangeCursors: (data) => {
-        // const { cursorList, localCursor } = data;
-        // updateUserList(cursorList, localCursor);
-      },
-      // 改变文档内容
-      onChangeDocument: (data) => {
-        console.log("onChangeDocument", data);
-      },
-      // 文档websocket 连接
-      documentConnectionUrl:
-        (location.protocol === "https:" ? "wss" : "ws") +
-        "://" +
-        '127.0.0.1/:3100' +
-        "/sharedb" +
-        `?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
-      // // 光标websocket 连接
-      // cursorConnectionUrl:
-      //   (location.protocol === "https:" ? "wss" : "ws") +
-      //   "://" +
-      //   window.location.host +
-      //   "/cursors" +
-      //   `?documentId=${id}&documentType=${type}`,
-    });
-
-    main.quill.enable();
+    return acc;
   }, []);
-  return (
-    <div>
-      <div id="editor"></div>
-    </div>
+
+  connections.forEach(function (connection) {
+    var userItemEl = document.createElement("li");
+    var userNameEl = document.createElement("div");
+    var userDataEl = document.createElement("div");
+
+    userNameEl.innerHTML =
+      "<strong>" +
+      (connection.name || "(Waiting for username...)") +
+      "</strong>";
+    userNameEl.classList.add("user-name");
+
+    if (connection.id == localCursor.id) {
+      userNameEl.innerHTML += " (You)";
+    }
+
+    if (connection.range) {
+      userDataEl.innerHTML = [
+        '<div class="user-data">',
+        " <div>Index: " +
+          (connection.range ? connection.range.index : "") +
+          "</div>",
+        "  <div>Length: " +
+          (connection.range ? connection.range.length : 0) +
+          "</div>",
+        "</div>"
+      ].join("");
+    } else {
+      userDataEl.innerHTML = "(光标不在编辑器中)";
+    }
+
+    userItemEl.appendChild(userNameEl);
+    userItemEl.appendChild(userDataEl);
+
+    userItemEl.style.backgroundColor = connection.color;
+    usersListEl.appendChild(userItemEl);
+  });
+}
+
+// 实例化 富文本
+const main = new Main({
+  quillElId: "#editor",
+  quillOptions: {
+    theme: "snow",
+    modules: {
+      cursors: {
+        autoRegisterListener: false
+      },
+      history: {
+        userOnly: true
+      }
+    },
+    readOnly: true
+  }
+});
+document.getElementById("connect-btn").addEventListener("click", (event) => {
+  const { id = "1", type: type = "documents" } = main.getUrlParams(
+    window.location.href
   );
+
+  main.init({
+    documentTitle: "ot协同文档",
+    documentId: id, // 文档id
+    documentType: type, // 文档类型
+    userName: usernameInputEl.value, // 用户名称
+    userId: 123,
+    // 文档连接状态
+    onDocumentConnectionState: (state) => {
+      var indicatorColor;
+      sharedbSocketStateEl.innerHTML = state;
+      switch (state.toString()) {
+        case "connecting":
+          indicatorColor = "silver";
+          break;
+        case "connected":
+          indicatorColor = "lime";
+          break;
+        case "disconnected":
+        case "closed":
+        case "stopped":
+          indicatorColor = "red";
+          break;
+      }
+      sharedbSocketIndicatorEl.style.backgroundColor = indicatorColor;
+    },
+    // 光标连接状态
+    onCursorConnectionState: (state) => {
+      var indicatorColor;
+      socketStateEl.innerHTML = state;
+      switch (state.toString()) {
+        case "connected":
+          indicatorColor = "lime";
+          break;
+        case "error":
+        case "closed":
+          indicatorColor = "red";
+          break;
+      }
+      socketIndicatorEl.style.backgroundColor = indicatorColor;
+    },
+    // 改变光标位置
+    onChangeCursors: (data) => {
+      const { cursorList, localCursor } = data;
+      updateUserList(cursorList, localCursor);
+    },
+    // 改变文档内容
+    onChangeDocument: (data) => {
+      console.log("onChangeDocument", data);
+    },
+    // 文档websocket 连接
+    documentConnectionUrl:
+      (location.protocol === "https:" ? "wss" : "ws") +
+      "://" +
+      window.location.host +
+      "/sharedb" +
+      `?documentId=${1}&documentType=${type}&userName=${
+        usernameInputEl.value
+      }&userId=123&documentTitle=ot协同文档`
+    // // 光标websocket 连接
+    // cursorConnectionUrl:
+    //   (location.protocol === "https:" ? "wss" : "ws") +
+    //   "://" +
+    //   window.location.host +
+    //   "/cursors" +
+    //   `?documentId=${id}&documentType=${type}`,
+  });
+
+  main.quill.enable();
+
+  document.getElementById("connect-panel").style.display = "none";
+  document.getElementById("users-panel").style.display = "block";
+  event.preventDefault();
+  return false;
 });

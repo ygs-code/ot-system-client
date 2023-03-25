@@ -158,6 +158,10 @@ class Index extends Component {
   // 定义表头字段
   getColumns = () => {
     const { tabsValue } = this.state;
+    const {
+      pushRoute,
+      routePaths: { officeDocumentDetails }
+    } = this.props;
 
     return [
       {
@@ -176,8 +180,41 @@ class Index extends Component {
         dataIndex: "actions",
         key: "actions",
         width: 120,
-        render: () => {
-          return <Actions />;
+        render: (text, row) => {
+          const { id, title } = row;
+
+          return (
+            <Actions
+              options={[
+                {
+                  label: "编辑",
+                  type: "edit",
+                  onClick: () => {
+                    pushRoute({
+                      path: officeDocumentDetails,
+                      params: {
+                        action: "edit",
+                        id,
+                        type: "document"
+                      } // 地址传参
+                    });
+                    console.log("row===", row);
+                    console.log("this.props===", this.props);
+                  }
+                },
+                {
+                  label: "删除",
+                  type: "remove",
+                  onClick: () => {}
+                },
+                {
+                  label: "查看",
+                  type: "view",
+                  onClick: () => {}
+                }
+              ]}
+            />
+          );
         }
       }
     ];

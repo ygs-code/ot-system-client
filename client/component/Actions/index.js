@@ -7,6 +7,9 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import PreviewIcon from "@mui/icons-material/Preview";
 import { alpha, styled } from "@mui/material/styles";
 import * as React from "react";
 
@@ -64,6 +67,13 @@ export default (props) => {
     setAnchorEl(null);
   };
 
+  const mapType = {
+    create: <AddCircleIcon />,
+    edit: <EditIcon />,
+    remove: <DeleteForeverIcon />,
+    view: <PreviewIcon />
+  };
+
   return (
     <div>
       <Button
@@ -85,23 +95,21 @@ export default (props) => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}>
-        <MenuItem onClick={handleClose} disableRipple>
-          <EditIcon />
-          编辑
-        </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
-          <FileCopyIcon />
-          Duplicate
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} disableRipple>
-          <ArchiveIcon />
-          Archive
-        </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
-          <MoreHorizIcon />
-          More
-        </MenuItem>
+        {options.map((item, index) => {
+          const { label, type, onClick = () => {} } = item;
+          return (
+            <MenuItem
+              key={index}
+              onClick={async () => {
+                await onClick(item);
+                handleClose()
+              }}
+              disableRipple>
+              {mapType[type] || null}
+              {label}
+            </MenuItem>
+          );
+        })}
       </StyledMenu>
     </div>
   );

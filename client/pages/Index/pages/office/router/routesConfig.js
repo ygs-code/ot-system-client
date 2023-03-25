@@ -14,7 +14,7 @@ export default [
         level: 2,
         children: [
           {
-            path: "/details/:action/:id?",
+            path: "/details/:action/:type/:id?",
             name: "officeDocumentDetails",
             entry: "/pages/Index/pages/office/pages/Document/details/index.js",
             level: 2,
