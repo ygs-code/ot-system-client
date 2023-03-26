@@ -472,7 +472,7 @@ export default mapRedux(["user"])((props) => {
       documentConnectionUrl:
         (location.protocol === "https:" ? "wss" : "ws") +
         "://" +
-        '127.0.0.1/:3100' +
+        '127.0.0.1:3000' +
         "/sharedb" +
         `?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
       // // 光标websocket 连接
