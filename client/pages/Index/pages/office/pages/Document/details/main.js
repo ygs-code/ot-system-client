@@ -4,7 +4,7 @@ import ReconnectingWebSocket from "reconnectingwebsocket";
 import ShareDB from "client/modules/otServe/lib/client";
 import Quill from "./quill";
 import { mapRedux } from "client/redux";
-import Cursors from "./cursors";
+import Cursors from "./cursors"; 
 import { stabilization } from "client/utils";
 import { type } from "rich-text";
 

@@ -28,7 +28,5 @@ module.exports = {
   module: {
     rules: []
   },
-  plugins: [
-    new CleanWebpackPlugin(),
-  ]
+  plugins: [new CleanWebpackPlugin()]
 };
