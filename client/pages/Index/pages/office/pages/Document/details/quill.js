@@ -10,20 +10,17 @@ class $Quill {
     { elId, onTextChange = () => {}, onSelectionChange = () => {} },
     quillOptions = {}
   ) {
-    // const { id, type } = getUrlParams(window.location.href);
-    // this.documentId = id;
-    // this.documentType = type;
+ 
     this.options = {};
     this.documentConnectionState = null;
     this.initQuill({ elId, onTextChange, onSelectionChange }, quillOptions);
-    this.setLocalCursorsData = {};
-    this.isSetLocalCursorsFlag = 0;
+ 
   }
   initQuill(
     { elId, onTextChange = () => {}, onSelectionChange = () => {} },
     quillOptions
   ) {
-    console.log("quillOptions===", quillOptions);
+   
     this.quill = new Quill(elId, quillOptions);
     this.cursorsModule = this.quill.getModule("cursors");
     // local -> server
@@ -58,6 +55,7 @@ class $Quill {
   }
   // 设置光标
   setCursor(...ags) {
+    
     this.cursorsModule.setCursor(...ags);
   }
   getDelta() {
@@ -74,6 +72,7 @@ class $Quill {
     // update editor contents  更新文本内容
     this.quill.setContents(delta);
   }
+  
   registerTextChangeListener() {
     this.cursorsModule.registerTextChangeListener();
   }

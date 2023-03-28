@@ -1,48 +1,428 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.index = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-var i=require("./doc"),o=require("./query"),n=require("./presence/presence"),r=require("./presence/doc-presence"),c=require("./snapshot-request/snapshot-version-request"),a=require("./snapshot-request/snapshot-timestamp-request"),s=require("../emitter"),h=require("../error"),t=require("../types"),u=require("../util"),d=require("../logger"),p=h.CODES;function l(e){return 0===e.readyState||1===e.readyState?"connecting":"disconnected"}function e(e,t={}){this.options=t,s.EventEmitter.call(this),this.collections={},this.nextQueryId=1,this.nextSnapshotRequestId=1,this.queries={},this._presences={},this._snapshotRequests={},this.seq=1,this._presenceSeq=1,this.id=null,this.agent=null,this.debug=!1,this.state=l(e),this.bindToSocket(e)}function f(e,t){var n=new Error(e.message);return n.code=e.code,t&&(n.data=t),n}function _(e){return e.hasPending()}function y(e){return e.hasWritePending()}s.mixin(e),e.prototype.bindToSocket=function(e){var{data:{}={}}=this.options,t=(this.socket&&(this.socket.close(),this.socket.onmessage=null,this.socket.onopen=null,this.socket.onerror=null,this.socket.onclose=null),l(this.socket=e)),n=(this._setState(t),this.canSend=!1,this);e.onmessage=function(t){try{var e="string"==typeof t.data?JSON.parse(t.data):t.data}catch(e){return void d.warn("Failed to parse message",t)}n.debug&&d.info("RECV",JSON.stringify(e));t={data:e};if(n.emit("receive",t),t.data)try{n.handleMessage(t.data)}catch(e){u.nextTick(function(){n.emit("error",e)})}},e.onopen=function(){n._setState("connecting"),n._initializeHandshake()},e.onerror=function(e){n.emit("connection error",e)},e.onclose=function(e){"closed"===e||"Closed"===e?n._setState("closed",e):"stopped"===e||"Stopped by server"===e?n._setState("stopped",e):n._setState("disconnected",e)}},e.prototype.handleMessage=function(e){var t,n,s=null;switch(e.error&&(s=f(e.error,e),delete e.error),e.a){case"init":return this._handleLegacyInit(e);case"hs":return this._handleHandshake(s,e);case"qf":return void((t=this.queries[e.clientId])&&t._handleFetch(s,e.data,e.extra));case"qs":return void((t=this.queries[e.clientId])&&t._handleSubscribe(s,e.data,e.extra));case"qu":return;case"q":return(t=this.queries[e.clientId])?s?t._handleError(s):(e.diff&&t._handleDiff(e.diff),void(e.hasOwnProperty("extra")&&t._handleExtra(e.extra))):void 0;case"bf":return this._handleBulkMessage(s,e,"_handleFetch");case"bs":case"bu":return this._handleBulkMessage(s,e,"_handleSubscribe");case"nf":case"nt":return this._handleSnapshotFetch(s,e);case"f":return void((n=this.getExisting(e.c,e.d))&&n._handleFetch(s,e.data));case"s":case"u":return void((n=this.getExisting(e.c,e.d))&&n._handleSubscribe(s,e.data));case"op":return void((n=this.getExisting(e.c,e.d))&&n._handleOp(s,e));case"p":return this._handlePresence(s,e);case"ps":return this._handlePresenceSubscribe(s,e);case"pu":return this._handlePresenceUnsubscribe(s,e);case"pr":return this._handlePresenceRequest(s,e);default:d.warn("Ignoring unrecognized message",e)}},e.prototype._handleBulkMessage=function(e,t,n){if(t.data)for(var s in t.data){var i=t.data[s];(o=this.getExisting(t.c,s))&&(e?o[n](e):i.error?o[n](f(i.error)):o[n](null,i))}else if(Array.isArray(t.b))for(var r=0;r<t.b.length;r++){s=t.b[r];(o=this.getExisting(t.c,s))&&o[n](e)}else if(t.b)for(var s in t.b){var o;(o=this.getExisting(t.c,s))&&o[n](e)}else d.error("Invalid bulk message",t)},e.prototype._reset=function(){this.agent=null},e.prototype._setState=function(e,t){if(this.state!==e){var n,s,i;if("connecting"===e&&"disconnected"!==this.state&&"stopped"!==this.state&&"closed"!==this.state||"connected"===e&&"connecting"!==this.state)return n=new h(p.ERR_CONNECTION_STATE_TRANSITION_INVALID,"Cannot transition directly from "+this.state+" to "+e),this.emit("error",n);for(r in this.state=e,this.canSend="connected"===e,"disconnected"!==e&&"stopped"!==e&&"closed"!==e||this._reset(),this.startBulk(),this.queries)this.queries[r]._onConnectionStateChanged();for(s in this.collections){var r,o=this.collections[s];for(r in o)o[r]._onConnectionStateChanged()}for(i in this._presences)this._presences[i]._onConnectionStateChanged();for(r in this._snapshotRequests)this._snapshotRequests[r]._onConnectionStateChanged();this.endBulk(),this.emit(e,t),this.emit("state",e,t)}},e.prototype.startBulk=function(){this.bulk||(this.bulk={})},e.prototype.endBulk=function(){if(this.bulk)for(var e in this.bulk){var t=this.bulk[e];this._sendBulk("f",e,t.f),this._sendBulk("s",e,t.s),this._sendBulk("u",e,t.u)}this.bulk=null},e.prototype._sendBulk=function(e,t,n){if(n){var s,i,r=[],o={},c=0;for(i in n){var a=n[i];null==a?r.push(i):(o[i]=a,s=i,c++)}1===r.length?this.send({a:e,c:t,d:i=r[0]}):r.length&&this.send({a:"b"+e,c:t,b:r}),1===c?this.send({a:e,c:t,d:s,v:o[s]}):c&&this.send({a:"b"+e,c:t,b:o})}},e.prototype._sendAction=function(e,t,n){var s,i;if(this._addDoc(t),this.bulk)return s=(i=(i=this.bulk[t.collection]||(this.bulk[t.collection]={}))[e]||(i[e]={})).hasOwnProperty(t.id),i[t.id]=n,s;i={a:e,c:t.collection,d:t.id,v:n},this.send(i)},e.prototype.sendFetch=function(e){return this._sendAction("f",e,e.version)},e.prototype.sendSubscribe=function(e){return this._sendAction("s",e,e.version)},e.prototype.sendUnsubscribe=function(e){return this._sendAction("u",e)},e.prototype.sendOp=function(e,t){this._addDoc(e);var n={a:"op",c:e.collection,d:e.id,v:e.version,seq:t.seq,x:{},data:t.data};"op"in t&&(n.op=t.op),t.create&&(n.create=t.create),t.del&&(n.del=t.del),e.submitSource&&(n.x.source=t.source),this.send(n)},e.prototype.send=function(e){e.clientId=this.id,this.debug&&d.info("SEND",JSON.stringify(e)),this.emit("send",e),this.socket.send(JSON.stringify(e))},e.prototype.close=function(){this.socket.close()},e.prototype.getExisting=function(e,t){if(this.collections[e])return this.collections[e][t]},e.prototype.get=function(e,t){var n=this.collections[e]||(this.collections[e]={}),s=n[t];return s||(s=n[t]=new i(this,e,t),this.emit("doc",s)),s},e.prototype._destroyDoc=function(e){u.digAndRemove(this.collections,e.collection,e.id)},e.prototype._addDoc=function(e){var t=this.collections[e.collection];(t=t||(this.collections[e.collection]={}))[e.id]!==e&&(t[e.id]=e)},e.prototype._createQuery=function(e,t,n,s,i){var r=this.nextQueryId++,e=new o(e,this,r,t,n,s,i);return(this.queries[r]=e).send(),e},e.prototype._destroyQuery=function(e){delete this.queries[e.id]},e.prototype.createFetchQuery=function(e,t,n,s){return this._createQuery("qf",e,t,n,s)},e.prototype.createSubscribeQuery=function(e,t,n,s){return this._createQuery("qs",e,t,n,s)},e.prototype.hasPending=function(){return!!(this._firstDoc(_)||this._firstQuery(_)||this._firstSnapshotRequest())},e.prototype.hasWritePending=function(){return!!this._firstDoc(y)},e.prototype.whenNothingPending=function(e){var t=this._firstDoc(_);t?t.once("nothing pending",this._nothingPendingRetry(e)):(t=this._firstQuery(_))?t.once("ready",this._nothingPendingRetry(e)):(t=this._firstSnapshotRequest())?t.once("ready",this._nothingPendingRetry(e)):u.nextTick(e)},e.prototype._nothingPendingRetry=function(e){var t=this;return function(){u.nextTick(function(){t.whenNothingPending(e)})}},e.prototype._firstDoc=function(e){for(var t in this.collections){var n,s=this.collections[t];for(n in s){var i=s[n];if(e(i))return i}}},e.prototype._firstQuery=function(e){for(var t in this.queries){t=this.queries[t];if(e(t))return t}},e.prototype._firstSnapshotRequest=function(){for(var e in this._snapshotRequests)return this._snapshotRequests[e]},e.prototype.fetchSnapshot=function(e,t,n,s){"function"==typeof n&&(s=n,n=null);var i=this.nextSnapshotRequestId++,i=new c(this,i,e,t,n,s);(this._snapshotRequests[i.requestId]=i).send()},e.prototype.fetchSnapshotByTimestamp=function(e,t,n,s){"function"==typeof n&&(s=n,n=null);var i=this.nextSnapshotRequestId++,i=new a(this,i,e,t,n,s);(this._snapshotRequests[i.requestId]=i).send()},e.prototype._handleSnapshotFetch=function(e,t){var n=this._snapshotRequests[t.clientId];n&&(delete this._snapshotRequests[t.clientId],n._handleResponse(e,t))},e.prototype._handleLegacyInit=function(e){this.emit("init",e),this._initialize(e)},e.prototype._initializeHandshake=function(){var{data:e={},c:t,d:n}=this.options;this.send({a:"hs",id:this.id,data:e,c:t,d:n})},e.prototype._handleHandshake=function(e,t){if(e)return this.emit("error",e);this.emit("hs",t),this._initialize(t)},e.prototype._initialize=function(e){if("connecting"===this.state)return 1!==e.protocol?this.emit("error",new h(p.ERR_PROTOCOL_VERSION_NOT_SUPPORTED,"Unsupported protocol version: "+e.protocol)):t.map[e.type]!==t.defaultType?this.emit("error",new h(p.ERR_DEFAULT_TYPE_MISMATCH,e.type+" does not match the server default type")):"string"!=typeof e.clientId?this.emit("error",new h(p.ERR_CLIENT_ID_BADLY_FORMED,"Client id must be a string")):(this.id=e.clientId,void this._setState("connected"))},e.prototype.getPresence=function(e){var t=this;return u.digOrCreate(this._presences,e,function(){return new n(t,e)})},e.prototype.getDocPresence=function(e,t){var n=r.channel(e,t),s=this;return u.digOrCreate(this._presences,n,function(){return new r(s,e,t)})},e.prototype._sendPresenceAction=function(e,t,n){this._addPresence(n);e={a:e,ch:n.channel,seq:t};return this.send(e),e.seq},e.prototype._addPresence=function(e){u.digOrCreate(this._presences,e.channel,function(){return e})},e.prototype._handlePresenceSubscribe=function(e,t){var n=u.dig(this._presences,t.ch);n&&n._handleSubscribe(e,t.seq)},e.prototype._handlePresenceUnsubscribe=function(e,t){var n=u.dig(this._presences,t.ch);n&&n._handleUnsubscribe(e,t.seq)},e.prototype._handlePresence=function(e,t){var n=u.dig(this._presences,t.ch);n&&n._receiveUpdate(e,t)},e.prototype._handlePresenceRequest=function(e,t){var n=u.dig(this._presences,t.ch);n&&n._broadcastAllLocalPresence(e,t)},module.exports=e;
-},{"../emitter":14,"../error":15,"../logger":16,"../types":20,"../util":21,"./doc":2,"./presence/doc-presence":4,"./presence/presence":7,"./query":10,"./snapshot-request/snapshot-timestamp-request":12,"./snapshot-request/snapshot-version-request":13}],2:[function(require,module,exports){
-var n=require("../emitter"),i=require("../logger"),p=require("../error"),c=require("../types"),h=require("../util"),t=h.clone,e=require("fast-deep-equal"),a=p.CODES;function s(t,i,e){n.EventEmitter.call(this),this.connection=t,this.collection=i,this.id=e,this.version=null,this.type=null,this.data=void 0,this.inflightFetch=[],this.inflightSubscribe=null,this.pendingFetch=[],this.pendingSubscribe=[],this.subscribed=!1,this.wantSubscribe=!1,this.inflightOp=null,this.pendingOps=[],this.type=null,this.applyStack=null,this.preventCompose=!1,this.submitSource=!1,this.paused=!1,this._dataStateVersion=0}function l(t,i){var e,n;if(!t.del)return i.del?new p(a.ERR_DOC_WAS_DELETED,"Document was deleted"):i.create?new p(a.ERR_DOC_ALREADY_CREATED,"Document already created"):"op"in i?t.create?new p(a.ERR_DOC_ALREADY_CREATED,"Document already created"):void(t.type.transformX?(e=t.type.transformX(t.op,i.op),t.op=e[0],i.op=e[1]):(e=t.type.transform(t.op,i.op,"left"),n=t.type.transform(i.op,t.op,"right"),t.op=e,i.op=n)):void 0;delete(t=i).op,delete t.create,delete t.del}module.exports=s,n.mixin(s),s.prototype.destroy=function(i){var e=this;e.whenNothingPending(function(){e.wantSubscribe?e.unsubscribe(function(t){if(t)return i?i(t):e.emit("error",t);e.connection._destroyDoc(e),e.emit("destroy"),i&&i()}):(e.connection._destroyDoc(e),e.emit("destroy"),i&&i())})},s.prototype._setType=function(t){if(t="string"==typeof t?c.map[t]:t)this.type=t;else{var i;if(null!==t)return i=new p(a.ERR_DOC_TYPE_NOT_RECOGNIZED,"Missing type "+t),this.emit("error",i);this.type=t,this._setData(void 0)}},s.prototype._setData=function(t){this.data=t,this._dataStateVersion++},s.prototype.ingestSnapshot=function(t,i){if(!t)return i&&i();if("number"!=typeof t.v)return e=new p(a.ERR_INGESTED_SNAPSHOT_HAS_NO_VERSION,"Missing version in ingested snapshot. "+this.collection+"."+this.id),i?i(e):this.emit("error",e);if(this.type||this.hasWritePending())return null==this.version?this.hasWritePending()?i&&this.once("no write pending",i):(e=new p(a.ERR_DOC_MISSING_VERSION,"Cannot ingest snapshot in doc with null version. "+this.collection+"."+this.id),i?i(e):this.emit("error",e)):t.v>this.version?this.fetch(i):i&&i();if(this.version>t.v)return i&&i();this.version=t.v;var e=void 0===t.type?c.defaultType:t.type;this._setType(e),this._setData(this.type&&this.type.deserialize?this.type.deserialize(t.data):t.data),this.emit("load"),i&&i()},s.prototype.whenNothingPending=function(t){var i=this;h.nextTick(function(){i.hasPending()?i.once("nothing pending",t):t()})},s.prototype.hasPending=function(){return!!(this.inflightOp||this.pendingOps.length||this.inflightFetch.length||this.inflightSubscribe||this.pendingFetch.length||this.pendingSubscribe.length)},s.prototype.hasWritePending=function(){return!(!this.inflightOp&&!this.pendingOps.length)},s.prototype._emitNothingPending=function(){this.hasWritePending()||(this.emit("no write pending"),this.hasPending())||this.emit("nothing pending")},s.prototype._emitResponseError=function(t,i){t&&t.code===a.ERR_SNAPSHOT_READ_SILENT_REJECTION?(this.wantSubscribe=!1,i&&i(),this._emitNothingPending()):i?(i(t),this._emitNothingPending()):(this._emitNothingPending(),this.emit("error",t))},s.prototype._handleFetch=function(t,i){var e=this.pendingFetch,n=(this.pendingFetch=[],this.inflightFetch.shift());if(n&&e.push(n),e.length&&(n=function(t){h.callEach(e,t)}),t)return this._emitResponseError(t,n);this.ingestSnapshot(i,n),this._emitNothingPending()},s.prototype._handleSubscribe=function(t,i){var e,n=this.inflightSubscribe,s=(this.inflightSubscribe=null,this.pendingFetch);if(this.pendingFetch=[],n.callback&&s.push(n.callback),s.length&&(e=function(t){h.callEach(s,t)}),t)return this._emitResponseError(t,e);this.subscribed=n.wantSubscribe,this.subscribed?this.ingestSnapshot(i,e):e&&e(),this._emitNothingPending(),this._flushSubscribe()},s.prototype._handleOp=function(t,i){if(t)return this.inflightOp?(t.code===a.ERR_OP_SUBMIT_REJECTED&&(t=null),this._rollback(t)):this.emit("error",t);if(this.inflightOp&&i.clientId===this.inflightOp.clientId&&i.seq===this.inflightOp.seq)this._opAcknowledged(i);else if(null==this.version||i.v>this.version)this.fetch();else if(!(i.v<this.version)){if(this.inflightOp)if(e=l(this.inflightOp,i))return this._hardRollback(e);for(var e,n=0;n<this.pendingOps.length;n++)if(e=l(this.pendingOps[n],i))return this._hardRollback(e);this.version++;try{this._otApply(i,!1)}catch(t){return this._hardRollback(t)}}},s.prototype._onConnectionStateChanged=function(){this.connection.canSend?(this.flush(),this._resubscribe()):(this.inflightOp&&(this.pendingOps.unshift(this.inflightOp),this.inflightOp=null),this.subscribed=!1,this.inflightSubscribe&&(this.inflightSubscribe.wantSubscribe?(this.pendingSubscribe.unshift(this.inflightSubscribe),this.inflightSubscribe=null):this._handleSubscribe()),this.inflightFetch.length&&(this.pendingFetch=this.pendingFetch.concat(this.inflightFetch),this.inflightFetch.length=0))},s.prototype._resubscribe=function(){if(!this.pendingSubscribe.length&&this.wantSubscribe)return this.subscribe();!this.pendingSubscribe.some(function(t){return t.wantSubscribe})&&this.pendingFetch.length&&this.fetch(),this._flushSubscribe()},s.prototype.fetch=function(t){var i,e,n,s;this.connection.canSend?(i=this.connection.sendFetch(this),n=this.inflightFetch,s=t,i?(e=n.pop(),n.push(function(t){e&&e(t),s&&s(t)})):n.push(s)):this.pendingFetch.push(t)},s.prototype.subscribe=function(t){this._queueSubscribe(!0,t)},s.prototype.unsubscribe=function(t){this._queueSubscribe(!1,t)},s.prototype._queueSubscribe=function(t,i){var e,n=this.pendingSubscribe[this.pendingSubscribe.length-1]||this.inflightSubscribe;n&&n.wantSubscribe===t?n.callback=(e=(e=[n.callback,i]).filter(h.truthy)).length?function(t){h.callEach(e,t)}:null:(this.pendingSubscribe.push({wantSubscribe:!!t,callback:i}),this._flushSubscribe())},s.prototype._flushSubscribe=function(){var t;!this.inflightSubscribe&&this.pendingSubscribe.length&&(this.connection.canSend?(this.inflightSubscribe=this.pendingSubscribe.shift(),this.wantSubscribe=this.inflightSubscribe.wantSubscribe,this.wantSubscribe?this.connection.sendSubscribe(this):(this.subscribed=!1,this.connection.sendUnsubscribe(this))):this.pendingSubscribe[0].wantSubscribe||(this.inflightSubscribe=this.pendingSubscribe.shift(),t=this,h.nextTick(function(){t._handleSubscribe()})))},s.prototype.flush=function(){this.connection.canSend&&!this.inflightOp&&!this.paused&&this.pendingOps.length&&this._sendOp()},s.prototype._otApply=function(t,i){const e=i["source"];if("op"in t){if(!this.type)throw new p(a.ERR_DOC_DOES_NOT_EXIST,"Cannot apply op to uncreated document. "+this.collection+"."+this.id);const e=i["source"];if(this.emit("before op batch",t.op,e),!e&&this.type===c.defaultType&&1<t.op.length){this.applyStack||(this.applyStack=[]);for(var n=this.applyStack.length,s=0;s<t.op.length;s++){var h={op:[t.op[s]]};this.emit("before op",h.op,e,t.clientId);for(var o=n;o<this.applyStack.length;o++){var r=l(this.applyStack[o],h);if(r)return this._hardRollback(r)}this._setData(this.type.apply(this.data,h.op)),this.emit("op",h.op,e,t.clientId)}return this.emit("op batch",t.op,e),void this._popApplyStack(n)}this.emit("before op",t.op,e,t.clientId),this._setData(this.type.apply(this.data,t.op)),this.emit("op",t,e,t.clientId),void this.emit("op batch",t.op,e)}else t.create?(this._setType(t.create.type),this.type.deserialize?this.type.createDeserialized?this._setData(this.type.createDeserialized(t.create.data)):this._setData(this.type.deserialize(this.type.create(t.create.data))):this._setData(this.type.create(t.create.data)),this.emit("create",e)):t.del&&(i=this.data,this._setType(null),this.emit("del",i,e))},s.prototype._sendOp=function(){if(this.connection.canSend){var t,i=this.connection.id,e=(this.inflightOp||(this.inflightOp=this.pendingOps.shift()),this.inflightOp);if(!e)return t=new p(a.ERR_INFLIGHT_OP_MISSING,"No op to send on call to _sendOp"),this.emit("error",t);if(e.sentAt=Date.now(),e.retries=null==e.retries?0:e.retries+1,null==e.seq){if(this.connection.seq>=h.MAX_SAFE_INTEGER)return this.emit("error",new p(a.ERR_CONNECTION_SEQ_INTEGER_OVERFLOW,"Connection seq has exceeded the max safe integer, maybe from being open for too long"));e.seq=this.connection.seq++}this.connection.sendOp(this,e),null==e.clientId&&(e.clientId=i)}},s.prototype._submit=function(t,i={},e){var n,{}=i;if("op"in t){if(!this.type)return n=new p(a.ERR_DOC_DOES_NOT_EXIST,"Cannot submit op. Document has not been created. "+this.collection+"."+this.id),e?e(n):this.emit("error",n);this.type.normalize&&(t.op=this.type.normalize(t.op))}try{this._pushOp(t,i,e),this._otApply(t,i)}catch(t){return this._hardRollback(t)}var s=this;h.nextTick(function(){s.flush()})},s.prototype._pushOp=function(t,i,e){i=i.source;if(t.source=i,this.applyStack)this.applyStack.push(t);else{i=this._tryCompose(t);if(i)return void i.callbacks.push(e)}t.type=this.type,t.callbacks=[e],this.pendingOps.push(t)},s.prototype._popApplyStack=function(t){if(0<t)this.applyStack.length=t;else{var i=this.applyStack[0];if(this.applyStack=null,i){var e=this.pendingOps.indexOf(i);if(-1!==e)for(var n=this.pendingOps.splice(e),e=0;e<n.length;e++){var i=n[e],s=this._tryCompose(i);s?s.callbacks=s.callbacks.concat(i.callbacks):this.pendingOps.push(i)}}}},s.prototype._tryCompose=function(t){if(!this.preventCompose){var i=this.pendingOps[this.pendingOps.length-1];if(i&&!i.sentAt&&(!this.submitSource||e(t.source,i.source)))return i.create&&"op"in t?(i.create.data=this.type.apply(i.create.data,t.op),i):"op"in i&&"op"in t&&this.type.compose?(i.op=this.type.compose(i.op,t.op),i):void 0}},s.prototype.submitOp=function(t,i,e){"function"==typeof i&&(e=i,i=null);t={op:t.op,data:t.data};this._submit(t,i,e)},s.prototype.create=function(t,i,e,n){var s,{op:{ops:t=[]},data:h}=t;if("function"==typeof i?(n=i,i=e=null):"function"==typeof e&&(n=e,e=null),i=i||c.defaultType.uri,this.type)return s=new p(a.ERR_DOC_ALREADY_CREATED,"Document already exists"),n?n(s):this.emit("error",s);this._submit({create:{type:i,data:t},data:h},e,n)},s.prototype.del=function(t,i){var e;if("function"==typeof t&&(i=t,t=null),!this.type)return e=new p(a.ERR_DOC_DOES_NOT_EXIST,"Document does not exist"),i?i(e):this.emit("error",e);this._submit({del:!0},t,i)},s.prototype.pause=function(){this.paused=!0},s.prototype.resume=function(){this.paused=!1,this.flush()},s.prototype.toSnapshot=function(){return{v:this.version,data:t(this.data),type:this.type.uri}},s.prototype._opAcknowledged=function(t){if(this.inflightOp.create)this.version=t.v;else if(t.v!==this.version)return i.warn("Invalid version from server. Expected: "+this.version+" Received: "+t.v,t),this.fetch();this.version++,this._clearInflightOp()},s.prototype._rollback=function(i){var t=this.inflightOp;if("op"in t&&t.type.invert){try{t.op=t.type.invert(t.op)}catch(t){return this._hardRollback(i)}for(var e=0;e<this.pendingOps.length;e++){var n=l(this.pendingOps[e],t);if(n)return this._hardRollback(n)}try{this._otApply(t,!1)}catch(t){return this._hardRollback(t)}this._clearInflightOp(i)}else this._hardRollback(i)},s.prototype._hardRollback=function(e){var n=[],s=(this.inflightOp&&n.push(this.inflightOp),n=n.concat(this.pendingOps),this._setType(null),this.version=null,this.inflightOp=null,this.pendingOps=[],this);this.fetch(function(){for(var t=!!n.length,i=0;i<n.length;i++)t=h.callEach(n[i].callbacks,e)&&t;if(e&&!t)return s.emit("error",e)})},s.prototype._clearInflightOp=function(t){var i=this.inflightOp,i=(this.inflightOp=null,h.callEach(i.callbacks,t));if(this.flush(),this._emitNothingPending(),t&&!i)return this.emit("error",t)};
-},{"../emitter":14,"../error":15,"../logger":16,"../types":20,"../util":21,"fast-deep-equal":24}],3:[function(require,module,exports){
-exports.Connection=require("./connection"),exports.Doc=require("./doc"),exports.Error=require("../error"),exports.Query=require("./query"),exports.types=require("../types"),exports.logger=require("../logger");
-},{"../error":15,"../logger":16,"../types":20,"./connection":1,"./doc":2,"./query":10}],4:[function(require,module,exports){
-var c=require("./presence"),r=require("./local-doc-presence"),t=require("./remote-doc-presence");function o(e,r,t){var n=o.channel(r,t);c.call(this,e,n),this.collection=r,this.id=t}(module.exports=o).prototype=Object.create(c.prototype),o.channel=function(e,r){return e+"."+r},o.prototype._createLocalPresence=function(e){return new r(this,e)},o.prototype._createRemotePresence=function(e){return new t(this,e)};
-},{"./local-doc-presence":5,"./presence":7,"./remote-doc-presence":8}],5:[function(require,module,exports){
-var n=require("./local-presence"),i=require("../../error"),o=require("../../util"),r=i.CODES;function e(e,t){n.call(this,e,t),this.collection=this.presence.collection,this.id=this.presence.id,this._doc=this.connection.get(this.collection,this.id),this._isSending=!1,this._docDataVersionByPresenceVersion={},this._opHandler=this._transformAgainstOp.bind(this),this._createOrDelHandler=this._handleCreateOrDel.bind(this),this._loadHandler=this._handleLoad.bind(this),this._destroyHandler=this.destroy.bind(this),this._registerWithDoc()}((module.exports=e).prototype=Object.create(n.prototype)).submit=function(e,t){var s;if(!this._doc.type)return null===e?this._callbackOrEmit(null,t):(s={code:r.ERR_DOC_DOES_NOT_EXIST,message:"Cannot submit presence. Document has not been created"},this._callbackOrEmit(s,t));this._docDataVersionByPresenceVersion[this.presenceVersion]=this._doc._dataStateVersion,n.prototype.submit.call(this,e,t)},e.prototype.destroy=function(e){this._doc.removeListener("op",this._opHandler),this._doc.removeListener("create",this._createOrDelHandler),this._doc.removeListener("del",this._createOrDelHandler),this._doc.removeListener("load",this._loadHandler),this._doc.removeListener("destroy",this._destroyHandler),n.prototype.destroy.call(this,e)},e.prototype._sendPending=function(){var t;this._isSending||(this._isSending=!0,(t=this)._doc.whenNothingPending(function(){t._isSending=!1,t.connection.canSend&&(t._pendingMessages.forEach(function(e){e.t=t._doc.type.uri,e.v=t._doc.version,t.connection.send(e)}),t._pendingMessages=[],t._docDataVersionByPresenceVersion={})}))},e.prototype._registerWithDoc=function(){this._doc.on("op",this._opHandler),this._doc.on("create",this._createOrDelHandler),this._doc.on("del",this._createOrDelHandler),this._doc.on("load",this._loadHandler),this._doc.on("destroy",this._destroyHandler)},e.prototype._transformAgainstOp=function(e,n){var i=this,o=this._doc._dataStateVersion;this._pendingMessages.forEach(function(t){var s=i._docDataVersionByPresenceVersion[t.pv];if(!(o<=s))try{t.p=i._transformPresence(t.p,e,n),i._docDataVersionByPresenceVersion[t.pv]=o}catch(e){s=i._getCallback(t.pv);i._callbackOrEmit(e,s)}});try{this.value=this._transformPresence(this.value,e,n)}catch(e){this.emit("error",e)}},e.prototype._handleCreateOrDel=function(){this._pendingMessages.forEach(function(e){e.p=null}),this.value=null},e.prototype._handleLoad=function(){this.value=null,this._pendingMessages=[],this._docDataVersionByPresenceVersion={}},e.prototype._message=function(){var e=n.prototype._message.call(this);return e.c=this.collection,e.d=this.id,e.v=null,e.t=null,e},e.prototype._transformPresence=function(e,t,s){var n=this._doc.type;if(o.supportsPresence(n))return n.transformPresence(e,t,s);throw new i(r.ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE,"Type does not support presence: "+n.name)};
-},{"../../error":15,"../../util":21,"./local-presence":6}],6:[function(require,module,exports){
-var t=require("../../emitter"),s=require("../../util");function e(e,n){if(t.EventEmitter.call(this),!n||"string"!=typeof n)throw new Error("LocalPresence presenceId must be a string");this.presence=e,this.presenceId=n,this.connection=e.connection,this.presenceVersion=0,this.value=null,this._pendingMessages=[],this._callbacksByPresenceVersion={}}module.exports=e,t.mixin(e),e.prototype.submit=function(e,n){this.value=e,this.send(n)},e.prototype.send=function(e){var n=this._message();this._pendingMessages.push(n),this._callbacksByPresenceVersion[n.pv]=e,this._sendPending()},e.prototype.destroy=function(n){var t=this;this.submit(null,function(e){if(e)return t._callbackOrEmit(e,n);delete t.presence.localPresences[t.presenceId],n&&n()})},e.prototype._sendPending=function(){var n;this.connection.canSend&&((n=this)._pendingMessages.forEach(function(e){n.connection.send(e)}),this._pendingMessages=[])},e.prototype._ack=function(e,n){n=this._getCallback(n);this._callbackOrEmit(e,n)},e.prototype._message=function(){return{a:"p",ch:this.presence.channel,id:this.presenceId,p:this.value,pv:this.presenceVersion++}},e.prototype._getCallback=function(e){var n=this._callbacksByPresenceVersion[e];return delete this._callbacksByPresenceVersion[e],n},e.prototype._callbackOrEmit=function(e,n){if(n)return s.nextTick(n,e);e&&this.emit("error",e)};
-},{"../../emitter":14,"../../util":21}],7:[function(require,module,exports){
-var n=require("../../emitter"),t=require("./local-presence"),s=require("./remote-presence"),r=require("../../util"),i=require("async"),c=require("hat");function e(e,t){if(n.EventEmitter.call(this),!t||"string"!=typeof t)throw new Error("Presence channel must be provided");this.connection=e,this.channel=t,this.wantSubscribe=!1,this.subscribed=!1,this.remotePresences={},this.localPresences={},this._remotePresenceInstances={},this._subscriptionCallbacksBySeq={}}module.exports=e,n.mixin(e),e.prototype.subscribe=function(e){this._sendSubscriptionAction(!0,e)},e.prototype.unsubscribe=function(e){this._sendSubscriptionAction(!1,e)},e.prototype.create=function(e){e=e||c();var t=this._createLocalPresence(e);return this.localPresences[e]=t},e.prototype.destroy=function(s){var r=this;this.unsubscribe(function(e){if(e)return r._callbackOrEmit(e,s);var t=Object.keys(r.localPresences),n=Object.keys(r._remotePresenceInstances);i.parallel([function(e){i.each(t,function(e,t){r.localPresences[e].destroy(t)},e)},function(e){i.each(n,function(e,t){r._remotePresenceInstances[e].destroy(t)},e)}],function(e){delete r.connection._presences[r.channel],r._callbackOrEmit(e,s)})})},e.prototype._sendSubscriptionAction=function(e,t){this.wantSubscribe=!!e;var e=this.wantSubscribe?"ps":"pu",n=this.connection._presenceSeq++;this._subscriptionCallbacksBySeq[n]=t,this.connection.canSend&&this.connection._sendPresenceAction(e,n,this)},e.prototype._handleSubscribe=function(e,t){this.wantSubscribe&&(this.subscribed=!0);t=this._subscriptionCallback(t);this._callbackOrEmit(e,t)},e.prototype._handleUnsubscribe=function(e,t){this.subscribed=!1;t=this._subscriptionCallback(t);this._callbackOrEmit(e,t)},e.prototype._receiveUpdate=function(e,t){var n,s=r.dig(this.localPresences,t.clientId);return s?s._ack(e,t.pv):e?this.emit("error",e):void r.digOrCreate((n=this)._remotePresenceInstances,t.clientId,function(){return n._createRemotePresence(t.clientId)}).receiveUpdate(t)},e.prototype._updateRemotePresence=function(e){this.remotePresences[e.presenceId]=e.value,null===e.value&&this._removeRemotePresence(e.presenceId),this.emit("receive",e.presenceId,e.value)},e.prototype._broadcastAllLocalPresence=function(e){if(e)return this.emit("error",e);for(var t in this.localPresences){t=this.localPresences[t];null!==t.value&&t.send()}},e.prototype._removeRemotePresence=function(e){this._remotePresenceInstances[e].destroy(),delete this._remotePresenceInstances[e],delete this.remotePresences[e]},e.prototype._onConnectionStateChanged=function(){if(this.connection.canSend)for(var e in this._resubscribe(),this.localPresences)this.localPresences[e]._sendPending()},e.prototype._resubscribe=function(){var e,t=[];for(e in this._subscriptionCallbacksBySeq){var n=this._subscriptionCallback(e);t.push(n)}if(!this.wantSubscribe)return this._callEachOrEmit(t);var s=this;this.subscribe(function(e){s._callEachOrEmit(t,e)})},e.prototype._subscriptionCallback=function(e){var t=this._subscriptionCallbacksBySeq[e];return delete this._subscriptionCallbacksBySeq[e],t},e.prototype._callbackOrEmit=function(e,t){if(t)return r.nextTick(t,e);e&&this.emit("error",e)},e.prototype._createLocalPresence=function(e){return new t(this,e)},e.prototype._createRemotePresence=function(e){return new s(this,e)},e.prototype._callEachOrEmit=function(e,t){!r.callEach(e,t)&&t&&this.emit("error",t)};
-},{"../../emitter":14,"../../util":21,"./local-presence":6,"./remote-presence":9,"async":22,"hat":25}],8:[function(require,module,exports){
-var n=require("./remote-presence"),i=require("../../ot");function e(e,t){n.call(this,e,t),this.collection=this.presence.collection,this.id=this.presence.id,this.clientId=null,this.presenceVersion=null,this._doc=this.connection.get(this.collection,this.id),this._pending=null,this._opCache=null,this._pendingSetPending=!1,this._opHandler=this._handleOp.bind(this),this._createDelHandler=this._handleCreateDel.bind(this),this._loadHandler=this._handleLoad.bind(this),this._registerWithDoc()}((module.exports=e).prototype=Object.create(n.prototype)).receiveUpdate=function(e){this._pending&&e.pv<this._pending.pv||(this.clientId=e.clientId,this._pending=e,this._setPendingPresence())},e.prototype.destroy=function(e){this._doc.removeListener("op",this._opHandler),this._doc.removeListener("create",this._createDelHandler),this._doc.removeListener("del",this._createDelHandler),this._doc.removeListener("load",this._loadHandler),n.prototype.destroy.call(this,e)},e.prototype._registerWithDoc=function(){this._doc.on("op",this._opHandler),this._doc.on("create",this._createDelHandler),this._doc.on("del",this._createDelHandler),this._doc.on("load",this._loadHandler)},e.prototype._setPendingPresence=function(){var e;this._pendingSetPending||(this._pendingSetPending=!0,(e=this)._doc.whenNothingPending(function(){if(e._pendingSetPending=!1,e._pending)return e._pending.pv<e.presenceVersion?e._pending=null:e._pending.v>e._doc.version?e._doc.fetch():void(e._catchUpStalePresence()&&(e.value=e._pending.p,e.presenceVersion=e._pending.pv,e._pending=null,e.presence._updateRemotePresence(e)))}))},e.prototype._handleOp=function(e,t,n){n=n===this.clientId;this._transformAgainstOp(e,n),this._cacheOp(e,n),this._setPendingPresence()},n.prototype._handleCreateDel=function(){this._cacheOp(null),this._setPendingPresence()},n.prototype._handleLoad=function(){this.value=null,this._pending=null,this._opCache=null,this.presence._updateRemotePresence(this)},e.prototype._transformAgainstOp=function(e,t){if(this.value){try{this.value=this._doc.type.transformPresence(this.value,e,t)}catch(e){return this.presence.emit("error",e)}this.presence._updateRemotePresence(this)}},e.prototype._catchUpStalePresence=function(){if(this._pending.v>=this._doc.version)return!0;if(!this._opCache)return this._startCachingOps(),this._doc.fetch(),this.presence.subscribe(),!1;for(;this._opCache[this._pending.v];){var e=this._opCache[this._pending.v],t=e.op,e=e.isOwnOp;null===t?(this._pending.p=null,this._pending.v++):i.transformPresence(this._pending,t,e)}var n=this._pending.v>=this._doc.version;return n&&this._stopCachingOps(),n},e.prototype._startCachingOps=function(){this._opCache=[]},e.prototype._stopCachingOps=function(){this._opCache=null},e.prototype._cacheOp=function(e,t){this._opCache&&(this._opCache[this._doc.version-1]={op:e=e?{op:e}:null,isOwnOp:t})};
-},{"../../ot":18,"./remote-presence":9}],9:[function(require,module,exports){
-var s=require("../../util");function e(e,s){this.presence=e,this.presenceId=s,this.connection=this.presence.connection,this.value=null,this.presenceVersion=0}(module.exports=e).prototype.receiveUpdate=function(e){e.pv<this.presenceVersion||(this.value=e.p,this.presenceVersion=e.pv,this.presence._updateRemotePresence(this))},e.prototype.destroy=function(e){delete this.presence._remotePresenceInstances[this.presenceId],delete this.presence.remotePresences[this.presenceId],e&&s.nextTick(e)};
-},{"../../util":21}],10:[function(require,module,exports){
-var h=require("../emitter"),e=require("../util");function t(t,e,s,i,n,o,r){h.EventEmitter.call(this),this.action=t,this.connection=e,this.id=s,this.collection=i,this.query=n,this.results=null,o&&o.results&&(this.results=o.results,delete o.results),this.extra=void 0,this.options=o,this.callback=r,this.ready=!1,this.sent=!1}module.exports=t,h.mixin(t),t.prototype.hasPending=function(){return!this.ready},t.prototype.send=function(){if(this.connection.canSend){var t={a:this.action,id:this.id,c:this.collection,q:this.query};if(this.options&&(t.o=this.options),this.results){for(var e=[],s=0;s<this.results.length;s++){var i=this.results[s];e.push([i.id,i.version])}t.r=e}this.connection.send(t),this.sent=!0}},t.prototype.destroy=function(t){this.connection.canSend&&"qs"===this.action&&this.connection.send({a:"qu",id:this.id}),this.connection._destroyQuery(this),t&&e.nextTick(t)},t.prototype._onConnectionStateChanged=function(){this.connection.canSend&&!this.sent?this.send():this.sent=!1},t.prototype._handleFetch=function(t,e,s){this.connection._destroyQuery(this),this._handleResponse(t,e,s)},t.prototype._handleSubscribe=function(t,e,s){this._handleResponse(t,e,s)},t.prototype._handleResponse=function(t,e,s){var i=this.callback;if(this.callback=null,t)return this._finishResponse(t,i);if(!e)return this._finishResponse(null,i);function n(t){if(t)return o._finishResponse(t,i);--r||o._finishResponse(null,i)}var o=this,r=1;if(Array.isArray(e))r+=e.length,this.results=this._ingestSnapshots(e,n),this.extra=s;else for(var h in e){r++;var c=e[h];this.connection.get(c.c||this.collection,h).ingestSnapshot(c,n)}n()},t.prototype._ingestSnapshots=function(t,e){for(var s=[],i=0;i<t.length;i++){var n=t[i],o=this.connection.get(n.c||this.collection,n.d);o.ingestSnapshot(n,e),s.push(o)}return s},t.prototype._finishResponse=function(t,e){if(this.emit("ready"),this.ready=!0,t)return this.connection._destroyQuery(this),e?e(t):this.emit("error",t);e&&e(null,this.results,this.extra)},t.prototype._handleError=function(t){this.emit("error",t)},t.prototype._handleDiff=function(t){for(var e=0;e<t.length;e++)"insert"===(s=t[e]).type&&(s.values=this._ingestSnapshots(s.values));for(var s,e=0;e<t.length;e++)switch((s=t[e]).type){case"insert":var i=s.values;Array.prototype.splice.apply(this.results,[s.index,0].concat(i)),this.emit("insert",i,s.index);break;case"remove":var n=s.howMany||1,i=this.results.splice(s.index,n);this.emit("remove",i,s.index);break;case"move":var n=s.howMany||1,o=this.results.splice(s.from,n);Array.prototype.splice.apply(this.results,[s.to,0].concat(o)),this.emit("move",o,s.from,s.to)}this.emit("changed",this.results)},t.prototype._handleExtra=function(t){this.extra=t,this.emit("extra",t)};
-},{"../emitter":14,"../util":21}],11:[function(require,module,exports){
-var e=require("../../snapshot"),o=require("../../emitter");function t(t,n,e,i,s){if(o.EventEmitter.call(this),"function"!=typeof s)throw new Error("Callback is required for SnapshotRequest");this.requestId=n,this.connection=t,this.id=i,this.collection=e,this.callback=s,this.sent=!1}module.exports=t,o.mixin(t),t.prototype.send=function(){this.connection.canSend&&(this.connection.send(this._message()),this.sent=!0)},t.prototype._onConnectionStateChanged=function(){this.connection.canSend?this.sent||this.send():this.sent=!1},t.prototype._handleResponse=function(t,n){if(this.emit("ready"),t)return this.callback(t);t=n.meta||null,n=new e(this.id,n.v,n.type,n.data,t);this.callback(null,n)};
-},{"../../emitter":14,"../../snapshot":19}],12:[function(require,module,exports){
-var a=require("./snapshot-request"),n=require("../../util");function t(t,e,i,s,r,o){if(a.call(this,t,e,i,s,o),!n.isValidTimestamp(r))throw new Error("Snapshot timestamp must be a positive integer or null");this.timestamp=r}((module.exports=t).prototype=Object.create(a.prototype))._message=function(){return{a:"nt",id:this.requestId,c:this.collection,d:this.id,ts:this.timestamp}};
-},{"../../util":21,"./snapshot-request":11}],13:[function(require,module,exports){
-var n=require("./snapshot-request"),u=require("../../util");function e(e,t,i,r,s,o){if(n.call(this,e,t,i,r,o),!u.isValidVersion(s))throw new Error("Snapshot version must be a positive integer or null");this.version=s}((module.exports=e).prototype=Object.create(n.prototype))._message=function(){return{a:"nf",id:this.requestId,c:this.collection,d:this.id,v:this.version}};
-},{"../../util":21,"./snapshot-request":11}],14:[function(require,module,exports){
-var r=require("events").EventEmitter;exports.EventEmitter=r,exports.mixin=function(t){for(var e in r.prototype)t.prototype[e]=r.prototype[e]};
-},{"events":23}],15:[function(require,module,exports){
-function R(_,E){this.code=_,this.message=E||"",Error.captureStackTrace?Error.captureStackTrace(this,R):this.stack=(new Error).stack}((R.prototype=Object.create(Error.prototype)).constructor=R).prototype.name="ShareDBError",R.CODES={ERR_APPLY_OP_VERSION_DOES_NOT_MATCH_SNAPSHOT:"ERR_APPLY_OP_VERSION_DOES_NOT_MATCH_SNAPSHOT",ERR_APPLY_SNAPSHOT_NOT_PROVIDED:"ERR_APPLY_SNAPSHOT_NOT_PROVIDED",ERR_CLIENT_ID_BADLY_FORMED:"ERR_CLIENT_ID_BADLY_FORMED",ERR_CONNECTION_SEQ_INTEGER_OVERFLOW:"ERR_CONNECTION_SEQ_INTEGER_OVERFLOW",ERR_CONNECTION_STATE_TRANSITION_INVALID:"ERR_CONNECTION_STATE_TRANSITION_INVALID",ERR_DATABASE_ADAPTER_NOT_FOUND:"ERR_DATABASE_ADAPTER_NOT_FOUND",ERR_DATABASE_DOES_NOT_SUPPORT_SUBSCRIBE:"ERR_DATABASE_DOES_NOT_SUPPORT_SUBSCRIBE",ERR_DATABASE_METHOD_NOT_IMPLEMENTED:"ERR_DATABASE_METHOD_NOT_IMPLEMENTED",ERR_DEFAULT_TYPE_MISMATCH:"ERR_DEFAULT_TYPE_MISMATCH",ERR_DOC_MISSING_VERSION:"ERR_DOC_MISSING_VERSION",ERR_DOC_ALREADY_CREATED:"ERR_DOC_ALREADY_CREATED",ERR_DOC_DOES_NOT_EXIST:"ERR_DOC_DOES_NOT_EXIST",ERR_DOC_TYPE_NOT_RECOGNIZED:"ERR_DOC_TYPE_NOT_RECOGNIZED",ERR_DOC_WAS_DELETED:"ERR_DOC_WAS_DELETED",ERR_INFLIGHT_OP_MISSING:"ERR_INFLIGHT_OP_MISSING",ERR_INGESTED_SNAPSHOT_HAS_NO_VERSION:"ERR_INGESTED_SNAPSHOT_HAS_NO_VERSION",ERR_MAX_SUBMIT_RETRIES_EXCEEDED:"ERR_MAX_SUBMIT_RETRIES_EXCEEDED",ERR_MESSAGE_BADLY_FORMED:"ERR_MESSAGE_BADLY_FORMED",ERR_MILESTONE_ARGUMENT_INVALID:"ERR_MILESTONE_ARGUMENT_INVALID",ERR_OP_ALREADY_SUBMITTED:"ERR_OP_ALREADY_SUBMITTED",ERR_OP_NOT_ALLOWED_IN_PROJECTION:"ERR_OP_NOT_ALLOWED_IN_PROJECTION",ERR_OP_SUBMIT_REJECTED:"ERR_OP_SUBMIT_REJECTED",ERR_OP_VERSION_MISMATCH_AFTER_TRANSFORM:"ERR_OP_VERSION_MISMATCH_AFTER_TRANSFORM",ERR_OP_VERSION_MISMATCH_DURING_TRANSFORM:"ERR_OP_VERSION_MISMATCH_DURING_TRANSFORM",ERR_OP_VERSION_NEWER_THAN_CURRENT_SNAPSHOT:"ERR_OP_VERSION_NEWER_THAN_CURRENT_SNAPSHOT",ERR_OT_LEGACY_JSON0_OP_CANNOT_BE_NORMALIZED:"ERR_OT_LEGACY_JSON0_OP_CANNOT_BE_NORMALIZED",ERR_OT_OP_BADLY_FORMED:"ERR_OT_OP_BADLY_FORMED",ERR_OT_OP_NOT_APPLIED:"ERR_OT_OP_NOT_APPLIED",ERR_OT_OP_NOT_PROVIDED:"ERR_OT_OP_NOT_PROVIDED",ERR_PRESENCE_TRANSFORM_FAILED:"ERR_PRESENCE_TRANSFORM_FAILED",ERR_PROTOCOL_VERSION_NOT_SUPPORTED:"ERR_PROTOCOL_VERSION_NOT_SUPPORTED",ERR_QUERY_EMITTER_LISTENER_NOT_ASSIGNED:"ERR_QUERY_EMITTER_LISTENER_NOT_ASSIGNED",ERR_SNAPSHOT_READ_SILENT_REJECTION:"ERR_SNAPSHOT_READ_SILENT_REJECTION",ERR_SNAPSHOT_READS_REJECTED:"ERR_SNAPSHOT_READS_REJECTED",ERR_SUBMIT_TRANSFORM_OPS_NOT_FOUND:"ERR_SUBMIT_TRANSFORM_OPS_NOT_FOUND",ERR_TYPE_CANNOT_BE_PROJECTED:"ERR_TYPE_CANNOT_BE_PROJECTED",ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE:"ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE",ERR_UNKNOWN_ERROR:"ERR_UNKNOWN_ERROR"},module.exports=R;
-},{}],16:[function(require,module,exports){
-var e=new(require("./logger"));module.exports=e;
-},{"./logger":17}],17:[function(require,module,exports){
-var o=["info","warn","error"];function n(){var n={};o.forEach(function(o){n[o]=console[o].bind(console)}),this.setMethods(n)}(module.exports=n).prototype.setMethods=function(n){n=n||{};var t=this;o.forEach(function(o){"function"==typeof n[o]&&(t[o]=n[o])})};
-},{}],18:[function(require,module,exports){
-var f=require("./types"),D=require("./error"),T=require("./util"),y=D.CODES;exports.checkOp=function(e){if(null==e||"object"!=typeof e)return new D(y.ERR_OT_OP_BADLY_FORMED,"Op must be an object");if(null!=e.create){if("object"!=typeof e.create)return new D(y.ERR_OT_OP_BADLY_FORMED,"Create data must be an object");var t=e.create.type;if("string"!=typeof t)return new D(y.ERR_OT_OP_BADLY_FORMED,"Missing create type");t=f.map[t];if(null==t||"object"!=typeof t)return new D(y.ERR_DOC_TYPE_NOT_RECOGNIZED,"Unknown type")}else if(null!=e.del){if(!0!==e.del)return new D(y.ERR_OT_OP_BADLY_FORMED,"del value must be true")}else if(!("op"in e))return new D(y.ERR_OT_OP_BADLY_FORMED,"Missing op, create, or del");return null!=e.clientId&&"string"!=typeof e.clientId?new D(y.ERR_OT_OP_BADLY_FORMED,"src must be a string"):null!=e.seq&&"number"!=typeof e.seq?new D(y.ERR_OT_OP_BADLY_FORMED,"seq must be a number"):null==e.clientId&&null!=e.seq||null!=e.clientId&&null==e.seq?new D(y.ERR_OT_OP_BADLY_FORMED,"Both src and seq must be set together"):null!=e.m&&"object"!=typeof e.m?new D(y.ERR_OT_OP_BADLY_FORMED,"op.m must be an object or null"):void 0},exports.normalizeType=function(e){return f.map[e]&&f.map[e].uri},exports.apply=function(e,t){if("object"!=typeof e)return new D(y.ERR_APPLY_SNAPSHOT_NOT_PROVIDED,"Missing snapshot");if(null!=e.v&&null!=t.v&&e.v!==t.v)return new D(y.ERR_APPLY_OP_VERSION_DOES_NOT_MATCH_SNAPSHOT,"Version mismatch");if(t.create){if(e.type)return new D(y.ERR_DOC_ALREADY_CREATED,"Document already exists");var n=t.create,r=f.map[n.type];if(!r)return new D(y.ERR_DOC_TYPE_NOT_RECOGNIZED,"Unknown type");try{e.data=r.create(n.data),e.type=r.uri,e.v++}catch(_){return _}}else{if(t.del)e.data=void 0,e.type=null;else if("op"in t){var _=function(e,t){if(!e.type)return new D(y.ERR_DOC_DOES_NOT_EXIST,"Document does not exist");if(void 0===t)return new D(y.ERR_OT_OP_NOT_PROVIDED,"Missing op");var n=f.map[e.type];if(!n)return new D(y.ERR_DOC_TYPE_NOT_RECOGNIZED,"Unknown type");try{e.data=n.apply(e.data,t)}catch(e){return new D(y.ERR_OT_OP_NOT_APPLIED,e.message)}}(e,t.op);if(_)return _}e.v++}},exports.transform=function(e,t,n){if(null!=t.v&&t.v!==n.v)return new D(y.ERR_OP_VERSION_MISMATCH_DURING_TRANSFORM,"Version mismatch");if(n.del){if(t.create||"op"in t)return new D(y.ERR_DOC_WAS_DELETED,"Document was deleted")}else{if(n.create&&("op"in t||t.create||t.del)||"op"in n&&t.create)return new D(y.ERR_DOC_ALREADY_CREATED,"Document was created remotely");if("op"in n&&"op"in t){if(!e)return new D(y.ERR_DOC_DOES_NOT_EXIST,"Document does not exist");if("string"==typeof e&&!(e=f.map[e]))return new D(y.ERR_DOC_TYPE_NOT_RECOGNIZED,"Unknown type");try{t.op=e.transform(t.op,n.op,"left")}catch(e){return e}}}null!=t.v&&t.v++},exports.applyOps=function(e,t,n){n=n||{};for(var r=0;r<t.length;r++){var _=t[r];if(n._normalizeLegacyJson0Ops)try{E=R=u=O=s=l=p=i=a=o=void 0;var o=e,a=_;if(o.type===f.defaultType.uri){var i=a.op;if(i){var p=o.data;1<i.length&&(p=T.clone(p));for(var l=0;l<i.length;l++){for(var s=i[l],O=("string"==typeof s.lm&&(s.lm=+s.lm),s.p),u=p,R=0;R<O.length;R++){var E=O[R];"[object Array]"==Object.prototype.toString.call(u)?O[R]=+E:u.constructor===Object&&(O[R]=E.toString()),u=u[E]}l<i.length-1&&(p=f.defaultType.apply(p,[s]))}}}}catch(c){return new D(y.ERR_OT_LEGACY_JSON0_OP_CANNOT_BE_NORMALIZED,"Cannot normalize legacy json0 op")}e.v=_.v;var c=exports.apply(e,_);if(c)return c}},exports.transformPresence=function(e,t,n){var r=this.checkOp(t);if(r)return r;r=e.t;if(!(r="string"==typeof r?f.map[r]:r))return{code:y.ERR_DOC_TYPE_NOT_RECOGNIZED,message:"Unknown type"};if(!T.supportsPresence(r))return{code:y.ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE,message:"Type does not support presence"};if(t.create||t.del)e.p=null;else try{e.p=null===e.p?null:r.transformPresence(e.p,t.op,n)}catch(e){return{code:y.ERR_PRESENCE_TRANSFORM_FAILED,message:e.message||e}}e.v++};
-},{"./error":15,"./types":20,"./util":21}],19:[function(require,module,exports){
-module.exports=function(t,i,s,h,d){this.id=t,this.v=i,this.type=s,this.data=h,this.m=d};
-},{}],20:[function(require,module,exports){
-exports.defaultType=require("ot-json0").type,exports.map={},exports.register=function(e){e.name&&(exports.map[e.name]=e),e.uri&&(exports.map[e.uri]=e)},exports.register(exports.defaultType);
-},{"ot-json0":29}],21:[function(require,module,exports){
+"use strict";var n=require("async"),u=require("../error"),i=u.CODES;function t(t){this.pollDebounce=t&&t.pollDebounce}(module.exports=t).prototype.projectsSnapshots=!1,t.prototype.disableSubscribe=!1,t.prototype.close=function(t){t&&t()},t.prototype.commit=function(t,e,o,n,r,p){p(new u(i.ERR_DATABASE_METHOD_NOT_IMPLEMENTED,"commit DB method unimplemented"))},t.prototype.getSnapshot=function(t,e,o,n,r){r(new u(i.ERR_DATABASE_METHOD_NOT_IMPLEMENTED,"getSnapshot DB method unimplemented"))},t.prototype.getSnapshotBulk=function(t,e,r,p,o){var u={},i=this;n.each(e,function(o,n){i.getSnapshot(t,o,r,p,function(t,e){if(t)return n(t);u[o]=e,n()})},function(t){if(t)return o(t);o(null,u)})},t.prototype.getOps=function(t,e,o,n,r,p){p(new u(i.ERR_DATABASE_METHOD_NOT_IMPLEMENTED,"getOps DB method unimplemented"))},t.prototype.getOpsToSnapshot=function(t,e,o,n,r,p){n=n.v;this.getOps(t,e,o,n,r,p)},t.prototype.getOpsBulk=function(r,t,p,u,e){var i={},c=this;n.forEachOf(t,function(t,o,n){var e=p&&p[o];c.getOps(r,o,t,e,u,function(t,e){if(t)return n(t);i[o]=e,n()})},function(t){if(t)return e(t);e(null,i)})},t.prototype.getCommittedOpVersion=function(t,e,o,r,n,p){this.getOpsToSnapshot(t,e,0,o,n,function(t,e){if(t)return p(t);for(var o=e.length;o--;){var n=e[o];if(r.src===n.src&&r.seq===n.seq)return p(null,n.v)}p()})},t.prototype.query=function(t,e,o,n,r){r(new u(i.ERR_DATABASE_METHOD_NOT_IMPLEMENTED,"query DB method unimplemented"))},t.prototype.queryPoll=function(t,e,o,p){this.query(t,e,{},o,function(t,e,o){if(t)return p(t);for(var n=[],r=0;r<e.length;r++)n.push(e[r].id);p(null,n,o)})},t.prototype.queryPollDoc=function(t,e,o,n,r){r(new u(i.ERR_DATABASE_METHOD_NOT_IMPLEMENTED,"queryPollDoc DB method unimplemented"))},t.prototype.canPollDoc=function(){return!1},t.prototype.skipPoll=function(){return!1};
+},{"../error":5,"async":15}],2:[function(require,module,exports){
+"use strict";var e=require("./memory");module.exports=e;
+},{"./memory":3}],3:[function(require,module,exports){
+"use strict";var t=require("@babel/runtime/helpers/interopRequireDefault"),l=t(require("@babel/runtime/regenerator")),r=t(require("@babel/runtime/helpers/defineProperty")),a=t(require("@babel/runtime/helpers/asyncToGenerator"));function o(e,t){var n,r=Object.keys(e);return Object.getOwnPropertySymbols&&(n=Object.getOwnPropertySymbols(e),t&&(n=n.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),r.push.apply(r,n)),r}function p(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?o(Object(n),!0).forEach(function(t){(0,r.default)(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):o(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}var e=require("./db"),i=require("./snapshot"),h=require("../util").clone;function n(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{};if(!(this instanceof n))return new n(t);e.call(this,t),this.options=t,this.docs={},this.ops={},this.closed=!1}((module.exports=n).prototype=Object.create(e.prototype)).close=function(t){this.closed=!0,t&&t()},n.prototype.commit=/*@__PURE__*/function(){var u=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n,r,a,o,u){var c,s;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(c=this,"function"!=typeof u)throw new Error("Callback required");t.next=3;break;case 3:return t.next=5,c._getVersionSync(e,n);case 5:if(s=t.sent,a.v!==s+1)return t.abrupt("return");t.next=9;break;case 9:return t.next=11,c._writeOpSync({collection:e,id:n,snapshot:a,op:r});case 11:if(s=t.sent)return t.abrupt("return",u(s));t.next=14;break;case 14:return t.next=16,c._writeSnapshotSync({collection:e,id:n,snapshot:a,op:r}).catch(function(t){if(t)return u(t)}).then(function(){u(null,!0)});case 16:case"end":return t.stop()}},t,this)}));return function(t,e,n,r,a,o){return u.apply(this,arguments)}}(),n.prototype.getSnapshot=/*@__PURE__*/function(){var o=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n,r,a,o){var u,c,s;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(u=r&&r.$submit||a&&a.metadata,c=this,"function"!=typeof o)throw new Error("Callback required");t.next=4;break;case 4:return t.next=6,c._getSnapshotSync(e,n,u);case 6:s=t.sent,o(null,s);case 8:case"end":return t.stop()}},t,this)}));return function(t,e,n,r,a){return o.apply(this,arguments)}}(),n.prototype.getOps=/*@__PURE__*/function(){var u=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n,r,a,o,u){var c,s,i,p,f;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(c=o&&o.metadata,s=this,"function"!=typeof u)throw new Error("Callback required");t.next=4;break;case 4:return t.next=6,s._getOpLogSync(e,n);case 6:if(i=t.sent,null==a&&(a=i.length),p=h(i.slice(r,a)),!c)for(f=0;f<p.length;f++)delete p[f].m;u(null,p);case 11:case"end":return t.stop()}},t,this)}));return function(t,e,n,r,a,o){return u.apply(this,arguments)}}(),n.prototype.query=/*@__PURE__*/function(){var o=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n,r,a,o){var u,c,s,i,p,f;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(u=a&&a.metadata,c=this,"function"!=typeof o)throw new Error("Callback required");t.next=4;break;case 4:i=c.docs[e],s=[],t.t0=l.default.keys(i||{});case 7:if((t.t1=t.t0()).done){t.next=15;break}return i=t.t1.value,t.next=11,c._getSnapshotSync(e,i,u);case 11:p=t.sent,s.push(p),t.next=7;break;case 15:try{f=c._querySync(s,n,a),o(null,f.snapshots,f.extra)}catch(t){o(t)}case 16:case"end":return t.stop()}},t,this)}));return function(t,e,n,r,a){return o.apply(this,arguments)}}(),n.prototype._querySync=function(t){return{snapshots:t}},n.prototype._writeOpSync=/*@__PURE__*/function(){var e=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e){var n,r,a,o,u,c;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:return n=e.collection,r=e.id,e.snapshot,a=e.op,o=this.options,o.getOpsDocument,o.createOpsDocument,o=o.editOpsDocument,o=void 0===o?function(){}:o,t.next=4,this._getOpLogSync(n,r);case 4:return u=t.sent,c=a.data||{},c=c.userId,u[a.v]=h(a),t.next=9,o("o_"+n,{id:r,ops:u,userId:c});case 9:case"end":return t.stop()}},t,this)}));return function(t){return e.apply(this,arguments)}}(),n.prototype._writeSnapshotSync=/*@__PURE__*/function(){var e=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e){var n,r,a,o,u,c,s,i;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(n=e.collection,r=e.id,a=e.snapshot,o=e.op,s=this.options,u=s.createDocument,u=void 0===u?function(){}:u,c=s.editDocument,c=void 0===c?function(){}:c,s=s.removeDocument,s=void 0===s?function(){}:s,i=this.docs[n]||(this.docs[n]={}),o.create)return t.next=6,u(n,p(p({},o.data),a));t.next=8;break;case 6:t.next=17;break;case 8:if(a.type){t.next=14;break}return delete i[r],t.next=12,s(n,r);case 12:t.next=17;break;case 14:return i[r]=h(a),t.next=17,c(n,p(p({},o.data),a));case 17:case"end":return t.stop()}},t,this)}));return function(t){return e.apply(this,arguments)}}(),n.prototype._getSnapshotSync=/*@__PURE__*/function(){var r=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n,r){var a,o,u,c,s;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(a=this.options,o=a.getDocument,a.createDocument,a=this.docs[e],!(a=a&&a[n])&&e&&o)return t.next=6,o(e,n);t.next=7;break;case 6:a=t.sent;case 7:a?(o=h(a.data),u=r?h(a.m):null,u=new i(n,a.v,a.type,o,u),s=(c=a).m,s.ctime,s.mtime,c.data.ops,t.next=18):t.next=14;break;case 14:return t.next=16,this._getVersionSync(e,n);case 16:s=t.sent,u=new i(n,s,null,void 0,null);case 18:return t.abrupt("return",u);case 19:case"end":return t.stop()}},t,this)}));return function(t,e,n){return r.apply(this,arguments)}}(),n.prototype._getOpLogSync=/*@__PURE__*/function(){var n=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n){var r,a,o;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(a=this.options,r=a.getOpsDocument,a.createOpsDocument,a.editOpsDocument,(a=this.ops[e]||(this.ops[e]={}))[n])return t.abrupt("return",a[n]);t.next=4;break;case 4:if(o=[],r)return t.next=8,r("o_"+e,n).then(function(t){return t||[]}).catch(function(){return[]});t.next=9;break;case 8:o=t.sent;case 9:return a[n]=o,t.abrupt("return",o);case 11:case"end":return t.stop()}},t,this)}));return function(t,e){return n.apply(this,arguments)}}(),n.prototype._getVersionSync=/*@__PURE__*/function(){var n=(0,a.default)(/*@__PURE__*/l.default.mark(function t(e,n){var r,a,o;return l.default.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:if(o=this.options,o.getOpsDocument,o.createOpsDocument,o.editOpsDocument,o=o.getDocument,o=void 0===o?function(){}:o,r=0,(a=this.ops[e])&&a[n]&&a[n].length){t.next=8;break}return t.next=6,o(e,n);case 6:(o=t.sent)&&(r=o.v);case 8:return t.abrupt("return",a&&a[n]&&a[n].length||r);case 9:case"end":return t.stop()}},t,this)}));return function(t,e){return n.apply(this,arguments)}}();
+},{"../util":6,"./db":1,"./snapshot":4,"@babel/runtime/helpers/asyncToGenerator":7,"@babel/runtime/helpers/defineProperty":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],4:[function(require,module,exports){
+"use strict";module.exports=function(t,i,s,h,e){this.id=t,this.v=i,this.type=s,this.data=h,this.m=e};
+},{}],5:[function(require,module,exports){
+"use strict";function R(_,E){this.code=_,this.message=E||"",Error.captureStackTrace?Error.captureStackTrace(this,R):this.stack=(new Error).stack}((R.prototype=Object.create(Error.prototype)).constructor=R).prototype.name="ShareDBError",R.CODES={ERR_APPLY_OP_VERSION_DOES_NOT_MATCH_SNAPSHOT:"ERR_APPLY_OP_VERSION_DOES_NOT_MATCH_SNAPSHOT",ERR_APPLY_SNAPSHOT_NOT_PROVIDED:"ERR_APPLY_SNAPSHOT_NOT_PROVIDED",ERR_CLIENT_ID_BADLY_FORMED:"ERR_CLIENT_ID_BADLY_FORMED",ERR_CONNECTION_SEQ_INTEGER_OVERFLOW:"ERR_CONNECTION_SEQ_INTEGER_OVERFLOW",ERR_CONNECTION_STATE_TRANSITION_INVALID:"ERR_CONNECTION_STATE_TRANSITION_INVALID",ERR_DATABASE_ADAPTER_NOT_FOUND:"ERR_DATABASE_ADAPTER_NOT_FOUND",ERR_DATABASE_DOES_NOT_SUPPORT_SUBSCRIBE:"ERR_DATABASE_DOES_NOT_SUPPORT_SUBSCRIBE",ERR_DATABASE_METHOD_NOT_IMPLEMENTED:"ERR_DATABASE_METHOD_NOT_IMPLEMENTED",ERR_DEFAULT_TYPE_MISMATCH:"ERR_DEFAULT_TYPE_MISMATCH",ERR_DOC_MISSING_VERSION:"ERR_DOC_MISSING_VERSION",ERR_DOC_ALREADY_CREATED:"ERR_DOC_ALREADY_CREATED",ERR_DOC_DOES_NOT_EXIST:"ERR_DOC_DOES_NOT_EXIST",ERR_DOC_TYPE_NOT_RECOGNIZED:"ERR_DOC_TYPE_NOT_RECOGNIZED",ERR_DOC_WAS_DELETED:"ERR_DOC_WAS_DELETED",ERR_INFLIGHT_OP_MISSING:"ERR_INFLIGHT_OP_MISSING",ERR_INGESTED_SNAPSHOT_HAS_NO_VERSION:"ERR_INGESTED_SNAPSHOT_HAS_NO_VERSION",ERR_MAX_SUBMIT_RETRIES_EXCEEDED:"ERR_MAX_SUBMIT_RETRIES_EXCEEDED",ERR_MESSAGE_BADLY_FORMED:"ERR_MESSAGE_BADLY_FORMED",ERR_MILESTONE_ARGUMENT_INVALID:"ERR_MILESTONE_ARGUMENT_INVALID",ERR_OP_ALREADY_SUBMITTED:"ERR_OP_ALREADY_SUBMITTED",ERR_OP_NOT_ALLOWED_IN_PROJECTION:"ERR_OP_NOT_ALLOWED_IN_PROJECTION",ERR_OP_SUBMIT_REJECTED:"ERR_OP_SUBMIT_REJECTED",ERR_OP_VERSION_MISMATCH_AFTER_TRANSFORM:"ERR_OP_VERSION_MISMATCH_AFTER_TRANSFORM",ERR_OP_VERSION_MISMATCH_DURING_TRANSFORM:"ERR_OP_VERSION_MISMATCH_DURING_TRANSFORM",ERR_OP_VERSION_NEWER_THAN_CURRENT_SNAPSHOT:"ERR_OP_VERSION_NEWER_THAN_CURRENT_SNAPSHOT",ERR_OT_LEGACY_JSON0_OP_CANNOT_BE_NORMALIZED:"ERR_OT_LEGACY_JSON0_OP_CANNOT_BE_NORMALIZED",ERR_OT_OP_BADLY_FORMED:"ERR_OT_OP_BADLY_FORMED",ERR_OT_OP_NOT_APPLIED:"ERR_OT_OP_NOT_APPLIED",ERR_OT_OP_NOT_PROVIDED:"ERR_OT_OP_NOT_PROVIDED",ERR_PRESENCE_TRANSFORM_FAILED:"ERR_PRESENCE_TRANSFORM_FAILED",ERR_PROTOCOL_VERSION_NOT_SUPPORTED:"ERR_PROTOCOL_VERSION_NOT_SUPPORTED",ERR_QUERY_EMITTER_LISTENER_NOT_ASSIGNED:"ERR_QUERY_EMITTER_LISTENER_NOT_ASSIGNED",ERR_SNAPSHOT_READ_SILENT_REJECTION:"ERR_SNAPSHOT_READ_SILENT_REJECTION",ERR_SNAPSHOT_READS_REJECTED:"ERR_SNAPSHOT_READS_REJECTED",ERR_SUBMIT_TRANSFORM_OPS_NOT_FOUND:"ERR_SUBMIT_TRANSFORM_OPS_NOT_FOUND",ERR_TYPE_CANNOT_BE_PROJECTED:"ERR_TYPE_CANNOT_BE_PROJECTED",ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE:"ERR_TYPE_DOES_NOT_SUPPORT_PRESENCE",ERR_UNKNOWN_ERROR:"ERR_UNKNOWN_ERROR"},module.exports=R;
+},{}],6:[function(require,module,exports){
 (function (process){(function (){
-exports.doNothing=function(){},exports.hasKeys=function(e){for(var r in e)return!0;return!1},exports.isInteger=Number.isInteger||function(e){return"number"==typeof e&&isFinite(e)&&Math.floor(e)===e},exports.isValidVersion=function(e){return null===e||exports.isInteger(e)&&0<=e},exports.isValidTimestamp=function(e){return exports.isValidVersion(e)},exports.MAX_SAFE_INTEGER=9007199254740991,exports.dig=function(){for(var e=arguments[0],r=1;r<arguments.length;r++)e=e[arguments[r]]||(r===arguments.length-1?void 0:{});return e},exports.digOrCreate=function(){for(var e=arguments[0],r=arguments[arguments.length-1],n=1;n<arguments.length-1;n++)var t=arguments[n],e=e[t]||(e[t]=n===arguments.length-2?r():{});return e},exports.digAndRemove=function(){for(var e=arguments[0],r=[e],n=1;n<arguments.length-1;n++){var t=arguments[n];if(!e.hasOwnProperty(t))break;e=e[t],r.push(e)}for(n=r.length-1;0<=n;n--){var o=r[n],i=o[t=arguments[n+1]];n!==r.length-1&&exports.hasKeys(i)||delete o[t]}},exports.supportsPresence=function(e){return e&&"function"==typeof e.transformPresence},exports.callEach=function(e,r){var n=!1;return e.forEach(function(e){e&&(e(r),n=!0)}),n},exports.truthy=function(e){return!!e},exports.nextTick=function(e){if("undefined"!=typeof process&&process.nextTick)return process.nextTick.apply(null,arguments);for(var r=[],n=1;n<arguments.length;n++)r[n-1]=arguments[n];setTimeout(function(){e.apply(null,r)})},exports.clone=function(e){return void 0===e?void 0:JSON.parse(JSON.stringify(e))};
+"use strict";exports.doNothing=function(){},exports.hasKeys=function(e){for(var r in e)return!0;return!1},exports.isInteger=Number.isInteger||function(e){return"number"==typeof e&&isFinite(e)&&Math.floor(e)===e},exports.isValidVersion=function(e){return null===e||exports.isInteger(e)&&0<=e},exports.isValidTimestamp=function(e){return exports.isValidVersion(e)},exports.MAX_SAFE_INTEGER=9007199254740991,exports.dig=function(){for(var e=arguments[0],r=1;r<arguments.length;r++)e=e[arguments[r]]||(r===arguments.length-1?void 0:{});return e},exports.digOrCreate=function(){for(var e=arguments[0],r=arguments[arguments.length-1],t=1;t<arguments.length-1;t++)var n=arguments[t],e=e[n]||(e[n]=t===arguments.length-2?r():{});return e},exports.digAndRemove=function(){for(var e=arguments[0],r=[e],t=1;t<arguments.length-1;t++){var n=arguments[t];if(!e.hasOwnProperty(n))break;e=e[n],r.push(e)}for(t=r.length-1;0<=t;t--){var o=r[t],i=o[n=arguments[t+1]];t!==r.length-1&&exports.hasKeys(i)||delete o[n]}},exports.supportsPresence=function(e){return e&&"function"==typeof e.transformPresence},exports.callEach=function(e,r){var t=!1;return e.forEach(function(e){e&&(e(r),t=!0)}),t},exports.truthy=function(e){return!!e},exports.nextTick=function(e){if("undefined"!=typeof process&&process.nextTick)return process.nextTick.apply(null,arguments);for(var r=[],t=1;t<arguments.length;t++)r[t-1]=arguments[t];setTimeout(function(){e.apply(null,r)})},exports.clone=function(e){return void 0===e?void 0:JSON.parse(JSON.stringify(e))};
 }).call(this)}).call(this,require('_process'))
-},{"_process":26}],22:[function(require,module,exports){
+},{"_process":16}],7:[function(require,module,exports){
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+      args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+      _next(undefined);
+    });
+  };
+}
+module.exports = _asyncToGenerator, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{}],8:[function(require,module,exports){
+var toPropertyKey = require("./toPropertyKey.js");
+function _defineProperty(obj, key, value) {
+  key = toPropertyKey(key);
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+module.exports = _defineProperty, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{"./toPropertyKey.js":12}],9:[function(require,module,exports){
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    "default": obj
+  };
+}
+module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{}],10:[function(require,module,exports){
+var _typeof = require("./typeof.js")["default"];
+function _regeneratorRuntime() {
+  "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+  module.exports = _regeneratorRuntime = function _regeneratorRuntime() {
+    return exports;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports;
+  var exports = {},
+    Op = Object.prototype,
+    hasOwn = Op.hasOwnProperty,
+    defineProperty = Object.defineProperty || function (obj, key, desc) {
+      obj[key] = desc.value;
+    },
+    $Symbol = "function" == typeof Symbol ? Symbol : {},
+    iteratorSymbol = $Symbol.iterator || "@@iterator",
+    asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator",
+    toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+  function define(obj, key, value) {
+    return Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: !0,
+      configurable: !0,
+      writable: !0
+    }), obj[key];
+  }
+  try {
+    define({}, "");
+  } catch (err) {
+    define = function define(obj, key, value) {
+      return obj[key] = value;
+    };
+  }
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator,
+      generator = Object.create(protoGenerator.prototype),
+      context = new Context(tryLocsList || []);
+    return defineProperty(generator, "_invoke", {
+      value: makeInvokeMethod(innerFn, self, context)
+    }), generator;
+  }
+  function tryCatch(fn, obj, arg) {
+    try {
+      return {
+        type: "normal",
+        arg: fn.call(obj, arg)
+      };
+    } catch (err) {
+      return {
+        type: "throw",
+        arg: err
+      };
+    }
+  }
+  exports.wrap = wrap;
+  var ContinueSentinel = {};
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+  var IteratorPrototype = {};
+  define(IteratorPrototype, iteratorSymbol, function () {
+    return this;
+  });
+  var getProto = Object.getPrototypeOf,
+    NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype);
+  var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype);
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function (method) {
+      define(prototype, method, function (arg) {
+        return this._invoke(method, arg);
+      });
+    });
+  }
+  function AsyncIterator(generator, PromiseImpl) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if ("throw" !== record.type) {
+        var result = record.arg,
+          value = result.value;
+        return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) {
+          invoke("next", value, resolve, reject);
+        }, function (err) {
+          invoke("throw", err, resolve, reject);
+        }) : PromiseImpl.resolve(value).then(function (unwrapped) {
+          result.value = unwrapped, resolve(result);
+        }, function (error) {
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+      reject(record.arg);
+    }
+    var previousPromise;
+    defineProperty(this, "_invoke", {
+      value: function value(method, arg) {
+        function callInvokeWithMethodAndArg() {
+          return new PromiseImpl(function (resolve, reject) {
+            invoke(method, arg, resolve, reject);
+          });
+        }
+        return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg();
+      }
+    });
+  }
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = "suspendedStart";
+    return function (method, arg) {
+      if ("executing" === state) throw new Error("Generator is already running");
+      if ("completed" === state) {
+        if ("throw" === method) throw arg;
+        return doneResult();
+      }
+      for (context.method = method, context.arg = arg;;) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+        if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) {
+          if ("suspendedStart" === state) throw state = "completed", context.arg;
+          context.dispatchException(context.arg);
+        } else "return" === context.method && context.abrupt("return", context.arg);
+        state = "executing";
+        var record = tryCatch(innerFn, self, context);
+        if ("normal" === record.type) {
+          if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue;
+          return {
+            value: record.arg,
+            done: context.done
+          };
+        }
+        "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg);
+      }
+    };
+  }
+  function maybeInvokeDelegate(delegate, context) {
+    var methodName = context.method,
+      method = delegate.iterator[methodName];
+    if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel;
+    var record = tryCatch(method, delegate.iterator, context.arg);
+    if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel;
+    var info = record.arg;
+    return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel);
+  }
+  function pushTryEntry(locs) {
+    var entry = {
+      tryLoc: locs[0]
+    };
+    1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry);
+  }
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal", delete record.arg, entry.completion = record;
+  }
+  function Context(tryLocsList) {
+    this.tryEntries = [{
+      tryLoc: "root"
+    }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0);
+  }
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) return iteratorMethod.call(iterable);
+      if ("function" == typeof iterable.next) return iterable;
+      if (!isNaN(iterable.length)) {
+        var i = -1,
+          next = function next() {
+            for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next;
+            return next.value = undefined, next.done = !0, next;
+          };
+        return next.next = next;
+      }
+    }
+    return {
+      next: doneResult
+    };
+  }
+  function doneResult() {
+    return {
+      value: undefined,
+      done: !0
+    };
+  }
+  return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", {
+    value: GeneratorFunctionPrototype,
+    configurable: !0
+  }), defineProperty(GeneratorFunctionPrototype, "constructor", {
+    value: GeneratorFunction,
+    configurable: !0
+  }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) {
+    var ctor = "function" == typeof genFun && genFun.constructor;
+    return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name));
+  }, exports.mark = function (genFun) {
+    return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun;
+  }, exports.awrap = function (arg) {
+    return {
+      __await: arg
+    };
+  }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () {
+    return this;
+  }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) {
+    void 0 === PromiseImpl && (PromiseImpl = Promise);
+    var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl);
+    return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) {
+      return result.done ? result.value : iter.next();
+    });
+  }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () {
+    return this;
+  }), define(Gp, "toString", function () {
+    return "[object Generator]";
+  }), exports.keys = function (val) {
+    var object = Object(val),
+      keys = [];
+    for (var key in object) keys.push(key);
+    return keys.reverse(), function next() {
+      for (; keys.length;) {
+        var key = keys.pop();
+        if (key in object) return next.value = key, next.done = !1, next;
+      }
+      return next.done = !0, next;
+    };
+  }, exports.values = values, Context.prototype = {
+    constructor: Context,
+    reset: function reset(skipTempReset) {
+      if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined);
+    },
+    stop: function stop() {
+      this.done = !0;
+      var rootRecord = this.tryEntries[0].completion;
+      if ("throw" === rootRecord.type) throw rootRecord.arg;
+      return this.rval;
+    },
+    dispatchException: function dispatchException(exception) {
+      if (this.done) throw exception;
+      var context = this;
+      function handle(loc, caught) {
+        return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught;
+      }
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i],
+          record = entry.completion;
+        if ("root" === entry.tryLoc) return handle("end");
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc"),
+            hasFinally = hasOwn.call(entry, "finallyLoc");
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0);
+            if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc);
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0);
+          } else {
+            if (!hasFinally) throw new Error("try statement without catch or finally");
+            if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc);
+          }
+        }
+      }
+    },
+    abrupt: function abrupt(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+      finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null);
+      var record = finallyEntry ? finallyEntry.completion : {};
+      return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record);
+    },
+    complete: function complete(record, afterLoc) {
+      if ("throw" === record.type) throw record.arg;
+      return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel;
+    },
+    finish: function finish(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel;
+      }
+    },
+    "catch": function _catch(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if ("throw" === record.type) {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+      throw new Error("illegal catch attempt");
+    },
+    delegateYield: function delegateYield(iterable, resultName, nextLoc) {
+      return this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      }, "next" === this.method && (this.arg = undefined), ContinueSentinel;
+    }
+  }, exports;
+}
+module.exports = _regeneratorRuntime, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{"./typeof.js":13}],11:[function(require,module,exports){
+var _typeof = require("./typeof.js")["default"];
+function _toPrimitive(input, hint) {
+  if (_typeof(input) !== "object" || input === null) return input;
+  var prim = input[Symbol.toPrimitive];
+  if (prim !== undefined) {
+    var res = prim.call(input, hint || "default");
+    if (_typeof(res) !== "object") return res;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return (hint === "string" ? String : Number)(input);
+}
+module.exports = _toPrimitive, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{"./typeof.js":13}],12:[function(require,module,exports){
+var _typeof = require("./typeof.js")["default"];
+var toPrimitive = require("./toPrimitive.js");
+function _toPropertyKey(arg) {
+  var key = toPrimitive(arg, "string");
+  return _typeof(key) === "symbol" ? key : String(key);
+}
+module.exports = _toPropertyKey, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{"./toPrimitive.js":11,"./typeof.js":13}],13:[function(require,module,exports){
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
+}
+module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{}],14:[function(require,module,exports){
+// TODO(Babel 8): Remove this file.
+
+var runtime = require("../helpers/regeneratorRuntime")();
+module.exports = runtime;
+
+// Copied from https://github.com/facebook/regenerator/blob/main/packages/runtime/runtime.js#L736=
+try {
+  regeneratorRuntime = runtime;
+} catch (accidentalStrictMode) {
+  if (typeof globalThis === "object") {
+    globalThis.regeneratorRuntime = runtime;
+  } else {
+    Function("r", "regeneratorRuntime = r")(runtime);
+  }
+}
+
+},{"../helpers/regeneratorRuntime":10}],15:[function(require,module,exports){
 (function (process,global,setImmediate){(function (){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -5658,627 +6038,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"_process":26,"timers":27}],23:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-var R = typeof Reflect === 'object' ? Reflect : null
-var ReflectApply = R && typeof R.apply === 'function'
-  ? R.apply
-  : function ReflectApply(target, receiver, args) {
-    return Function.prototype.apply.call(target, receiver, args);
-  }
-
-var ReflectOwnKeys
-if (R && typeof R.ownKeys === 'function') {
-  ReflectOwnKeys = R.ownKeys
-} else if (Object.getOwnPropertySymbols) {
-  ReflectOwnKeys = function ReflectOwnKeys(target) {
-    return Object.getOwnPropertyNames(target)
-      .concat(Object.getOwnPropertySymbols(target));
-  };
-} else {
-  ReflectOwnKeys = function ReflectOwnKeys(target) {
-    return Object.getOwnPropertyNames(target);
-  };
-}
-
-function ProcessEmitWarning(warning) {
-  if (console && console.warn) console.warn(warning);
-}
-
-var NumberIsNaN = Number.isNaN || function NumberIsNaN(value) {
-  return value !== value;
-}
-
-function EventEmitter() {
-  EventEmitter.init.call(this);
-}
-module.exports = EventEmitter;
-module.exports.once = once;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._eventsCount = 0;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-var defaultMaxListeners = 10;
-
-function checkListener(listener) {
-  if (typeof listener !== 'function') {
-    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-  }
-}
-
-Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
-  enumerable: true,
-  get: function() {
-    return defaultMaxListeners;
-  },
-  set: function(arg) {
-    if (typeof arg !== 'number' || arg < 0 || NumberIsNaN(arg)) {
-      throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + arg + '.');
-    }
-    defaultMaxListeners = arg;
-  }
-});
-
-EventEmitter.init = function() {
-
-  if (this._events === undefined ||
-      this._events === Object.getPrototypeOf(this)._events) {
-    this._events = Object.create(null);
-    this._eventsCount = 0;
-  }
-
-  this._maxListeners = this._maxListeners || undefined;
-};
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
-  if (typeof n !== 'number' || n < 0 || NumberIsNaN(n)) {
-    throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received ' + n + '.');
-  }
-  this._maxListeners = n;
-  return this;
-};
-
-function _getMaxListeners(that) {
-  if (that._maxListeners === undefined)
-    return EventEmitter.defaultMaxListeners;
-  return that._maxListeners;
-}
-
-EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
-  return _getMaxListeners(this);
-};
-
-EventEmitter.prototype.emit = function emit(type) {
-  var args = [];
-  for (var i = 1; i < arguments.length; i++) args.push(arguments[i]);
-  var doError = (type === 'error');
-
-  var events = this._events;
-  if (events !== undefined)
-    doError = (doError && events.error === undefined);
-  else if (!doError)
-    return false;
-
-  // If there is no 'error' event listener then throw.
-  if (doError) {
-    var er;
-    if (args.length > 0)
-      er = args[0];
-    if (er instanceof Error) {
-      // Note: The comments on the `throw` lines are intentional, they show
-      // up in Node's output if this results in an unhandled exception.
-      throw er; // Unhandled 'error' event
-    }
-    // At least give some kind of context to the user
-    var err = new Error('Unhandled error.' + (er ? ' (' + er.message + ')' : ''));
-    err.context = er;
-    throw err; // Unhandled 'error' event
-  }
-
-  var handler = events[type];
-
-  if (handler === undefined)
-    return false;
-
-  if (typeof handler === 'function') {
-    ReflectApply(handler, this, args);
-  } else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      ReflectApply(listeners[i], this, args);
-  }
-
-  return true;
-};
-
-function _addListener(target, type, listener, prepend) {
-  var m;
-  var events;
-  var existing;
-
-  checkListener(listener);
-
-  events = target._events;
-  if (events === undefined) {
-    events = target._events = Object.create(null);
-    target._eventsCount = 0;
-  } else {
-    // To avoid recursion in the case that type === "newListener"! Before
-    // adding it to the listeners, first emit "newListener".
-    if (events.newListener !== undefined) {
-      target.emit('newListener', type,
-                  listener.listener ? listener.listener : listener);
-
-      // Re-assign `events` because a newListener handler could have caused the
-      // this._events to be assigned to a new object
-      events = target._events;
-    }
-    existing = events[type];
-  }
-
-  if (existing === undefined) {
-    // Optimize the case of one listener. Don't need the extra array object.
-    existing = events[type] = listener;
-    ++target._eventsCount;
-  } else {
-    if (typeof existing === 'function') {
-      // Adding the second element, need to change to array.
-      existing = events[type] =
-        prepend ? [listener, existing] : [existing, listener];
-      // If we've already got an array, just append.
-    } else if (prepend) {
-      existing.unshift(listener);
-    } else {
-      existing.push(listener);
-    }
-
-    // Check for listener leak
-    m = _getMaxListeners(target);
-    if (m > 0 && existing.length > m && !existing.warned) {
-      existing.warned = true;
-      // No error code for this since it is a Warning
-      // eslint-disable-next-line no-restricted-syntax
-      var w = new Error('Possible EventEmitter memory leak detected. ' +
-                          existing.length + ' ' + String(type) + ' listeners ' +
-                          'added. Use emitter.setMaxListeners() to ' +
-                          'increase limit');
-      w.name = 'MaxListenersExceededWarning';
-      w.emitter = target;
-      w.type = type;
-      w.count = existing.length;
-      ProcessEmitWarning(w);
-    }
-  }
-
-  return target;
-}
-
-EventEmitter.prototype.addListener = function addListener(type, listener) {
-  return _addListener(this, type, listener, false);
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.prependListener =
-    function prependListener(type, listener) {
-      return _addListener(this, type, listener, true);
-    };
-
-function onceWrapper() {
-  if (!this.fired) {
-    this.target.removeListener(this.type, this.wrapFn);
-    this.fired = true;
-    if (arguments.length === 0)
-      return this.listener.call(this.target);
-    return this.listener.apply(this.target, arguments);
-  }
-}
-
-function _onceWrap(target, type, listener) {
-  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
-  var wrapped = onceWrapper.bind(state);
-  wrapped.listener = listener;
-  state.wrapFn = wrapped;
-  return wrapped;
-}
-
-EventEmitter.prototype.once = function once(type, listener) {
-  checkListener(listener);
-  this.on(type, _onceWrap(this, type, listener));
-  return this;
-};
-
-EventEmitter.prototype.prependOnceListener =
-    function prependOnceListener(type, listener) {
-      checkListener(listener);
-      this.prependListener(type, _onceWrap(this, type, listener));
-      return this;
-    };
-
-// Emits a 'removeListener' event if and only if the listener was removed.
-EventEmitter.prototype.removeListener =
-    function removeListener(type, listener) {
-      var list, events, position, i, originalListener;
-
-      checkListener(listener);
-
-      events = this._events;
-      if (events === undefined)
-        return this;
-
-      list = events[type];
-      if (list === undefined)
-        return this;
-
-      if (list === listener || list.listener === listener) {
-        if (--this._eventsCount === 0)
-          this._events = Object.create(null);
-        else {
-          delete events[type];
-          if (events.removeListener)
-            this.emit('removeListener', type, list.listener || listener);
-        }
-      } else if (typeof list !== 'function') {
-        position = -1;
-
-        for (i = list.length - 1; i >= 0; i--) {
-          if (list[i] === listener || list[i].listener === listener) {
-            originalListener = list[i].listener;
-            position = i;
-            break;
-          }
-        }
-
-        if (position < 0)
-          return this;
-
-        if (position === 0)
-          list.shift();
-        else {
-          spliceOne(list, position);
-        }
-
-        if (list.length === 1)
-          events[type] = list[0];
-
-        if (events.removeListener !== undefined)
-          this.emit('removeListener', type, originalListener || listener);
-      }
-
-      return this;
-    };
-
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-
-EventEmitter.prototype.removeAllListeners =
-    function removeAllListeners(type) {
-      var listeners, events, i;
-
-      events = this._events;
-      if (events === undefined)
-        return this;
-
-      // not listening for removeListener, no need to emit
-      if (events.removeListener === undefined) {
-        if (arguments.length === 0) {
-          this._events = Object.create(null);
-          this._eventsCount = 0;
-        } else if (events[type] !== undefined) {
-          if (--this._eventsCount === 0)
-            this._events = Object.create(null);
-          else
-            delete events[type];
-        }
-        return this;
-      }
-
-      // emit removeListener for all listeners on all events
-      if (arguments.length === 0) {
-        var keys = Object.keys(events);
-        var key;
-        for (i = 0; i < keys.length; ++i) {
-          key = keys[i];
-          if (key === 'removeListener') continue;
-          this.removeAllListeners(key);
-        }
-        this.removeAllListeners('removeListener');
-        this._events = Object.create(null);
-        this._eventsCount = 0;
-        return this;
-      }
-
-      listeners = events[type];
-
-      if (typeof listeners === 'function') {
-        this.removeListener(type, listeners);
-      } else if (listeners !== undefined) {
-        // LIFO order
-        for (i = listeners.length - 1; i >= 0; i--) {
-          this.removeListener(type, listeners[i]);
-        }
-      }
-
-      return this;
-    };
-
-function _listeners(target, type, unwrap) {
-  var events = target._events;
-
-  if (events === undefined)
-    return [];
-
-  var evlistener = events[type];
-  if (evlistener === undefined)
-    return [];
-
-  if (typeof evlistener === 'function')
-    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
-
-  return unwrap ?
-    unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
-}
-
-EventEmitter.prototype.listeners = function listeners(type) {
-  return _listeners(this, type, true);
-};
-
-EventEmitter.prototype.rawListeners = function rawListeners(type) {
-  return _listeners(this, type, false);
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  if (typeof emitter.listenerCount === 'function') {
-    return emitter.listenerCount(type);
-  } else {
-    return listenerCount.call(emitter, type);
-  }
-};
-
-EventEmitter.prototype.listenerCount = listenerCount;
-function listenerCount(type) {
-  var events = this._events;
-
-  if (events !== undefined) {
-    var evlistener = events[type];
-
-    if (typeof evlistener === 'function') {
-      return 1;
-    } else if (evlistener !== undefined) {
-      return evlistener.length;
-    }
-  }
-
-  return 0;
-}
-
-EventEmitter.prototype.eventNames = function eventNames() {
-  return this._eventsCount > 0 ? ReflectOwnKeys(this._events) : [];
-};
-
-function arrayClone(arr, n) {
-  var copy = new Array(n);
-  for (var i = 0; i < n; ++i)
-    copy[i] = arr[i];
-  return copy;
-}
-
-function spliceOne(list, index) {
-  for (; index + 1 < list.length; index++)
-    list[index] = list[index + 1];
-  list.pop();
-}
-
-function unwrapListeners(arr) {
-  var ret = new Array(arr.length);
-  for (var i = 0; i < ret.length; ++i) {
-    ret[i] = arr[i].listener || arr[i];
-  }
-  return ret;
-}
-
-function once(emitter, name) {
-  return new Promise(function (resolve, reject) {
-    function errorListener(err) {
-      emitter.removeListener(name, resolver);
-      reject(err);
-    }
-
-    function resolver() {
-      if (typeof emitter.removeListener === 'function') {
-        emitter.removeListener('error', errorListener);
-      }
-      resolve([].slice.call(arguments));
-    };
-
-    eventTargetAgnosticAddListener(emitter, name, resolver, { once: true });
-    if (name !== 'error') {
-      addErrorHandlerIfEventEmitter(emitter, errorListener, { once: true });
-    }
-  });
-}
-
-function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
-  if (typeof emitter.on === 'function') {
-    eventTargetAgnosticAddListener(emitter, 'error', handler, flags);
-  }
-}
-
-function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
-  if (typeof emitter.on === 'function') {
-    if (flags.once) {
-      emitter.once(name, listener);
-    } else {
-      emitter.on(name, listener);
-    }
-  } else if (typeof emitter.addEventListener === 'function') {
-    // EventTarget does not have `error` event semantics like Node
-    // EventEmitters, we do not listen for `error` events here.
-    emitter.addEventListener(name, function wrapListener(arg) {
-      // IE does not have builtin `{ once: true }` support so we
-      // have to do it manually.
-      if (flags.once) {
-        emitter.removeEventListener(name, wrapListener);
-      }
-      listener(arg);
-    });
-  } else {
-    throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
-  }
-}
-
-},{}],24:[function(require,module,exports){
-'use strict';
-
-var isArray = Array.isArray;
-var keyList = Object.keys;
-var hasProp = Object.prototype.hasOwnProperty;
-
-module.exports = function equal(a, b) {
-  if (a === b) return true;
-
-  if (a && b && typeof a == 'object' && typeof b == 'object') {
-    var arrA = isArray(a)
-      , arrB = isArray(b)
-      , i
-      , length
-      , key;
-
-    if (arrA && arrB) {
-      length = a.length;
-      if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (!equal(a[i], b[i])) return false;
-      return true;
-    }
-
-    if (arrA != arrB) return false;
-
-    var dateA = a instanceof Date
-      , dateB = b instanceof Date;
-    if (dateA != dateB) return false;
-    if (dateA && dateB) return a.getTime() == b.getTime();
-
-    var regexpA = a instanceof RegExp
-      , regexpB = b instanceof RegExp;
-    if (regexpA != regexpB) return false;
-    if (regexpA && regexpB) return a.toString() == b.toString();
-
-    var keys = keyList(a);
-    length = keys.length;
-
-    if (length !== keyList(b).length)
-      return false;
-
-    for (i = length; i-- !== 0;)
-      if (!hasProp.call(b, keys[i])) return false;
-
-    for (i = length; i-- !== 0;) {
-      key = keys[i];
-      if (!equal(a[key], b[key])) return false;
-    }
-
-    return true;
-  }
-
-  return a!==a && b!==b;
-};
-
-},{}],25:[function(require,module,exports){
-var hat = module.exports = function (bits, base) {
-    if (!base) base = 16;
-    if (bits === undefined) bits = 128;
-    if (bits <= 0) return '0';
-    
-    var digits = Math.log(Math.pow(2, bits)) / Math.log(base);
-    for (var i = 2; digits === Infinity; i *= 2) {
-        digits = Math.log(Math.pow(2, bits / i)) / Math.log(base) * i;
-    }
-    
-    var rem = digits - Math.floor(digits);
-    
-    var res = '';
-    
-    for (var i = 0; i < Math.floor(digits); i++) {
-        var x = Math.floor(Math.random() * base).toString(base);
-        res = x + res;
-    }
-    
-    if (rem) {
-        var b = Math.pow(base, rem);
-        var x = Math.floor(Math.random() * b).toString(base);
-        res = x + res;
-    }
-    
-    var parsed = parseInt(res, base);
-    if (parsed !== Infinity && parsed >= Math.pow(2, bits)) {
-        return hat(bits, base)
-    }
-    else return res;
-};
-
-hat.rack = function (bits, base, expandBy) {
-    var fn = function (data) {
-        var iters = 0;
-        do {
-            if (iters ++ > 10) {
-                if (expandBy) bits += expandBy;
-                else throw new Error('too many ID collisions, use more bits')
-            }
-            
-            var id = hat(bits, base);
-        } while (Object.hasOwnProperty.call(hats, id));
-        
-        hats[id] = data;
-        return id;
-    };
-    var hats = fn.hats = {};
-    
-    fn.get = function (id) {
-        return fn.hats[id];
-    };
-    
-    fn.set = function (id, value) {
-        fn.hats[id] = value;
-        return fn;
-    };
-    
-    fn.bits = bits || 128;
-    fn.base = base || 16;
-    return fn;
-};
-
-},{}],26:[function(require,module,exports){
+},{"_process":16,"timers":17}],16:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -6464,7 +6224,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],27:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (setImmediate,clearImmediate){(function (){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -6543,1017 +6303,5 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this)}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":26,"timers":27}],28:[function(require,module,exports){
-// These methods let you build a transform function from a transformComponent
-// function for OT types like JSON0 in which operations are lists of components
-// and transforming them requires N^2 work. I find it kind of nasty that I need
-// this, but I'm not really sure what a better solution is. Maybe I should do
-// this automatically to types that don't have a compose function defined.
-
-// Add transform and transformX functions for an OT type which has
-// transformComponent defined.  transformComponent(destination array,
-// component, other component, side)
-module.exports = bootstrapTransform
-function bootstrapTransform(type, transformComponent, checkValidOp, append) {
-  var transformComponentX = function(left, right, destLeft, destRight) {
-    transformComponent(destLeft, left, right, 'left');
-    transformComponent(destRight, right, left, 'right');
-  };
-
-  var transformX = type.transformX = function(leftOp, rightOp) {
-    checkValidOp(leftOp);
-    checkValidOp(rightOp);
-    var newRightOp = [];
-
-    for (var i = 0; i < rightOp.length; i++) {
-      var rightComponent = rightOp[i];
-
-      // Generate newLeftOp by composing leftOp by rightComponent
-      var newLeftOp = [];
-      var k = 0;
-      while (k < leftOp.length) {
-        var nextC = [];
-        transformComponentX(leftOp[k], rightComponent, newLeftOp, nextC);
-        k++;
-
-        if (nextC.length === 1) {
-          rightComponent = nextC[0];
-        } else if (nextC.length === 0) {
-          for (var j = k; j < leftOp.length; j++) {
-            append(newLeftOp, leftOp[j]);
-          }
-          rightComponent = null;
-          break;
-        } else {
-          // Recurse.
-          var pair = transformX(leftOp.slice(k), nextC);
-          for (var l = 0; l < pair[0].length; l++) {
-            append(newLeftOp, pair[0][l]);
-          }
-          for (var r = 0; r < pair[1].length; r++) {
-            append(newRightOp, pair[1][r]);
-          }
-          rightComponent = null;
-          break;
-        }
-      }
-
-      if (rightComponent != null) {
-        append(newRightOp, rightComponent);
-      }
-      leftOp = newLeftOp;
-    }
-    return [leftOp, newRightOp];
-  };
-
-  // Transforms op with specified type ('left' or 'right') by otherOp.
-  type.transform = function(op, otherOp, type) {
-    if (!(type === 'left' || type === 'right'))
-      throw new Error("type must be 'left' or 'right'");
-
-    if (otherOp.length === 0) return op;
-
-    if (op.length === 1 && otherOp.length === 1)
-      return transformComponent([], op[0], otherOp[0], type);
-
-    if (type === 'left')
-      return transformX(op, otherOp)[0];
-    else
-      return transformX(otherOp, op)[1];
-  };
-};
-
-},{}],29:[function(require,module,exports){
-// Only the JSON type is exported, because the text type is deprecated
-// otherwise. (If you want to use it somewhere, you're welcome to pull it out
-// into a separate module that json0 can depend on).
-
-module.exports = {
-  type: require('./json0')
-};
-
-},{"./json0":30}],30:[function(require,module,exports){
-/*
- This is the implementation of the JSON OT type.
-
- Spec is here: https://github.com/josephg/ShareJS/wiki/JSON-Operations
-
- Note: This is being made obsolete. It will soon be replaced by the JSON2 type.
-*/
-
-/**
- * UTILITY FUNCTIONS
- */
-
-/**
- * Checks if the passed object is an Array instance. Can't use Array.isArray
- * yet because its not supported on IE8.
- *
- * @param obj
- * @returns {boolean}
- */
-var isArray = function(obj) {
-  return Object.prototype.toString.call(obj) == '[object Array]';
-};
-
-/**
- * Checks if the passed object is an Object instance.
- * No function call (fast) version
- *
- * @param obj
- * @returns {boolean}
- */
-var isObject = function(obj) {
-  return (!!obj) && (obj.constructor === Object);
-};
-
-/**
- * Clones the passed object using JSON serialization (which is slow).
- *
- * hax, copied from test/types/json. Apparently this is still the fastest way
- * to deep clone an object, assuming we have browser support for JSON.  @see
- * http://jsperf.com/cloning-an-object/12
- */
-var clone = function(o) {
-  return JSON.parse(JSON.stringify(o));
-};
-
-/**
- * JSON OT Type
- * @type {*}
- */
-var json = {
-  name: 'json0',
-  uri: 'http://sharejs.org/types/JSONv0'
-};
-
-// You can register another OT type as a subtype in a JSON document using
-// the following function. This allows another type to handle certain
-// operations instead of the builtin JSON type.
-var subtypes = {};
-json.registerSubtype = function(subtype) {
-  subtypes[subtype.name] = subtype;
-};
-
-json.create = function(data) {
-  // Null instead of undefined if you don't pass an argument.
-  return data === undefined ? null : clone(data);
-};
-
-json.invertComponent = function(c) {
-  var c_ = {p: c.p};
-
-  // handle subtype ops
-  if (c.t && subtypes[c.t]) {
-    c_.t = c.t;
-    c_.o = subtypes[c.t].invert(c.o);
-  }
-
-  if (c.si !== void 0) c_.sd = c.si;
-  if (c.sd !== void 0) c_.si = c.sd;
-  if (c.oi !== void 0) c_.od = c.oi;
-  if (c.od !== void 0) c_.oi = c.od;
-  if (c.li !== void 0) c_.ld = c.li;
-  if (c.ld !== void 0) c_.li = c.ld;
-  if (c.na !== void 0) c_.na = -c.na;
-
-  if (c.lm !== void 0) {
-    c_.lm = c.p[c.p.length-1];
-    c_.p = c.p.slice(0,c.p.length-1).concat([c.lm]);
-  }
-
-  return c_;
-};
-
-json.invert = function(op) {
-  var op_ = op.slice().reverse();
-  var iop = [];
-  for (var i = 0; i < op_.length; i++) {
-    iop.push(json.invertComponent(op_[i]));
-  }
-  return iop;
-};
-
-json.checkValidOp = function(op) {
-  for (var i = 0; i < op.length; i++) {
-    if (!isArray(op[i].p)) throw new Error('Missing path');
-  }
-};
-
-json.checkList = function(elem) {
-  if (!isArray(elem))
-    throw new Error('Referenced element not a list');
-};
-
-json.checkObj = function(elem) {
-  if (!isObject(elem)) {
-    throw new Error("Referenced element not an object (it was " + JSON.stringify(elem) + ")");
-  }
-};
-
-// helper functions to convert old string ops to and from subtype ops
-function convertFromText(c) {
-  c.t = 'text0';
-  var o = {p: c.p.pop()};
-  if (c.si != null) o.i = c.si;
-  if (c.sd != null) o.d = c.sd;
-  c.o = [o];
-}
-
-function convertToText(c) {
-  c.p.push(c.o[0].p);
-  if (c.o[0].i != null) c.si = c.o[0].i;
-  if (c.o[0].d != null) c.sd = c.o[0].d;
-  delete c.t;
-  delete c.o;
-}
-
-json.apply = function(snapshot, op) {
-  json.checkValidOp(op);
-
-  op = clone(op);
-
-  var container = {
-    data: snapshot
-  };
-
-  for (var i = 0; i < op.length; i++) {
-    var c = op[i];
-
-    // convert old string ops to use subtype for backwards compatibility
-    if (c.si != null || c.sd != null)
-      convertFromText(c);
-
-    var parent = null;
-    var parentKey = null;
-    var elem = container;
-    var key = 'data';
-
-    for (var j = 0; j < c.p.length; j++) {
-      var p = c.p[j];
-
-      parent = elem;
-      parentKey = key;
-      elem = elem[key];
-      key = p;
-
-      if (parent == null)
-        throw new Error('Path invalid');
-    }
-
-    // handle subtype ops
-    if (c.t && c.o !== void 0 && subtypes[c.t]) {
-      elem[key] = subtypes[c.t].apply(elem[key], c.o);
-
-    // Number add
-    } else if (c.na !== void 0) {
-      if (typeof elem[key] != 'number')
-        throw new Error('Referenced element not a number');
-
-      elem[key] += c.na;
-    }
-
-    // List replace
-    else if (c.li !== void 0 && c.ld !== void 0) {
-      json.checkList(elem);
-      // Should check the list element matches c.ld
-      elem[key] = c.li;
-    }
-
-    // List insert
-    else if (c.li !== void 0) {
-      json.checkList(elem);
-      elem.splice(key,0, c.li);
-    }
-
-    // List delete
-    else if (c.ld !== void 0) {
-      json.checkList(elem);
-      // Should check the list element matches c.ld here too.
-      elem.splice(key,1);
-    }
-
-    // List move
-    else if (c.lm !== void 0) {
-      json.checkList(elem);
-      if (c.lm != key) {
-        var e = elem[key];
-        // Remove it...
-        elem.splice(key,1);
-        // And insert it back.
-        elem.splice(c.lm,0,e);
-      }
-    }
-
-    // Object insert / replace
-    else if (c.oi !== void 0) {
-      json.checkObj(elem);
-
-      // Should check that elem[key] == c.od
-      elem[key] = c.oi;
-    }
-
-    // Object delete
-    else if (c.od !== void 0) {
-      json.checkObj(elem);
-
-      // Should check that elem[key] == c.od
-      delete elem[key];
-    }
-
-    else {
-      throw new Error('invalid / missing instruction in op');
-    }
-  }
-
-  return container.data;
-};
-
-// Helper to break an operation up into a bunch of small ops.
-json.shatter = function(op) {
-  var results = [];
-  for (var i = 0; i < op.length; i++) {
-    results.push([op[i]]);
-  }
-  return results;
-};
-
-// Helper for incrementally applying an operation to a snapshot. Calls yield
-// after each op component has been applied.
-json.incrementalApply = function(snapshot, op, _yield) {
-  for (var i = 0; i < op.length; i++) {
-    var smallOp = [op[i]];
-    snapshot = json.apply(snapshot, smallOp);
-    // I'd just call this yield, but thats a reserved keyword. Bah!
-    _yield(smallOp, snapshot);
-  }
-
-  return snapshot;
-};
-
-// Checks if two paths, p1 and p2 match.
-var pathMatches = json.pathMatches = function(p1, p2, ignoreLast) {
-  if (p1.length != p2.length)
-    return false;
-
-  for (var i = 0; i < p1.length; i++) {
-    if (p1[i] !== p2[i] && (!ignoreLast || i !== p1.length - 1))
-      return false;
-  }
-
-  return true;
-};
-
-json.append = function(dest,c) {
-  c = clone(c);
-
-  if (dest.length === 0) {
-    dest.push(c);
-    return;
-  }
-
-  var last = dest[dest.length - 1];
-
-  // convert old string ops to use subtype for backwards compatibility
-  if ((c.si != null || c.sd != null) && (last.si != null || last.sd != null)) {
-    convertFromText(c);
-    convertFromText(last);
-  }
-
-  if (pathMatches(c.p, last.p)) {
-    // handle subtype ops
-    if (c.t && last.t && c.t === last.t && subtypes[c.t]) {
-      last.o = subtypes[c.t].compose(last.o, c.o);
-
-      // convert back to old string ops
-      if (c.si != null || c.sd != null) {
-        var p = c.p;
-        for (var i = 0; i < last.o.length - 1; i++) {
-          c.o = [last.o.pop()];
-          c.p = p.slice();
-          convertToText(c);
-          dest.push(c);
-        }
-
-        convertToText(last);
-      }
-    } else if (last.na != null && c.na != null) {
-      dest[dest.length - 1] = {p: last.p, na: last.na + c.na};
-    } else if (last.li !== undefined && c.li === undefined && c.ld === last.li) {
-      // insert immediately followed by delete becomes a noop.
-      if (last.ld !== undefined) {
-        // leave the delete part of the replace
-        delete last.li;
-      } else {
-        dest.pop();
-      }
-    } else if (last.od !== undefined && last.oi === undefined && c.oi !== undefined && c.od === undefined) {
-      last.oi = c.oi;
-    } else if (last.oi !== undefined && c.od !== undefined) {
-      // The last path component inserted something that the new component deletes (or replaces).
-      // Just merge them.
-      if (c.oi !== undefined) {
-        last.oi = c.oi;
-      } else if (last.od !== undefined) {
-        delete last.oi;
-      } else {
-        // An insert directly followed by a delete turns into a no-op and can be removed.
-        dest.pop();
-      }
-    } else if (c.lm !== undefined && c.p[c.p.length - 1] === c.lm) {
-      // don't do anything
-    } else {
-      dest.push(c);
-    }
-  } else {
-    // convert string ops back
-    if ((c.si != null || c.sd != null) && (last.si != null || last.sd != null)) {
-      convertToText(c);
-      convertToText(last);
-    }
-
-    dest.push(c);
-  }
-};
-
-json.compose = function(op1,op2) {
-  json.checkValidOp(op1);
-  json.checkValidOp(op2);
-
-  var newOp = clone(op1);
-
-  for (var i = 0; i < op2.length; i++) {
-    json.append(newOp,op2[i]);
-  }
-
-  return newOp;
-};
-
-json.normalize = function(op) {
-  var newOp = [];
-
-  op = isArray(op) ? op : [op];
-
-  for (var i = 0; i < op.length; i++) {
-    var c = op[i];
-    if (c.p == null) c.p = [];
-
-    json.append(newOp,c);
-  }
-
-  return newOp;
-};
-
-// Returns the common length of the paths of ops a and b
-json.commonLengthForOps = function(a, b) {
-  var alen = a.p.length;
-  var blen = b.p.length;
-  if (a.na != null || a.t)
-    alen++;
-
-  if (b.na != null || b.t)
-    blen++;
-
-  if (alen === 0) return -1;
-  if (blen === 0) return null;
-
-  alen--;
-  blen--;
-
-  for (var i = 0; i < alen; i++) {
-    var p = a.p[i];
-    if (i >= blen || p !== b.p[i])
-      return null;
-  }
-
-  return alen;
-};
-
-// Returns true if an op can affect the given path
-json.canOpAffectPath = function(op, path) {
-  return json.commonLengthForOps({p:path}, op) != null;
-};
-
-// transform c so it applies to a document with otherC applied.
-json.transformComponent = function(dest, c, otherC, type) {
-  c = clone(c);
-
-  var common = json.commonLengthForOps(otherC, c);
-  var common2 = json.commonLengthForOps(c, otherC);
-  var cplength = c.p.length;
-  var otherCplength = otherC.p.length;
-
-  if (c.na != null || c.t)
-    cplength++;
-
-  if (otherC.na != null || otherC.t)
-    otherCplength++;
-
-  // if c is deleting something, and that thing is changed by otherC, we need to
-  // update c to reflect that change for invertibility.
-  if (common2 != null && otherCplength > cplength && c.p[common2] == otherC.p[common2]) {
-    if (c.ld !== void 0) {
-      var oc = clone(otherC);
-      oc.p = oc.p.slice(cplength);
-      c.ld = json.apply(clone(c.ld),[oc]);
-    } else if (c.od !== void 0) {
-      var oc = clone(otherC);
-      oc.p = oc.p.slice(cplength);
-      c.od = json.apply(clone(c.od),[oc]);
-    }
-  }
-
-  if (common != null) {
-    var commonOperand = cplength == otherCplength;
-
-    // backward compatibility for old string ops
-    var oc = otherC;
-    if ((c.si != null || c.sd != null) && (otherC.si != null || otherC.sd != null)) {
-      convertFromText(c);
-      oc = clone(otherC);
-      convertFromText(oc);
-    }
-
-    // handle subtype ops
-    if (oc.t && subtypes[oc.t]) {
-      if (c.t && c.t === oc.t) {
-        var res = subtypes[c.t].transform(c.o, oc.o, type);
-
-        // convert back to old string ops
-        if (c.si != null || c.sd != null) {
-          var p = c.p;
-          for (var i = 0; i < res.length; i++) {
-            c.o = [res[i]];
-            c.p = p.slice();
-            convertToText(c);
-            json.append(dest, c);
-          }
-        } else if (!isArray(res) || res.length > 0) {
-          c.o = res;
-          json.append(dest, c);
-        }
-
-        return dest;
-      }
-    }
-
-    // transform based on otherC
-    else if (otherC.na !== void 0) {
-      // this case is handled below
-    } else if (otherC.li !== void 0 && otherC.ld !== void 0) {
-      if (otherC.p[common] === c.p[common]) {
-        // noop
-
-        if (!commonOperand) {
-          return dest;
-        } else if (c.ld !== void 0) {
-          // we're trying to delete the same element, -> noop
-          if (c.li !== void 0 && type === 'left') {
-            // we're both replacing one element with another. only one can survive
-            c.ld = clone(otherC.li);
-          } else {
-            return dest;
-          }
-        }
-      }
-    } else if (otherC.li !== void 0) {
-      if (c.li !== void 0 && c.ld === undefined && commonOperand && c.p[common] === otherC.p[common]) {
-        // in li vs. li, left wins.
-        if (type === 'right')
-          c.p[common]++;
-      } else if (otherC.p[common] <= c.p[common]) {
-        c.p[common]++;
-      }
-
-      if (c.lm !== void 0) {
-        if (commonOperand) {
-          // otherC edits the same list we edit
-          if (otherC.p[common] <= c.lm)
-            c.lm++;
-          // changing c.from is handled above.
-        }
-      }
-    } else if (otherC.ld !== void 0) {
-      if (c.lm !== void 0) {
-        if (commonOperand) {
-          if (otherC.p[common] === c.p[common]) {
-            // they deleted the thing we're trying to move
-            return dest;
-          }
-          // otherC edits the same list we edit
-          var p = otherC.p[common];
-          var from = c.p[common];
-          var to = c.lm;
-          if (p < to || (p === to && from < to))
-            c.lm--;
-
-        }
-      }
-
-      if (otherC.p[common] < c.p[common]) {
-        c.p[common]--;
-      } else if (otherC.p[common] === c.p[common]) {
-        if (otherCplength < cplength) {
-          // we're below the deleted element, so -> noop
-          return dest;
-        } else if (c.ld !== void 0) {
-          if (c.li !== void 0) {
-            // we're replacing, they're deleting. we become an insert.
-            delete c.ld;
-          } else {
-            // we're trying to delete the same element, -> noop
-            return dest;
-          }
-        }
-      }
-
-    } else if (otherC.lm !== void 0) {
-      if (c.lm !== void 0 && cplength === otherCplength) {
-        // lm vs lm, here we go!
-        var from = c.p[common];
-        var to = c.lm;
-        var otherFrom = otherC.p[common];
-        var otherTo = otherC.lm;
-        if (otherFrom !== otherTo) {
-          // if otherFrom == otherTo, we don't need to change our op.
-
-          // where did my thing go?
-          if (from === otherFrom) {
-            // they moved it! tie break.
-            if (type === 'left') {
-              c.p[common] = otherTo;
-              if (from === to) // ugh
-                c.lm = otherTo;
-            } else {
-              return dest;
-            }
-          } else {
-            // they moved around it
-            if (from > otherFrom) c.p[common]--;
-            if (from > otherTo) c.p[common]++;
-            else if (from === otherTo) {
-              if (otherFrom > otherTo) {
-                c.p[common]++;
-                if (from === to) // ugh, again
-                  c.lm++;
-              }
-            }
-
-            // step 2: where am i going to put it?
-            if (to > otherFrom) {
-              c.lm--;
-            } else if (to === otherFrom) {
-              if (to > from)
-                c.lm--;
-            }
-            if (to > otherTo) {
-              c.lm++;
-            } else if (to === otherTo) {
-              // if we're both moving in the same direction, tie break
-              if ((otherTo > otherFrom && to > from) ||
-                  (otherTo < otherFrom && to < from)) {
-                if (type === 'right') c.lm++;
-              } else {
-                if (to > from) c.lm++;
-                else if (to === otherFrom) c.lm--;
-              }
-            }
-          }
-        }
-      } else if (c.li !== void 0 && c.ld === undefined && commonOperand) {
-        // li
-        var from = otherC.p[common];
-        var to = otherC.lm;
-        p = c.p[common];
-        if (p > from) c.p[common]--;
-        if (p > to) c.p[common]++;
-      } else {
-        // ld, ld+li, si, sd, na, oi, od, oi+od, any li on an element beneath
-        // the lm
-        //
-        // i.e. things care about where their item is after the move.
-        var from = otherC.p[common];
-        var to = otherC.lm;
-        p = c.p[common];
-        if (p === from) {
-          c.p[common] = to;
-        } else {
-          if (p > from) c.p[common]--;
-          if (p > to) c.p[common]++;
-          else if (p === to && from > to) c.p[common]++;
-        }
-      }
-    }
-    else if (otherC.oi !== void 0 && otherC.od !== void 0) {
-      if (c.p[common] === otherC.p[common]) {
-        if (c.oi !== void 0 && commonOperand) {
-          // we inserted where someone else replaced
-          if (type === 'right') {
-            // left wins
-            return dest;
-          } else {
-            // we win, make our op replace what they inserted
-            c.od = otherC.oi;
-          }
-        } else {
-          // -> noop if the other component is deleting the same object (or any parent)
-          return dest;
-        }
-      }
-    } else if (otherC.oi !== void 0) {
-      if (c.oi !== void 0 && c.p[common] === otherC.p[common]) {
-        // left wins if we try to insert at the same place
-        if (type === 'left') {
-          json.append(dest,{p: c.p, od:otherC.oi});
-        } else {
-          return dest;
-        }
-      }
-    } else if (otherC.od !== void 0) {
-      if (c.p[common] == otherC.p[common]) {
-        if (!commonOperand)
-          return dest;
-        if (c.oi !== void 0) {
-          delete c.od;
-        } else {
-          return dest;
-        }
-      }
-    }
-  }
-
-  json.append(dest,c);
-  return dest;
-};
-
-require('./bootstrapTransform')(json, json.transformComponent, json.checkValidOp, json.append);
-
-/**
- * Register a subtype for string operations, using the text0 type.
- */
-var text = require('./text0');
-
-json.registerSubtype(text);
-module.exports = json;
-
-
-},{"./bootstrapTransform":28,"./text0":31}],31:[function(require,module,exports){
-// DEPRECATED!
-//
-// This type works, but is not exported. Its included here because the JSON0
-// embedded string operations use this library.
-
-
-// A simple text implementation
-//
-// Operations are lists of components. Each component either inserts or deletes
-// at a specified position in the document.
-//
-// Components are either:
-//  {i:'str', p:100}: Insert 'str' at position 100 in the document
-//  {d:'str', p:100}: Delete 'str' at position 100 in the document
-//
-// Components in an operation are executed sequentially, so the position of components
-// assumes previous components have already executed.
-//
-// Eg: This op:
-//   [{i:'abc', p:0}]
-// is equivalent to this op:
-//   [{i:'a', p:0}, {i:'b', p:1}, {i:'c', p:2}]
-
-var text = module.exports = {
-  name: 'text0',
-  uri: 'http://sharejs.org/types/textv0',
-  create: function(initial) {
-    if ((initial != null) && typeof initial !== 'string') {
-      throw new Error('Initial data must be a string');
-    }
-    return initial || '';
-  }
-};
-
-/** Insert s2 into s1 at pos. */
-var strInject = function(s1, pos, s2) {
-  return s1.slice(0, pos) + s2 + s1.slice(pos);
-};
-
-/** Check that an operation component is valid. Throws if its invalid. */
-var checkValidComponent = function(c) {
-  if (typeof c.p !== 'number')
-    throw new Error('component missing position field');
-
-  if ((typeof c.i === 'string') === (typeof c.d === 'string'))
-    throw new Error('component needs an i or d field');
-
-  if (c.p < 0)
-    throw new Error('position cannot be negative');
-};
-
-/** Check that an operation is valid */
-var checkValidOp = function(op) {
-  for (var i = 0; i < op.length; i++) {
-    checkValidComponent(op[i]);
-  }
-};
-
-/** Apply op to snapshot */
-text.apply = function(snapshot, op) {
-  var deleted;
-
-  checkValidOp(op);
-  for (var i = 0; i < op.length; i++) {
-    var component = op[i];
-    if (component.i != null) {
-      snapshot = strInject(snapshot, component.p, component.i);
-    } else {
-      deleted = snapshot.slice(component.p, component.p + component.d.length);
-      if (component.d !== deleted)
-        throw new Error("Delete component '" + component.d + "' does not match deleted text '" + deleted + "'");
-
-      snapshot = snapshot.slice(0, component.p) + snapshot.slice(component.p + component.d.length);
-    }
-  }
-  return snapshot;
-};
-
-/**
- * Append a component to the end of newOp. Exported for use by the random op
- * generator and the JSON0 type.
- */
-var append = text._append = function(newOp, c) {
-  if (c.i === '' || c.d === '') return;
-
-  if (newOp.length === 0) {
-    newOp.push(c);
-  } else {
-    var last = newOp[newOp.length - 1];
-
-    if (last.i != null && c.i != null && last.p <= c.p && c.p <= last.p + last.i.length) {
-      // Compose the insert into the previous insert
-      newOp[newOp.length - 1] = {i:strInject(last.i, c.p - last.p, c.i), p:last.p};
-
-    } else if (last.d != null && c.d != null && c.p <= last.p && last.p <= c.p + c.d.length) {
-      // Compose the deletes together
-      newOp[newOp.length - 1] = {d:strInject(c.d, last.p - c.p, last.d), p:c.p};
-
-    } else {
-      newOp.push(c);
-    }
-  }
-};
-
-/** Compose op1 and op2 together */
-text.compose = function(op1, op2) {
-  checkValidOp(op1);
-  checkValidOp(op2);
-  var newOp = op1.slice();
-  for (var i = 0; i < op2.length; i++) {
-    append(newOp, op2[i]);
-  }
-  return newOp;
-};
-
-/** Clean up an op */
-text.normalize = function(op) {
-  var newOp = [];
-
-  // Normalize should allow ops which are a single (unwrapped) component:
-  // {i:'asdf', p:23}.
-  // There's no good way to test if something is an array:
-  // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
-  // so this is probably the least bad solution.
-  if (op.i != null || op.p != null) op = [op];
-
-  for (var i = 0; i < op.length; i++) {
-    var c = op[i];
-    if (c.p == null) c.p = 0;
-
-    append(newOp, c);
-  }
-
-  return newOp;
-};
-
-// This helper method transforms a position by an op component.
-//
-// If c is an insert, insertAfter specifies whether the transform
-// is pushed after the insert (true) or before it (false).
-//
-// insertAfter is optional for deletes.
-var transformPosition = function(pos, c, insertAfter) {
-  // This will get collapsed into a giant ternary by uglify.
-  if (c.i != null) {
-    if (c.p < pos || (c.p === pos && insertAfter)) {
-      return pos + c.i.length;
-    } else {
-      return pos;
-    }
-  } else {
-    // I think this could also be written as: Math.min(c.p, Math.min(c.p -
-    // otherC.p, otherC.d.length)) but I think its harder to read that way, and
-    // it compiles using ternary operators anyway so its no slower written like
-    // this.
-    if (pos <= c.p) {
-      return pos;
-    } else if (pos <= c.p + c.d.length) {
-      return c.p;
-    } else {
-      return pos - c.d.length;
-    }
-  }
-};
-
-// Helper method to transform a cursor position as a result of an op.
-//
-// Like transformPosition above, if c is an insert, insertAfter specifies
-// whether the cursor position is pushed after an insert (true) or before it
-// (false).
-text.transformCursor = function(position, op, side) {
-  var insertAfter = side === 'right';
-  for (var i = 0; i < op.length; i++) {
-    position = transformPosition(position, op[i], insertAfter);
-  }
-
-  return position;
-};
-
-// Transform an op component by another op component. Asymmetric.
-// The result will be appended to destination.
-//
-// exported for use in JSON type
-var transformComponent = text._tc = function(dest, c, otherC, side) {
-  //var cIntersect, intersectEnd, intersectStart, newC, otherIntersect, s;
-
-  checkValidComponent(c);
-  checkValidComponent(otherC);
-
-  if (c.i != null) {
-    // Insert.
-    append(dest, {i:c.i, p:transformPosition(c.p, otherC, side === 'right')});
-  } else {
-    // Delete
-    if (otherC.i != null) {
-      // Delete vs insert
-      var s = c.d;
-      if (c.p < otherC.p) {
-        append(dest, {d:s.slice(0, otherC.p - c.p), p:c.p});
-        s = s.slice(otherC.p - c.p);
-      }
-      if (s !== '')
-        append(dest, {d: s, p: c.p + otherC.i.length});
-
-    } else {
-      // Delete vs delete
-      if (c.p >= otherC.p + otherC.d.length)
-        append(dest, {d: c.d, p: c.p - otherC.d.length});
-      else if (c.p + c.d.length <= otherC.p)
-        append(dest, c);
-      else {
-        // They overlap somewhere.
-        var newC = {d: '', p: c.p};
-
-        if (c.p < otherC.p)
-          newC.d = c.d.slice(0, otherC.p - c.p);
-
-        if (c.p + c.d.length > otherC.p + otherC.d.length)
-          newC.d += c.d.slice(otherC.p + otherC.d.length - c.p);
-
-        // This is entirely optional - I'm just checking the deleted text in
-        // the two ops matches
-        var intersectStart = Math.max(c.p, otherC.p);
-        var intersectEnd = Math.min(c.p + c.d.length, otherC.p + otherC.d.length);
-        var cIntersect = c.d.slice(intersectStart - c.p, intersectEnd - c.p);
-        var otherIntersect = otherC.d.slice(intersectStart - otherC.p, intersectEnd - otherC.p);
-        if (cIntersect !== otherIntersect)
-          throw new Error('Delete ops delete different text in the same region of the document');
-
-        if (newC.d !== '') {
-          newC.p = transformPosition(newC.p, otherC);
-          append(dest, newC);
-        }
-      }
-    }
-  }
-
-  return dest;
-};
-
-var invertComponent = function(c) {
-  return (c.i != null) ? {d:c.i, p:c.p} : {i:c.d, p:c.p};
-};
-
-// No need to use append for invert, because the components won't be able to
-// cancel one another.
-text.invert = function(op) {
-  // Shallow copy & reverse that sucka.
-  op = op.slice().reverse();
-  for (var i = 0; i < op.length; i++) {
-    op[i] = invertComponent(op[i]);
-  }
-  return op;
-};
-
-require('./bootstrapTransform')(text, transformComponent, checkValidOp, append);
-
-},{"./bootstrapTransform":28}]},{},[3])(3)
+},{"process/browser.js":16,"timers":17}]},{},[2])(2)
 });
