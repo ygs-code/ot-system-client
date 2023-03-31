@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AccountMenu from "client/component/AccountMenu";
-import React, { memo } from "react";
+import React, { Children, memo } from "react";
 
 const MuiAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== "open"
@@ -39,31 +39,33 @@ export default memo((props) => {
     width,
     onChange = () => {},
     windosWidth,
-    user,
-    onClick = () => {}
+    user: { user: { id } = {} } = {},
+    onClick = () => {},
+    children
   } = props;
-
   return (
     <div className="header">
       <CssBaseline />
       <MuiAppBar position="fixed" open={open} width={width}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={onChange}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(windosWidth > 600 && open && { display: "none" })
-            }}>
-            {open ? <CloseIcon /> : <MenuIcon />}
-          </IconButton>
+          {id ? (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={onChange}
+              edge="start"
+              sx={{
+                marginRight: 5,
+                ...(windosWidth > 600 && open && { display: "none" })
+              }}>
+              {open ? <CloseIcon /> : <MenuIcon />}
+            </IconButton>
+          ) : null}
 
           <div className="right-header">
-            <div className="account-menu-box">
-              <AccountMenu user={user} onClick={onClick} />
-            </div>
+            {Children.map(children, (child) => {
+              return <>{child}</>;
+            })}
           </div>
         </Toolbar>
       </MuiAppBar>

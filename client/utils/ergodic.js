@@ -50,7 +50,7 @@ const recursionTreeData = (parameter, _index = null) => {
     if (item.children && item.children.length >= 1) {
       item = {
         ...item,
-        children: recursionTreeData(
+        children: recursionTreeData( 
           {
             treeData: item.children,
             childrenCallback,

@@ -34,6 +34,7 @@ import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
 import { createForm } from "rc-form";
 import React, { Component, useRef, useState } from "react";
+import Layout, { layout } from "client/component/Layout";
 
 const Create = createForm()((props) => {
   const [open, setOpen] = useState(false);
@@ -120,6 +121,7 @@ const Create = createForm()((props) => {
   title: "用户&角色"
 })
 @addRouterApi
+@layout()
 @tablePage
 class Index extends Component {
   constructor(props) {

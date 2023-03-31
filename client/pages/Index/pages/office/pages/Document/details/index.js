@@ -2,7 +2,7 @@ import "./index.less";
 
 import { message } from "antd";
 import React, { memo, useEffect } from "react";
-
+import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 
 import Main from "./main";
@@ -108,8 +108,18 @@ export default mapRedux(["user"])((props) => {
     main.quill.enable();
   }, []);
   return (
-    <div>
-      <div id="editor"></div>
+    <div className="account-management-details">
+      <Layout
+        mainProps={{
+          sx: {
+            flexGrow: 1,
+            p: 0,
+            height: "100vh",
+            overflow: "auto"
+          }
+        }}>
+        <div id="editor"></div>
+      </Layout>
     </div>
   );
 });

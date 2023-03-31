@@ -1,8 +1,6 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-// import DescriptionIcon from "@mui/icons-material/Description";
-// import MailIcon from "@mui/icons-material/Mail";
-// import InboxIcon from "@mui/icons-material/MoveToInbox";
+import AccountMenu from "client/component/AccountMenu";
 import {
   // AppBar,
   Box,
@@ -27,7 +25,7 @@ import React, {
   useState
 } from "react";
 import { stabilization } from "utils";
-
+import { mapRedux } from "client/redux";
 import Main from "./Main";
 import Sider from "./Sider";
 
@@ -67,12 +65,15 @@ const Index = (props) => {
   const {
     children,
     state: { user: { userInfo = {} } = {} } = {},
-
     menuProps = {},
     mainProps = {},
     headerProps = {},
-    siderProps = {}
+    siderProps = {},
+    HeaderComponent = null
   } = props;
+  const {
+    user: { id }
+  } = userInfo;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = React.useState(
@@ -122,49 +123,65 @@ const Index = (props) => {
         onChange={onChangeDrawerOpen}
         onClick={(type) => {
           console.log("type=", type);
-        }}
-      />
+        }}>
+        {HeaderComponent ? (
+          <HeaderComponent
+            open={open}
+            width={width}
+            windosWidth={windosWidth}
+            onChange={onChangeDrawerOpen}></HeaderComponent>
+        ) : (
+          <div className="account-menu-box">
+            <AccountMenu user={{ ...userInfo }} />
+          </div>
+        )}
+      </Header>
       <CssBaseline />
 
       {/*菜单*/}
-      <Sider
-        {...siderProps}
-        open={open}
-        width={width}
-        windosWidth={windosWidth}
-        onChange={() => {
-          onChangeDrawerOpen();
-        }}>
-        <DrawerHeader>
-          <IconButton onClick={onChangeDrawerOpen}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
 
-        <Divider />
-
-        <Menu
-          {...menuProps}
-          onChange={(flag) => {
-            setOpen(flag);
-          }}
+      {id ? (
+        <Sider
+          {...siderProps}
           open={open}
           width={width}
           windosWidth={windosWidth}
-        />
-      </Sider>
+          onChange={() => {
+            onChangeDrawerOpen();
+          }}>
+          <DrawerHeader>
+            <IconButton onClick={onChangeDrawerOpen}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
+
+          <Divider />
+
+          <Menu
+            {...menuProps}
+            onChange={(flag) => {
+              setOpen(flag);
+            }}
+            open={open}
+            width={width}
+            windosWidth={windosWidth}
+          />
+        </Sider>
+      ) : null}
 
       {/*中间子页面*/}
       <Main
+        user={{ ...userInfo }}
         sx={{
           height: "100vh",
           overflow: "auto"
         }}
         menuProps={menuProps}
+        mainProps={mainProps}
         open={open}
         width={width}
         windosWidth={windosWidth}>
@@ -178,15 +195,17 @@ const Index = (props) => {
 };
 
 // 装饰器
-export const layout = (Component) => {
-  return class extends React.Component {
-    render() {
-      return (
-        <Index {...this.props}>
-          <Component {...this.props} />
-        </Index>
-      );
-    }
+export const layout = (props = {}) => {
+  return (Component) => {
+    return class extends React.Component {
+      render() {
+        return (
+          <Index {...this.props} {...props}>
+            <Component {...this.props} {...props} />
+          </Index>
+        );
+      }
+    };
   };
 };
-export default Index;
+export default mapRedux(["user"])(Index);

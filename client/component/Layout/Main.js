@@ -45,35 +45,18 @@ export default (props) => {
     onChange = () => {},
     windosWidth,
     p = 3,
-    menuProps = {},
-    sx = {}
+    mainProps = {},
+    sx = {},
+    user: { user: { id } = {} } = {}
   } = props;
-  // const [windosWidth, setWindosWidth] = useState(
-  //   document.documentElement.clientWidth
-  // );
 
-  // /*
-  //  小于950是平板
-  //  小于600是手机
-  // */
-  // const getWindosWidth = useCallback(async () => {
-  //   await $stabilization(300);
-  //   setWindosWidth(document.documentElement.clientWidth);
-  // }, []);
-
-  // useEffect(() => {
-  //   window.addEventListener("resize", getWindosWidth);
-  //   return () => {
-  //     window.removeEventListener("resize", getWindosWidth);
-  //   };
-  // }, []);
-
-  return windosWidth >= 950 ? (
+  console.log('menuProps=====',mainProps)
+  return !id || windosWidth >= 950 ? (
     <Box
       component="main"
       key={"box"}
       sx={{ flexGrow: 1, p, ...sx }}
-      {...menuProps}>
+      {...mainProps}>
       <DrawerHeader />
       {Children.map(children, (child) => {
         return (
@@ -87,7 +70,7 @@ export default (props) => {
       })}
     </Box>
   ) : (
-    <Main key={"main"} open={open} width={width} sx={{ ...sx }} {...menuProps}>
+    <Main key={"main"} open={open} width={width} sx={{ ...sx }} {...mainProps}>
       <DrawerHeader />
       {Children.map(children, (child) => {
         return (

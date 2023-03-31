@@ -11,6 +11,9 @@ const Index = (props) => {
       user: { setUserInfo }
     }
   } = props;
+
+  console.log('props123=======',props)
+
   const { routesComponent, history } = props;
   const [loading, setLoading] = useState(true);
 
@@ -26,14 +29,14 @@ const Index = (props) => {
   }, []);
   return (
     <Skeleton active loading={loading}>
-      <Layout {...props}>
+      
         <Routers
           {...props}
           level={2}
           history={history}
           routesComponent={routesComponent}
         />
-      </Layout>
+  
     </Skeleton>
   );
 };
