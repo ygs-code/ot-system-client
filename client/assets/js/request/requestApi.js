@@ -677,3 +677,20 @@ export const getDocumentList = (parameter = {}) => {
     }
   );
 };
+
+// 获取验证码
+export const checkLogin = () => {
+  return query(
+    "checkLogin",
+    ` query{
+      checkLogin {
+          code
+          message
+          data {
+            flag
+          }
+        }
+    }
+  `
+  );
+};

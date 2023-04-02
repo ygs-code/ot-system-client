@@ -7,7 +7,7 @@ import { mapRedux } from "client/redux";
 
 import Main from "./main";
 
-export default mapRedux(["user"])((props) => {
+const Quill = (props) => {
   const {
     match: {
       params: { action, id, type }
@@ -20,14 +20,36 @@ export default mapRedux(["user"])((props) => {
       }
     }
   } = props;
-  console.log("props===", props);
+
   useEffect(() => {
+    var toolbarOptions = [
+      // ['bold', 'italic'],
+      // ['link', 'image'],
+      [{ align: [] }],
+      ["link", "image", "bold", "italic", "underline", "strike"], // toggled buttons
+      ["blockquote", "code-block"],
+
+      // [{ header: 1 }, { header: 2 }], // custom button values
+      // [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ script: "sub" }, { script: "super" }], // superscript/subscript
+      // [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+      // [{ direction: 'rtl' }], // text direction
+      [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+      [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+      [{ font: [] }],
+
+      ["clean"] // remove formatting button
+    ];
+
     // 实例化 富文本
     const main = new Main({
       quillElId: "#editor",
       quillOptions: {
         theme: "snow",
         modules: {
+          toolbar: toolbarOptions,
           cursors: {
             autoRegisterListener: false
           },
@@ -106,20 +128,28 @@ export default mapRedux(["user"])((props) => {
     });
 
     main.quill.enable();
+    
   }, []);
   return (
     <div className="account-management-details">
-      <Layout
-        mainProps={{
-          sx: {
-            flexGrow: 1,
-            p: 0,
-            height: "100vh",
-            overflow: "auto"
-          }
-        }}>
-        <div id="editor"></div>
-      </Layout>
+      <div id="editor"></div>
     </div>
+  );
+};
+
+export default mapRedux(["user"])((props) => {
+  return (
+    <Layout
+      mainProps={{
+        sx: {
+          flexGrow: 1,
+          p: 0,
+          height: "100vh",
+          //  height: "calc(100vh - 30px)",
+          overflow: "auto"
+        }
+      }}>
+      <Quill {...props}></Quill>
+    </Layout>
   );
 });

@@ -77,17 +77,27 @@
 }
 
 .ql-cursor .ql-cursor-caret-container {
-  margin-left: -9px;
-  padding: 0 9px;
+  /* margin-left: -9px;
+  padding: 0 9px; */
   z-index: 1;
+  margin-left: -1px;
 }
 
 .ql-cursor .ql-cursor-caret-container .ql-cursor-caret {
+  display: block;
+  height: inherit;
+  width: inherit;
   position: absolute;
   top: 0;
+
+  /* bottom: 0; */
+
+  /* position: absolute;
+  top: 0;
   bottom: 0;
-  width: 2px;
-  margin-left: -1px;
+  width: 2px; */
+
+  /* margin-left: -1px; */
 
   /* background-color: attr(data-color); */
 }

@@ -4,7 +4,7 @@ import ReconnectingWebSocket from "reconnectingwebsocket";
 import ShareDB from "client/modules/otServe/lib/client";
 import Quill from "./quill";
 import { mapRedux } from "client/redux";
-import Cursors from "./cursors"; 
+import Cursors from "./cursors";
 import { stabilization } from "client/utils";
 import { type } from "rich-text";
 
@@ -91,18 +91,16 @@ export default class Main {
     this.docSubscribe();
   }
   // 设置本地光标
-  setQuillCursors({ localCursor, cursorList, removeCursorList }) {
+  setQuillCursors({
+    localCursor = {},
+    cursorList = [],
+    removeCursorList = []
+  }) {
     const { onChangeCursors } = this.options;
-
-    console.log("{ localCursor, cursorList, removeCursorList }==", {
-      localCursor,
-      cursorList,
-      removeCursorList
-    });
 
     // 设置光标
     for (let item of cursorList) {
-      if (item.id == localCursor.id) {
+      if (item.id === localCursor.id) {
         this.quill.removeCursor(item.id);
       } else if (item.range) {
         this.quill.setCursor(item.id, item.range, item.name, item.color);
@@ -178,11 +176,13 @@ export default class Main {
       userName, // 用户名称
       userId // 用户id
     } = this.options;
-    $stabilization(3000).then(() => {
+    $stabilization(200).then(() => {
+      // debugger;
       var range = this.quill.getSelection();
       const { index, length } = this.cursors.localCursor.range || {};
       const { index: quillRangeIndex, length: quillRangeLength } = range || {};
       if (index !== quillRangeIndex || quillRangeLength !== length) {
+        // debugger;
         const { localCursor } = this.cursors.setLocalCursor({
           range
         });
@@ -274,7 +274,15 @@ export default class Main {
             cursorList: this.cursors.cursorList,
             removeCursorList: d || []
           });
+
+          // 矫正光标问题
+          // this.correctCursorData();
         }
+      });
+
+      this.setQuillCursors({
+        localCursor: this.cursors.localCursor,
+        cursorList: this.cursors.cursorList
       });
 
       // // 没有输入的时候设置光标
@@ -293,7 +301,7 @@ export default class Main {
     } = this.options;
     // // local -> server
     // this.quill.on("text-change", (delta, oldDelta, source) => {
-    if (source == "user") {
+    if (source === "user") {
       let localCursorRangeIndex = this.cursors.localCursor.range
         ? this.cursors.localCursor.range.index +
           this.cursors.localCursor.range.length
@@ -305,6 +313,8 @@ export default class Main {
 
         changeRangeIndex += insert.length - (item.delete || 0);
       }
+
+      console.log('changeRangeIndex==',changeRangeIndex)
 
       if (this.documentConnectionState === "connected") {
         const cursors = this.cursors.setLocalCursor({
@@ -337,7 +347,7 @@ export default class Main {
           }
         );
         // 矫正光标问题
-        this.correctCursorData();
+        // this.correctCursorData();
       }
 
       this.options.onChangeDocument &&

@@ -71,9 +71,7 @@ const Index = (props) => {
     siderProps = {},
     HeaderComponent = null
   } = props;
-  const {
-    user: { id }
-  } = userInfo;
+  const { user: { id } = {} } = userInfo;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = React.useState(
@@ -177,7 +175,7 @@ const Index = (props) => {
       <Main
         user={{ ...userInfo }}
         sx={{
-          height: "100vh",
+          height: "calc(100vh - 30px)",
           overflow: "auto"
         }}
         menuProps={menuProps}

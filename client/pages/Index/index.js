@@ -1,5 +1,5 @@
 import { Skeleton } from "antd";
-import { getUserInfo } from "client/assets/js/request";
+import { getUserInfo ,checkLogin} from "client/assets/js/request";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 import Routers, { addRouterApi } from "client/router";
@@ -18,6 +18,7 @@ const Index = (props) => {
   const [loading, setLoading] = useState(true);
 
   const getUser = useCallback(async () => {
+    await checkLogin()
     let { data } = await getUserInfo({});
     setUserInfo(data);
   }, []);
