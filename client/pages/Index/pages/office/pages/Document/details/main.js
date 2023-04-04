@@ -4,10 +4,11 @@ import ReconnectingWebSocket from "reconnectingwebsocket";
 import ShareDB from "client/modules/otServe/lib/client";
 import Quill from "./quill";
 import { mapRedux } from "client/redux";
-import Cursors from "./cursors";
+// import Cursors from "./cursors";
 import { stabilization } from "client/utils";
 import { type } from "rich-text";
 
+const Cursors = ShareDB.Cursors;
 let $stabilization = stabilization();
 
 export default class Main {
@@ -248,13 +249,14 @@ export default class Main {
 
       // update editor contents  更新文本内容
       this.quill.setContents(this.doc.data);
-      // this.quill.registerTextChangeListener();
+      this.quill.registerTextChangeListener();
       this.doc.on("op", (message, source) => {
         const {
           data: { cursor: { a, d, e } = {} },
           op
         } = message;
-        console.log("message==", message);
+        const { ops = [] } = op;
+
         // debugger
         if (source !== this.quill) {
           // 更新文本
@@ -268,15 +270,30 @@ export default class Main {
           if (d) {
             this.cursors.removeCursorList(d);
           }
+          if (ops.length) {
+            let cursorList = this.cursors.transformIndex(
+              ops,
+              this.cursors.cursorList,
+              e
+            );
+            const cursors = this.cursors.setLocalCursor(
+              {
+                // range: {
+                //   index: localCursorRangeIndex + changeRangeIndex,
+                //   length: 0,
+                // },
+              },
+              cursorList
+            );
 
-          this.setQuillCursors({
-            localCursor: this.cursors.localCursor,
-            cursorList: this.cursors.cursorList,
-            removeCursorList: d || []
-          });
-
-          // 矫正光标问题
-          // this.correctCursorData();
+            this.setQuillCursors(cursors);
+          } else {
+            this.setQuillCursors({
+              localCursor: this.cursors.localCursor,
+              cursorList: this.cursors.cursorList,
+              removeCursorList: d || []
+            });
+          }
         }
       });
 
@@ -299,31 +316,28 @@ export default class Main {
       userName, // 用户名称
       userId // 用户id
     } = this.options;
+    const { ops = [] } = delta;
     // // local -> server
     // this.quill.on("text-change", (delta, oldDelta, source) => {
-    if (source === "user") {
-      let localCursorRangeIndex = this.cursors.localCursor.range
-        ? this.cursors.localCursor.range.index +
-          this.cursors.localCursor.range.length
-        : 0;
-
-      let changeRangeIndex = 0;
-      for (let item of delta.ops) {
-        const { insert = "" } = item;
-
-        changeRangeIndex += insert.length - (item.delete || 0);
-      }
-
-      console.log('changeRangeIndex==',changeRangeIndex)
+    if (source == "user") {
+      const { localCursor } = this.cursors;
 
       if (this.documentConnectionState === "connected") {
-        const cursors = this.cursors.setLocalCursor({
-          range: {
-            index: localCursorRangeIndex + changeRangeIndex,
-            length: 0
-          }
-        });
-        const { localCursor } = cursors;
+        let cursorList = this.cursors.transformIndex(
+          ops,
+          this.cursors.cursorList,
+          localCursor
+        );
+        const cursors = this.cursors.setLocalCursor(
+          {
+            // range: {
+            //   index: localCursorRangeIndex + changeRangeIndex,
+            //   length: 0,
+            // },
+          },
+          cursorList
+        );
+
         this.setQuillCursors(cursors);
 
         this.doc.submitOp(
@@ -346,7 +360,7 @@ export default class Main {
             }
           }
         );
-        // 矫正光标问题
+        // // 矫正光标问题
         // this.correctCursorData();
       }
 
