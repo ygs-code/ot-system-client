@@ -299,7 +299,6 @@ export default routesComponentConfig;
       const { path, filename } = value;
       if (filename === "routesConfig.js") {
         const content = require(path).default;
-        console.log("content=====", content);
         routesConfigs.push({
           path,
           config: content
