@@ -6,8 +6,6 @@ var isarray =
     return toString.call(arr) == "[object Array]";
   };
 
-
-
 /**
  * The main path matching regexp utility.
  *
@@ -470,12 +468,15 @@ function pathToRegexp(path, keys, options) {
   );
 }
 
+export default pathToRegexp;
+
+export { parse, compile, tokensToFunction, tokensToRegExp };
 
 /**
  * Expose `pathToRegexp`.
  */
-module.exports = pathToRegexp;
-module.exports.parse = parse;
-module.exports.compile = compile;
-module.exports.tokensToFunction = tokensToFunction;
-module.exports.tokensToRegExp = tokensToRegExp;
+// module.exports = pathToRegexp;
+// module.exports.parse = parse;
+// module.exports.compile = compile;
+// module.exports.tokensToFunction = tokensToFunction;
+// module.exports.tokensToRegExp = tokensToRegExp;
