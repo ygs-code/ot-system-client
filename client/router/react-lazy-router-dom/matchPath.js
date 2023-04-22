@@ -1,8 +1,4 @@
-import pathToRegexp from "path-to-regexp";
-
-console.log('pathToRegexp===',pathToRegexp)
-
-//应该是这个问题
+import pathToRegexp from "./path-to-regexp";
 
 var cache = {};
 var cacheLimit = 10000;
