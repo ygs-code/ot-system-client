@@ -1,5 +1,9 @@
 import pathToRegexp from "path-to-regexp";
 
+console.log('pathToRegexp===',pathToRegexp)
+
+//应该是这个问题
+
 var cache = {};
 var cacheLimit = 10000;
 var cacheCount = 0;
