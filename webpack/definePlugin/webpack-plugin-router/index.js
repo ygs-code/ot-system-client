@@ -264,10 +264,6 @@ export default routesComponentConfig;
       watch = []
     } = this.options;
 
-    if (NODE_ENV === "production") {
-      return false;
-    }
-
     this.throttle(aggregateTimeout, () => {
       let routesConfigs = [];
       readFile(entry, (value) => {
@@ -339,9 +335,14 @@ export default routesComponentConfig;
 
   apply(compiler) {
     // webpack  处理webpack选项的条目配置后调用。 只编译一次
-    // this.hook(compiler, "entryOption", () => {
-    // this.compilerFile(compiler);
-    // });
+
+    if (NODE_ENV === "production") {
+      this.hook(compiler, "entryOption", (compilation, callback) => {
+        this.compilerFile(compiler);
+        callback();
+      });
+      return false;
+    }
     this.hook(compiler, "watchRun", (compilation) => {
       this.writeFile(compilation);
     });
