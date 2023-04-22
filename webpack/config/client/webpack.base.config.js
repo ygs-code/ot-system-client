@@ -30,7 +30,7 @@ const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
 const isEnvDevelopment = NODE_ENV === "development";
 
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 });
+const happyThreadPool = HappyPack.ThreadPool({ size:os.cpus().length - 3<=1?1: os.cpus().length - 3});
 const rootPath = process.cwd();
 
 const cacheLoader = (happypackId) => {
