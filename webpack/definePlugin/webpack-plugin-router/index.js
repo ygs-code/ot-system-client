@@ -337,9 +337,9 @@ export default routesComponentConfig;
     // webpack  处理webpack选项的条目配置后调用。 只编译一次
 
     if (NODE_ENV === "production") {
-      this.hook(compiler, "entryOption", (compilation, callback) => {
-        this.compilerFile(compiler);
-        callback();
+      compiler.hooks.emit.tapAsync("entryOption", (compilation, callback) => {
+        this.compilerFile(compilation);
+        callback()
       });
       return false;
     }
