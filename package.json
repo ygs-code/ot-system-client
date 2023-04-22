@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "lint-style": "stylelint \"client/**/*.(less|css)\" --syntax less",
+         "lint-style": "stylelint \"client/**/*.(less|css)\" --syntax less",
         "copyFile": "node ./webpack/utils/copyFile.js",
         "webpack-plugin-copy-file": "node  ./webpack/definePlugin/webpack-plugin-copy-file/index.js",
         "//注释10": "eslint校验",
@@ -18,8 +18,7 @@
         "start:ssr:prod": "cross-env  target='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.production",
         "web:dev:server": "cross-env    target=web  webpack-dev-server   -r @babel/register      --config  ./webpack/config/client/index.js  ",
         "start:client:dev": "cross-env  target=client  npx babel-node    -r @babel/register    ./bin/index.js   -r  dotenv/config  dotenv_config_path=.env.development",
-        "build:client:prod": "cross-env  target=client  npx babel-node    -r @babel/register    ./bin/index.js   -r  dotenv/config  dotenv_config_path=.env.production",
-        "webpack5": "cross-env  target='client'  npx babel-node    -r @babel/register    ./webpack/webpack5.js   -r  dotenv/config  dotenv_config_path=.env.production"
+        "build:client:prod": "cross-env  target=client  npx babel-node    -r @babel/register    ./bin/index.js   -r  dotenv/config  dotenv_config_path=.env.production"
     },
     "author": "",
     "license": "ISC",
@@ -158,7 +157,7 @@
         "stream": "^0.0.2",
         "style-loader": "^0.19.1",
         "styled-components": "^5.3.6",
-        "stylelint": "^10.0.1",
+        "stylelint": "13.2.0",
         "stylelint-config-recess-order": "^3.0.0",
         "stylelint-config-standard": "^18.3.0",
         "stylelint-config-standard-scss": "^4.0.0",

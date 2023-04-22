@@ -25,7 +25,7 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { stabilization } from "utils";
+import { stabilization } from "client/utils";
 
 export default (props) => {
   const { open } = props;

@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { stabilization } from "utils";
+import { stabilization } from "client/utils";
 
 import Dropdown from "./Dropdown";
 import Header from "./Header";

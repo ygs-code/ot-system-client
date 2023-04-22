@@ -24,7 +24,7 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { stabilization } from "utils";
+import { stabilization } from "client/utils";
 import { mapRedux } from "client/redux";
 import Main from "./Main";
 import Sider from "./Sider";

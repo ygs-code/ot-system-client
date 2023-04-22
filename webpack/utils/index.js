@@ -7,13 +7,12 @@ var readWriteFiles = require("./readWriteFiles");
 var stringToObject = require("./stringToObject");
 var alias = require("./alias");
 
-
 module.exports = {
-    alias,
-    copyFile,
-    readFile,
-    writeFile,
-    watchFile,
-    readWriteFiles,
-    stringToObject
+  alias,
+  copyFile,
+  readFile,
+  writeFile,
+  watchFile,
+  readWriteFiles,
+  stringToObject
 };

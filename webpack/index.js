@@ -10,14 +10,15 @@
 const chalk = require("chalk");
 const webpack = require("webpack");
 const client = require("./config/client");
-const server = require("./config/server");
+//不能加载不然会报错
+// const server = require("./config/server");
 const webpackMerge = require("webpack-merge");
 
 require("dotenv").config({ path: ".env" });
 
 let {
   NODE_ENV, // 环境参数
-  target, // 环境参数
+  target // 环境参数
 } = process.env; // 环境参数
 
 const isSsr = target === "ssr";
@@ -63,14 +64,24 @@ const compileRes = async (config) => {
 
 module.exports = {
   compiler: async () => {
- 
     if (isEnvProduction) {
       await compileRes(client);
       if (isSsr) {
+        const server = require("./config/server");
         await compileRes(server);
       }
     }
     return true;
   },
-  config: isSsr ? [client, server] : [client]
+
+  config: (() => {
+    let config = {};
+    if (isSsr) {
+      const server = require("./config/server");
+      config = [client, server];
+    } else {
+      config = [client];
+    }
+    return config;
+  })()
 };

@@ -7,7 +7,7 @@ import React, {
   // useEffect,
   // useState
 } from "react";
-// import { stabilization } from "utils";
+// import { stabilization } from "client/utils";
 
 // const $stabilization = stabilization();
 const openedMixin = (theme, width) => {

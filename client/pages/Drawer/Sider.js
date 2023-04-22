@@ -1,7 +1,7 @@
 import { Drawer, SwipeableDrawer } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { Children } from "react";
-// import { stabilization } from "utils";
+// import { stabilization } from "client/utils";
 
 // const $stabilization = stabilization();
 const openedMixin = (theme, width) => {

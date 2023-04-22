@@ -4,6 +4,13 @@ const _ = require("lodash");
 const { readFile } = require("../../utils");
 const dataDiff = require("./diff");
 const chalk = require("chalk");
+
+let {
+  NODE_ENV, // 环境参数
+  target, // 环境参数
+  htmlWebpackPluginOptions = ""
+} = process.env; // 环境参数
+
 // https://juejin.cn/post/6844903991508205576
 class WebpackPluginRouter {
   constructor(options) {
@@ -256,6 +263,10 @@ export default routesComponentConfig;
       output: { routesComponent, routePaths },
       watch = []
     } = this.options;
+
+    if (NODE_ENV === "production") {
+      return false;
+    }
 
     this.throttle(aggregateTimeout, () => {
       let routesConfigs = [];
