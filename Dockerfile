@@ -25,7 +25,7 @@ FROM nginx:alpine
 # 定义作者
 MAINTAINER yao guan shou
 #对外暴露的端口
-EXPOSE 80
+# EXPOSE 3002
 
 # 将dist文件中的内容复制到 /usr/share/nginx/html/ 这个目录下面
 RUN echo '复制静态文件到nginx html目录中'
