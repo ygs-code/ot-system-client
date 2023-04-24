@@ -22,10 +22,19 @@ RUN echo '编译打包client' & npm run build:client:prod
 
 # # # 设置基础镜像
 FROM nginx:alpine
+
 # 定义作者
 MAINTAINER yao guan shou
 #对外暴露的端口
 # EXPOSE 3002
+#更新Alpine的软件源为国内（清华大学）的站点，因为从默认官源拉取实在太慢了。。。
+RUN echo "https://mirror.tuna.tsinghua.edu.cn/alpine/v3.4/main/" > /etc/apk/repositories
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache bash \
+    bash-doc \
+    bash-completion \
+    && rm -rf /var/ca
 
 # 将dist文件中的内容复制到 /usr/share/nginx/html/ 这个目录下面
 RUN echo '复制静态文件到nginx html目录中'
@@ -34,7 +43,7 @@ COPY --from=BUILD_IMAGE  /ot-system-client/dist/client  /usr/share/nginx/html/
 # COPY  dist/client  /usr/share/nginx/html/
 
 # 覆盖默认配置
-COPY nginx.conf   /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf   /etc/nginx/conf.d/default.conf
 RUN echo 'client镜像build打包成功'
 
 CMD ["nginx", "-g", "daemon off;"]
