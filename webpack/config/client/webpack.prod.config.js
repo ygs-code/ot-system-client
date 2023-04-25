@@ -16,12 +16,11 @@ const isDevelopment = NODE_ENV == "development";
 module.exports = {
   mode: "development",
   watch: false,
-
   output: {
     // path: path.join(__dirname, 'dist'),
     // filename:'bundle.js',
     // 配置 二级目录
-    publicPath: "/client/"
+    // publicPath: "/client/"
   },
 
   module: {

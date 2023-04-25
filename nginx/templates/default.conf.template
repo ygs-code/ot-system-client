@@ -4,13 +4,21 @@ server {
 
     #access_log  /var/log/nginx/host.access.log  main;
 
-    location / {
+    location /client {
         root   /usr/share/nginx/html;
         index  index.html index.htm;
         #  注意⚠️：如果vue-router使用的是history模式，try_files $uri $uri/ /index.html;  非常重要！！！
         # 如果使用了hash模式，可以省略这个
-        try_files $uri $uri/ /index.html;
+        try_files $uri $uri/ /index.html =404;
     }
+
+
+    #/localhost:3002/client/static/js/node_mo
+
+     #location  ^~/client/static/**/\.(gif|jpg|jpeg|bmp|png|ico|txt|js|css)$ {
+         # alias   /usr/share/nginx/html/static/
+         # autoindex on;
+    #}
 
 #    location / {
 #             # root   html;

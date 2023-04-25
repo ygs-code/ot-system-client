@@ -12,6 +12,12 @@ let {
 } = process.env; // 环境参数
 
 module.exports = {
+  output: {
+    // path: path.join(__dirname, 'dist'),
+    // filename:'bundle.js',
+    // 配置 二级目录
+    // publicPath: "/client/"
+  },
   entry: {
     index: [
       // '@babel/polyfill',

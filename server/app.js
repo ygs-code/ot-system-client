@@ -16,7 +16,7 @@ let {
   NODE_ENV, // 环境参数
   target, // 环境参数
   htmlWebpackPluginOptions,
-  CLIENT_IP,
+  CLIENT_ADDRESS,
   CLIENT_PORT
 } = process.env; // 环境参数
 
@@ -45,7 +45,7 @@ class App {
     const server = this.app.listen(CLIENT_PORT, function () {
       var port = server.address().port;
       console.log(
-        `\n==> 🌎  node服务器启动成功，监听端口：${port}. 请打开浏览器 http://${CLIENT_IP}:${port}/ \n`
+        `\n==> 🌎  node服务器启动成功，监听端口：${port}. 请打开浏览器 http://${CLIENT_ADDRESS}:${port}/ \n`
       );
     });
   }

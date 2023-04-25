@@ -1,7 +1,9 @@
 module.exports = function (string) {
+  let reg = /\s*|\n/gi;
+  string = string.replace(reg, "");
   const regex = /(?<=\{)(.+?)(?=\})/g; // {} 花括号，大括号
   string = string.match(regex);
-  let obj={}
+  let obj = {};
   if (string) {
     string = string[0];
     let stringArr = string.split(",");
@@ -9,6 +11,6 @@ module.exports = function (string) {
       let [key, value] = item.split(":");
       obj[`${key}`] = value;
     }
-  }  
+  }
   return obj;
 };

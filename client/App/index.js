@@ -19,11 +19,14 @@ import Routers from "client/router";
 import React, { Component } from "react";
 import { Provider } from "react-redux";
 
-// let {
-//   NODE_ENV, // 环境参数
-//   target, // 环境参数
-//   htmlWebpackPluginOptions = ""
-// } = process.env; // 环境参数
+let {
+  NODE_ENV, // 环境参数
+  target, // 环境参数
+  htmlWebpackPluginOptions = ""
+} = process.env; // 环境参数
+
+
+console.log('htmlWebpackPluginOptions=====',htmlWebpackPluginOptions)
 
 class Index extends Component {
   render() {

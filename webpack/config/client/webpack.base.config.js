@@ -24,13 +24,23 @@ let {
   htmlWebpackPluginOptions = ""
 } = process.env; // 环境参数
 
+htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
+const { publicPath } = htmlWebpackPluginOptions;
+
+console.log("htmlWebpackPluginOptions==", htmlWebpackPluginOptions);
+console.log("type of==", typeof htmlWebpackPluginOptions);
+console.log('publicPath==',publicPath)
+
+
 const isSsr = target == "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
 const isEnvDevelopment = NODE_ENV === "development";
 
-const happyThreadPool = HappyPack.ThreadPool({ size:os.cpus().length - 3<=1?1: os.cpus().length - 3});
+const happyThreadPool = HappyPack.ThreadPool({
+  size: os.cpus().length - 3 <= 1 ? 1 : os.cpus().length - 3
+});
 const rootPath = process.cwd();
 
 const cacheLoader = (happypackId) => {
@@ -71,7 +81,8 @@ module.exports = {
     filename: `static/js/[name].[hash:8].js`,
     chunkFilename: `static/js/[name].[hash:8].chunk.js`,
     path: path.join(process.cwd(), "./dist/client"),
-    publicPath: "/",
+    // publicPath: "/",
+    publicPath,
     // libraryTarget: isServer?'commonjs2':'umd',
     chunkLoadTimeout: 120000,
     // 「devtool 中模块」的文件名模板 调试webpack的配置问题
@@ -387,7 +398,6 @@ module.exports = {
 
     new webpack.HashedModuleIdsPlugin(), // 确保 hash 不被意外改变
 
-
     // eslint 插件
     // new ESLintPlugin({
     //   emitError: true, //发现的错误将始终被触发，将禁用设置为false。
@@ -438,6 +448,7 @@ module.exports = {
     }),
 
     new WebpackPluginRouter({
+      publicPath,
       entry: path.join(process.cwd(), "/client"),
       //延迟监听时间
       aggregateTimeout: 30,
@@ -476,7 +487,7 @@ module.exports = {
       : [
           // // // html静态页面
           new HtmlWebpackPlugin({
-            ...stringToObject(htmlWebpackPluginOptions),
+            ...htmlWebpackPluginOptions,
             minify: true,
             // title: 'Custom template using Handlebars',
             // 生成出来的html文件名

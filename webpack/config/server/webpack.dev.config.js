@@ -23,6 +23,7 @@ module.exports = {
     ]
   },
   devServer: {
+    // publicPath: "/client/",
     open: true,
     contentBase: "assets",
     hot: true,

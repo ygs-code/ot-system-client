@@ -21,6 +21,7 @@ module.exports = {
   mode: NODE_ENV,
   devServer: {
     open: true,
+    // publicPath: "/client/",
     // publicPath: "/",
     // contentBase: "assets",
     hot: true,

@@ -36,6 +36,10 @@ class WebpackPluginRouter {
     return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
   }
 
+  removeLine(string) {
+    return string.replace(/\/{2,}/g, "/").trim();
+  }
+
   mapRoutesConfig(
     config,
     routesConfigPath,
@@ -45,6 +49,8 @@ class WebpackPluginRouter {
     cachePaths,
     parentPath = ""
   ) {
+    const { publicPath = "/" } = this.options;
+
     for (let item of config) {
       let { path, name, entry, exact, children = [], level = 1 } = item;
       path = parentPath ? parentPath + path : path;
@@ -140,7 +146,7 @@ import ${this.firstToUpper(name)} from "client${entry}"`;
 
       code.routesComponentConfig += `
                     {  
-                     path: "${path}",
+                     path: "${this.removeLine(publicPath + path)}",
                      exact: ${exact ? true : false},
                      name:"${name}",
                      entry:"${entry}",
@@ -339,7 +345,7 @@ export default routesComponentConfig;
     if (NODE_ENV === "production") {
       compiler.hooks.emit.tapAsync("entryOption", (compilation, callback) => {
         this.compilerFile(compilation);
-        callback()
+        callback();
       });
       return false;
     }
