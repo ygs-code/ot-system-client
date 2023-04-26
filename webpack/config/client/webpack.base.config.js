@@ -27,9 +27,7 @@ let {
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 const { publicPath } = htmlWebpackPluginOptions;
 
-console.log("htmlWebpackPluginOptions==", htmlWebpackPluginOptions);
-console.log("type of==", typeof htmlWebpackPluginOptions);
-console.log("publicPath==", publicPath);
+
 
 const isSsr = target == "ssr";
 //    是否是生产环境
