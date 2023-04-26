@@ -284,6 +284,7 @@ class WebpackHot {
         });
       });
 
+    // ssr 路由入口
     return async (ctx, next) => {
       await waitMiddleware();
       await dev(

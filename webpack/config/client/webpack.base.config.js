@@ -29,8 +29,7 @@ const { publicPath } = htmlWebpackPluginOptions;
 
 console.log("htmlWebpackPluginOptions==", htmlWebpackPluginOptions);
 console.log("type of==", typeof htmlWebpackPluginOptions);
-console.log('publicPath==',publicPath)
-
+console.log("publicPath==", publicPath);
 
 const isSsr = target == "ssr";
 //    是否是生产环境
@@ -82,7 +81,7 @@ module.exports = {
     chunkFilename: `static/js/[name].[hash:8].chunk.js`,
     path: path.join(process.cwd(), "./dist/client"),
     // publicPath: "/",
-    publicPath,
+    publicPath, // 静态资源不能用相对路径，否则路由改变的时候会发生静态资源引用路径错误问题。
     // libraryTarget: isServer?'commonjs2':'umd',
     chunkLoadTimeout: 120000,
     // 「devtool 中模块」的文件名模板 调试webpack的配置问题

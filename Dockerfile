@@ -11,7 +11,7 @@ RUN echo '删除dist,node_modules目录下所有文件,以及清理缓存' & rm 
 RUN echo '安装node_modules依赖包' & npm install --production 
 # ARG date; 获取命令行参数
 #清理缓存
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+# ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 #移动当前目录下面的文件到client目录下
 COPY  .  /ot-system-client
 # RUN echo '复制成功'
@@ -39,7 +39,7 @@ RUN apk update \
 # 将dist文件中的内容复制到 /usr/share/nginx/html/ 这个目录下面
 RUN echo '复制静态文件到nginx html目录中'
 # 拷贝 装依赖阶段 生成的 node_modules 文件夹到工作目录下
-COPY --from=BUILD_IMAGE  /ot-system-client/dist/client  /usr/share/nginx/html/
+COPY --from=BUILD_IMAGE  /ot-system-client/dist/client  /usr/share/nginx/html/client
 # COPY  dist/client  /usr/share/nginx/html/
 
 # 覆盖默认配置
