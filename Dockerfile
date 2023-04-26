@@ -39,7 +39,7 @@ RUN apk update \
 # 将dist文件中的内容复制到 /usr/share/nginx/html/ 这个目录下面
 RUN echo '复制静态文件到nginx html目录中'
 # 拷贝 装依赖阶段 生成的 node_modules 文件夹到工作目录下
-COPY --from=BUILD_IMAGE  /ot-system-client/dist/client  /usr/share/nginx/html/client
+COPY --from=BUILD_IMAGE  /ot-system-client/dist/client  /usr/share/nginx/html/
 # COPY  dist/client  /usr/share/nginx/html/
 
 # 覆盖默认配置

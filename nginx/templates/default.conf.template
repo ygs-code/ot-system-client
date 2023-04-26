@@ -11,16 +11,16 @@ server {
     #access_log  /var/log/nginx/host.access.log  main;
 
 
-   # css js 
-   #location ^~ /client/static {
-       # alias /usr/share/nginx/html/static;
-       # try_files $uri $uri/ =404;
-    #}
+   # css js  静态资源处理
+   location /client/static {
+        alias /usr/share/nginx/html/static;
+        try_files $uri $uri/;
+    }
 
-    location /client {
-        alias   /usr/share/nginx/html;  # root和alias区别 https://zhuanlan.zhihu.com/p/579768206
+    location /{
+        alias    /usr/share/nginx/html/;  # root和alias区别 https://zhuanlan.zhihu.com/p/579768206
         index  index.html index.htm;
-        try_files $uri $uri/ /index.html =404;
+        try_files $uri $uri/ /index.html;
     }
 
 

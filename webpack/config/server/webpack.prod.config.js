@@ -21,7 +21,7 @@ module.exports = {
     // path: path.join(__dirname, 'dist'),
     // filename:'bundle.js',
     // 配置 二级目录
-    publicPath
+    // publicPath
   },
   entry: {
     index: [

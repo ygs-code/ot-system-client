@@ -27,8 +27,6 @@ let {
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 const { publicPath } = htmlWebpackPluginOptions;
 
-
-
 const isSsr = target == "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
