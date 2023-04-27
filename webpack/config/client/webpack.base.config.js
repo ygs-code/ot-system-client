@@ -23,24 +23,16 @@ let {
   target, // 环境参数
   htmlWebpackPluginOptions = "",
   CLIENT_PUBLICPATH,
-  buildno
+  CLIENT_ADDRESS,
+  CLIENT_PORT,
+  CLIENT_SERVER_NAME
 } = process.env; // 环境参数
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 // const { publicPath = "/" } = htmlWebpackPluginOptions;
 
-let publicPath =
-  CLIENT_PUBLICPATH     //|| htmlWebpackPluginOptions.publicPath || "/";
+let publicPath = CLIENT_PUBLICPATH;
 
-console.log("CLIENT_PUBLICPATH==============", CLIENT_PUBLICPATH);
-console.log("process.env.BACKEND_SERVER==============", process.env.BACKEND_SERVER);
-console.log("buildno=============", buildno);
-
-
-
-throw '错误'
-
- 
 const isSsr = target === "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
@@ -497,6 +489,7 @@ module.exports = {
           // // // html静态页面
           new HtmlWebpackPlugin({
             ...htmlWebpackPluginOptions,
+            publicPath,
             minify: true,
             // title: 'Custom template using Handlebars',
             // 生成出来的html文件名

@@ -2,6 +2,18 @@ FROM node:14-alpine AS BUILD_IMAGE
 #声明作者
 MAINTAINER yao guan shou
 
+ARG CLIENT_ADDRESS 
+ARG CLIENT_PORT 
+ARG CLIENT_PUBLICPATH 
+ARG CLIENT_NODE_ENV 
+ARG CLIENT_TARGET 
+
+ENV CLIENT_ADDRESS = ${CLIENT_ADDRESS}
+ENV CLIENT_PORT = ${CLIENT_PORT}
+ENV CLIENT_PUBLICPATH = ${CLIENT_PUBLICPATH}
+ENV NODE_ENV = ${CLIENT_NODE_ENV}
+ENV target = ${CLIENT_TARGET}
+
 
 # RUN apk update && apk add bash
 RUN mkdir ot-system-client
@@ -20,29 +32,8 @@ COPY  .  /ot-system-client
 #进入到ot-system-client目录下面，类似cd
 WORKDIR /ot-system-client
 
-
-
-ARG buildno
-ARG gitcommithash
-
-RUN echo "Build number: $buildno"
-RUN echo "Based on commit: $gitcommithash"
-
-ARG CLIENT_PUBLICPATH
-
-ENV CLIENT_PUBLICPATH = $CLIENT_PUBLICPATH
-
-RUN echo  'CLIENT_PUBLICPATH============'
-RUN echo   ${CLIENT_PUBLICPATH}
-RUN echo   $CLIENT_PUBLICPATH
-ENV  buildno = $buildno
-
-
 # RUN echo 'webpack打包编译生产代码'
 RUN echo '编译打包client' & npm run build:client:prod
-
-
-
 
 # # # 设置基础镜像
 FROM nginx:alpine

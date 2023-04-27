@@ -30,8 +30,7 @@ let {
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 // const { publicPath = "/" } = htmlWebpackPluginOptions;
-let publicPath =
-  CLIENT_PUBLICPATH   //|| htmlWebpackPluginOptions.publicPath || "/";
+let publicPath = CLIENT_PUBLICPATH;
 
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
