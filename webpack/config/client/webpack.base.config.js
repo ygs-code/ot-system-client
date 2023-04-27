@@ -21,13 +21,27 @@ const { stringToObject, alias } = require("../../utils");
 let {
   NODE_ENV, // 环境参数
   target, // 环境参数
-  htmlWebpackPluginOptions = ""
+  htmlWebpackPluginOptions = "",
+  CLIENT_PUBLICPATH,
+  buildno
 } = process.env; // 环境参数
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
-const { publicPath } = htmlWebpackPluginOptions;
+// const { publicPath = "/" } = htmlWebpackPluginOptions;
 
-const isSsr = target == "ssr";
+let publicPath =
+  CLIENT_PUBLICPATH     //|| htmlWebpackPluginOptions.publicPath || "/";
+
+console.log("CLIENT_PUBLICPATH==============", CLIENT_PUBLICPATH);
+console.log("process.env.BACKEND_SERVER==============", process.env.BACKEND_SERVER);
+console.log("buildno=============", buildno);
+
+
+
+throw '错误'
+
+ 
+const isSsr = target === "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境

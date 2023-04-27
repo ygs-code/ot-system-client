@@ -11,7 +11,7 @@ let {
   NODE_ENV, // 环境参数
   target // 环境参数
 } = process.env; // 环境参数
-const isDevelopment = NODE_ENV == "development";
+const isDevelopment = NODE_ENV === "development";
 
 module.exports = {
   mode: "development",

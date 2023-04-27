@@ -5,8 +5,8 @@
 
 
 server {
-    listen       3002;
-    server_name  localhost;
+    listen       ${CLIENT_PORT};
+    server_name  ${CLIENT_SERVER_NAME};
 
     #access_log  /var/log/nginx/host.access.log  main;
 
@@ -19,7 +19,7 @@ server {
        # try_files $uri $uri/;
    #}
    
-   location  /client111/static/.*  {
+   location  /client/static/.*  {
         alias /usr/share/nginx/html/static;
         try_files $uri $uri/;
    }
@@ -28,7 +28,7 @@ server {
      #   try_files $uri $uri/;
    # }
 
-    location /client111/{
+    location /client{
         alias    /usr/share/nginx/html/;  # root和alias区别 https://zhuanlan.zhihu.com/p/579768206
         index  index.html index.htm;
         try_files $uri $uri/ /index.html;

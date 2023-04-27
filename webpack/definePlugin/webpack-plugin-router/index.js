@@ -159,10 +159,11 @@ import ${this.firstToUpper(name)} from "client${entry}"`;
                    },`;
 
       code.routePaths +=
+        // 过滤"~"转义 因为具有相同的值了
         name[0] === "~"
           ? ""
           : `
-  ${name}:"${path}",`;
+  ${name}:"${this.removeLine(publicPath + path)}",`;
     }
     return code;
   }

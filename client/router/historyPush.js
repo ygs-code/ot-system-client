@@ -12,6 +12,7 @@ const getNewUrlArr = (parameter) => {
       // 如果参数等于undefined 则会丢弃
       params[key] !== undefined && newUrlArr.push(`/${params[key]}`);
     } else {
+      // 如果匹配不到参数则使用地址栏的参数
       (optional === -1 || pathnameArr[index]) &&
         newUrlArr.push(`/${pathnameArr[index]}`);
     }
@@ -81,7 +82,15 @@ export const historyPush = (parameter) => {
 
   const { location } = window;
   const { pathname } = location;
+
+  console.log("history===", history);
+  console.log("location===", location);
+  console.log("url===", url);
+  debugger;
+
+  //拆分浏览器地址
   const pathnameArr = pathname.split("/");
+  // 拆分传入的地址
   let urlArr = url.split("/");
   urlArr = urlArr.filter((item) => item !== "");
   let newUrlArr = [];

@@ -1,6 +1,8 @@
 FROM node:14-alpine AS BUILD_IMAGE
 #声明作者
 MAINTAINER yao guan shou
+
+
 # RUN apk update && apk add bash
 RUN mkdir ot-system-client
 # 复制package.json文件
@@ -11,14 +13,36 @@ RUN echo '删除dist,node_modules目录下所有文件,以及清理缓存' & rm 
 RUN echo '安装node_modules依赖包' & npm install --production 
 # ARG date; 获取命令行参数
 #清理缓存
-# ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 #移动当前目录下面的文件到client目录下
 COPY  .  /ot-system-client
 # RUN echo '复制成功'
 #进入到ot-system-client目录下面，类似cd
 WORKDIR /ot-system-client
+
+
+
+ARG buildno
+ARG gitcommithash
+
+RUN echo "Build number: $buildno"
+RUN echo "Based on commit: $gitcommithash"
+
+ARG CLIENT_PUBLICPATH
+
+ENV CLIENT_PUBLICPATH = $CLIENT_PUBLICPATH
+
+RUN echo  'CLIENT_PUBLICPATH============'
+RUN echo   ${CLIENT_PUBLICPATH}
+RUN echo   $CLIENT_PUBLICPATH
+ENV  buildno = $buildno
+
+
 # RUN echo 'webpack打包编译生产代码'
 RUN echo '编译打包client' & npm run build:client:prod
+
+
+
 
 # # # 设置基础镜像
 FROM nginx:alpine
