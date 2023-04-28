@@ -23,12 +23,9 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const { stringToObject, alias } = require("../../utils");
 let {
   NODE_ENV, // 环境参数
-  target, // 环境参数
-  htmlWebpackPluginOptions = "",
   CLIENT_PUBLICPATH
 } = process.env; // 环境参数
 
-htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 // const { publicPath = "/" } = htmlWebpackPluginOptions;
 let publicPath = CLIENT_PUBLICPATH;
 

@@ -7,14 +7,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { stringToObject, alias } = require("../../utils");
 const rootPath = process.cwd();
-let {
-  NODE_ENV, // 环境参数
-  target, // 环境参数
-  htmlWebpackPluginOptions
-} = process.env; // 环境参数
-
-htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
-const { publicPath } = htmlWebpackPluginOptions;
 
 module.exports = {
   output: {

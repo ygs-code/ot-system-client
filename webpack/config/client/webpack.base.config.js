@@ -20,20 +20,19 @@ const { stringToObject, alias } = require("../../utils");
 
 let {
   NODE_ENV, // 环境参数
-  target, // 环境参数
   htmlWebpackPluginOptions = "",
-  CLIENT_PUBLICPATH,
-  CLIENT_ADDRESS,
-  CLIENT_PORT,
-  CLIENT_SERVER_NAME
+  ADDRESS,
+  PORT,
+  PUBLICPATH,
+  RENDER
 } = process.env; // 环境参数
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 // const { publicPath = "/" } = htmlWebpackPluginOptions;
 
-let publicPath = CLIENT_PUBLICPATH;
+let publicPath = PUBLICPATH;
 
-const isSsr = target === "ssr";
+const isSsr = RENDER === "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
@@ -464,8 +463,12 @@ module.exports = {
       process: {
         env: {
           NODE_ENV, // 环境参数
-          target, // 环境参数
-          htmlWebpackPluginOptions
+          RENDER, // 渲染环境参数
+          PUBLICPATH: PUBLICPATH,
+          htmlWebpackPluginOptions: {
+            ...htmlWebpackPluginOptions,
+            publicPath
+          }
         }
       }
     }),
@@ -478,7 +481,6 @@ module.exports = {
     // // 注入全局变量
     // new webpack.EnvironmentPlugin({
     //   NODE_ENV, // 环境参数  除非有定义 process.env.NODE_ENV，否则就使用 NODE_ENV
-    //   target, // 环境参数
     //   // htmlWebpackPluginOptions: stringToObject(htmlWebpackPluginOptions),
     //   // EnvironmentPluginDEBUG: false
     // }),

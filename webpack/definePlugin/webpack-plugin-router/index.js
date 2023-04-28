@@ -7,8 +7,6 @@ const chalk = require("chalk");
 
 let {
   NODE_ENV, // 环境参数
-  target, // 环境参数
-  htmlWebpackPluginOptions = ""
 } = process.env; // 环境参数
 
 // https://juejin.cn/post/6844903991508205576
@@ -213,7 +211,6 @@ import ${this.firstToUpper(name)} from "client${entry}"`;
   getCode(routesConfigs, compilation) {
     let {
       NODE_ENV, // 环境参数
-      target // 环境参数
     } = process.env; // 环境参数
 
     NODE_ENV == "development";
