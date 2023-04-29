@@ -187,10 +187,7 @@ const Index = (props) => {
           ...rowSelection,
           ...$rowSelection
         };
-
-  console.log("pageNum==", pageNum);
-  console.log("pageSize==", pageSize);
-  console.log("total==", total);
+ 
   return (
     <div className="table-box">
       <div className="table">

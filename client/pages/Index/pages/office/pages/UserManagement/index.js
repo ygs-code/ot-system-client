@@ -51,7 +51,7 @@ class Index extends Component {
 
         // render: (props) => {
         //   const { value, onChange } = props;
-        //   console.log("props======", props);
+     
         //   return <Input onChange={onChange} value={value}></Input>;
         // }
       },
@@ -158,7 +158,7 @@ class Index extends Component {
         key: "actions",
         width: 300,
         render: ({ row = {} } = {}) => {
-          console.log("row=======", row);
+         
           const { id } = row;
 
           return (

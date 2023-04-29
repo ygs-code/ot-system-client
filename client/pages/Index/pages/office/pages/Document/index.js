@@ -41,7 +41,7 @@ const Create = createForm()((props) => {
   const { form, pushRoute, confirm } = props;
   const { validateFields } = form;
   const message = useRef(null);
-  console.log("props11====", props);
+
   return (
     <div>
       <Message ref={message} />
@@ -50,7 +50,6 @@ const Create = createForm()((props) => {
           validateFields(async (error, values) => {
             if (!error) {
               let data = await createDocument(values);
-              console.log("data===", data);
 
               message.current.success("文档创建成功");
               setOpen(false);
@@ -200,8 +199,6 @@ class Index extends Component {
                         type: "document"
                       } // 地址传参
                     });
-                    console.log("row===", row);
-                    console.log("this.props===", this.props);
                   }
                 },
                 {

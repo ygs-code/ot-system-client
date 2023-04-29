@@ -51,7 +51,7 @@ const Index = memo((props) => {
     }
   } = props;
 
-  console.log("routePaths==", routePaths);
+ 
   const { validateFields } = form;
 
   const message = useRef(null);
@@ -81,10 +81,7 @@ const Index = memo((props) => {
     });
     // const data = new FormData(event.currentTarget);
 
-    // console.log({
-    //   email: data.get("name"),
-    //   password: data.get("password")
-    // });
+ 
     event.preventDefault();
   };
 

@@ -458,7 +458,7 @@ Enables/disables ES modules named export for locals.
 ```js
 import { fooBaz, bar } from './styles.css';
 
-console.log(fooBaz, bar);
+ 
 ```
 
 You can enable a ES module named export using:

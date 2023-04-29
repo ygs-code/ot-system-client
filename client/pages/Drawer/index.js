@@ -94,7 +94,7 @@ export default memo((props) => {
     };
   }, []);
 
-  console.log("props======", props);
+ 
 
   const onChangeDrawerOpen = useCallback(async () => {
     setOpen(!open);

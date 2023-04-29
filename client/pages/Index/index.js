@@ -12,7 +12,7 @@ const Index = (props) => {
     }
   } = props;
 
-  console.log('props123=======',props)
+  
 
   const { routesComponent, history } = props;
   const [loading, setLoading] = useState(true);

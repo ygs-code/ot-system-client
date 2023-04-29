@@ -84,7 +84,7 @@ const Quill = (props) => {
             indicatorColor = "red";
             break;
         }
-        console.log("state=========", state);
+   
         // sharedbSocketIndicatorEl.style.backgroundColor = indicatorColor;
       },
       // 光标连接状态
@@ -109,7 +109,7 @@ const Quill = (props) => {
       },
       // 改变文档内容
       onChangeDocument: (data) => {
-        console.log("onChangeDocument", data);
+        
       },
       // 文档websocket 连接
       documentConnectionUrl:

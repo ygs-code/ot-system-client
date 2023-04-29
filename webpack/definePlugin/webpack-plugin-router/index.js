@@ -83,8 +83,7 @@ class WebpackPluginRouter {
         cachePaths.has(path) &&
         !(name[0] === "~" || cachePaths.get(path).name[0] === "~")
       ) {
-        console.log("cachePaths===", cachePaths);
-        console.log("cachePaths.get(path)===", cachePaths.get(path));
+ 
         const { routesConfigPath: cacheRoutesConfigPath } =
           cachePaths.get(path);
         errorMessage = `[webpack-plugin-router]

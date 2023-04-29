@@ -70,8 +70,7 @@ class WebpackHot {
   addWebpackHotMiddleware() {
     this.app.use(async (ctx, next) => {
       const { response, request, req, res } = ctx;
-      // console.log("req==", req);
-      // console.log("res==", res);
+ 
       await webpackHotMiddleware(
         this.compiler.compilers.find((compiler) => compiler.name === "client")
       )(request, response, next);
