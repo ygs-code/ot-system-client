@@ -11,14 +11,21 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import React from "react";
+import React, { memo, useRef } from "react";
+import Message from "client/component/Message";
+import { mapRedux } from "client/redux";
+import { addRouterApi } from "client/router";
+import { logOut } from "client/assets/js/request";
 
-export default (props) => {
+export default addRouterApi((props) => {
   const {
     user: { user: { email, id, name, phone, type } = {} } = {},
     onClick = () => {}
   } = props;
 
+  console.log("props=========", props);
+
+  const message = useRef(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -29,6 +36,7 @@ export default (props) => {
   };
   return (
     <div className="account-menu">
+      <Message ref={message} />
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
         <Tooltip title="Account settings">
           <IconButton
@@ -78,7 +86,13 @@ export default (props) => {
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}>
-        <MenuItem onClick={onClick.bind(null, "account")}>
+        <MenuItem
+          onClick={() => {
+            console.log("routePaths.logIn==", routePaths);
+            onClick(id ? "account" : "logIn");
+
+            id ? null : pushRoute(routePaths.logIn);
+          }}>
           <Avatar
             fontSize="small"
             sx={{
@@ -86,31 +100,47 @@ export default (props) => {
               width: 19,
               height: 19
             }}></Avatar>
-          账号:{name}
+          {id ? "账号:" + name : "请登录"}
         </MenuItem>
 
-        <MenuItem onClick={handleClose}>
-          <PhoneIphoneIcon
-            fontSize="small"
-            sx={{ color: "rgb(117, 117, 117)", width: 24, height: 24 }}
-          />{" "}
-          手机:{phone}
-        </MenuItem>
+        {id ? (
+          <>
+            <MenuItem onClick={handleClose}>
+              <PhoneIphoneIcon
+                fontSize="small"
+                sx={{ color: "rgb(117, 117, 117)", width: 24, height: 24 }}
+              />{" "}
+              手机:{phone}
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onClick("setIng");
+              }}>
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              设置
+            </MenuItem>
+
+            <MenuItem
+              onClick={async () => {
+                await logOut();
+
+                message.current.success("注销成功");
+                setTimeout(() => {
+                  pushRoute(routePaths.logIn);
+                }, 1500);
+              }}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              退出登录
+            </MenuItem>
+          </>
+        ) : null}
+
         <Divider />
-
-        <MenuItem onClick={onClick.bind(null, "setIng")}>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          设置
-        </MenuItem>
-        <MenuItem onClick={onClick.bind(null, "logOut")}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          退出登录
-        </MenuItem>
       </Menu>
     </div>
   );
-};
+});

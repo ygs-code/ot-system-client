@@ -25,7 +25,7 @@ import React, {
   useState
 } from "react";
 import { stabilization } from "client/utils";
-import { mapRedux } from "client/redux";
+import { mapRedux } from "client/redux/index";
 import Main from "./Main";
 import Sider from "./Sider";
 
@@ -130,7 +130,7 @@ const Index = (props) => {
             onChange={onChangeDrawerOpen}></HeaderComponent>
         ) : (
           <div className="account-menu-box">
-            <AccountMenu user={{ ...userInfo }} />
+            <AccountMenu {...props} onClick={() => {}} user={{ ...userInfo }} />
           </div>
         )}
       </Header>
@@ -206,4 +206,6 @@ export const layout = (props = {}) => {
     };
   };
 };
+
 export default mapRedux(["user"])(Index);
+// mapRedux(["user"])(Index);

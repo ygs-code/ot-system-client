@@ -51,7 +51,6 @@ const Index = memo((props) => {
     }
   } = props;
 
- 
   const { validateFields } = form;
 
   const message = useRef(null);
@@ -81,7 +80,6 @@ const Index = memo((props) => {
     });
     // const data = new FormData(event.currentTarget);
 
- 
     event.preventDefault();
   };
 

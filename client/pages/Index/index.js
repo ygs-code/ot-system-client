@@ -1,5 +1,5 @@
 import { Skeleton } from "antd";
-import { getUserInfo ,checkLogin} from "client/assets/js/request";
+import { getUserInfo, checkLogin } from "client/assets/js/request";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 import Routers, { addRouterApi } from "client/router";
@@ -12,13 +12,15 @@ const Index = (props) => {
     }
   } = props;
 
-  
-
   const { routesComponent, history } = props;
   const [loading, setLoading] = useState(true);
 
   const getUser = useCallback(async () => {
-    await checkLogin()
+    let { data: { flag } = {} } = await checkLogin();
+    if (!flag) {
+      return false;
+    }
+
     let { data } = await getUserInfo({});
     setUserInfo(data);
   }, []);
@@ -30,14 +32,12 @@ const Index = (props) => {
   }, []);
   return (
     <Skeleton active loading={loading}>
-      
-        <Routers
-          {...props}
-          level={2}
-          history={history}
-          routesComponent={routesComponent}
-        />
-  
+      <Routers
+        {...props}
+        level={2}
+        history={history}
+        routesComponent={routesComponent}
+      />
     </Skeleton>
   );
 };

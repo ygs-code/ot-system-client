@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { getBundles } from "react-loadable-ssr-addon";
 import Helmet from "react-helmet";
 import { matchPath } from "react-lazy-router-dom";
-import store from "client/redux";
+import store from "client/redux/Store";
 import routesComponent from "client/router/routesComponent";
 import { getMemoryHistory } from "client/router/history";
 import { findTreeData } from "client/utils";

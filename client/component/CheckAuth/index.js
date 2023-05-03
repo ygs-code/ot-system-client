@@ -8,7 +8,8 @@
  */
 import React, { Children, Component, cloneElement } from "react";
 import { CheckDataType } from "client/utils";
-import Store, { mapRedux } from "client/redux";
+import Store from "client/redux/Store";
+import { mapRedux } from "client/redux";
 export const authKeys = [1, 2, 3, 4, 5];
 
 const checkAuthKey = (authKey, props) => {
@@ -44,7 +45,7 @@ const CheckAuth = (props) => {
   const { authKey, children } = props;
   return checkAuthKey(authKey)
     ? Children.map(children, (child, index) => {
-      return cloneElement(child, props);
+        return cloneElement(child, props);
       })
     : null;
 };

@@ -22,7 +22,7 @@ import {
 import {
   createDocument,
   getDocumentList,
-  getUserList
+  removeDocument
 } from "client/assets/js/request";
 import Actions from "client/component/Actions";
 import Dialog from "client/component/Dialog";
@@ -114,10 +114,10 @@ const Create = createForm()((props) => {
   //设置面包屑和标题
   breadcrumb: [
     {
-      label: "用户&角色"
+      label: "文档"
     }
   ],
-  title: "用户&角色"
+  title: "文档"
 })
 @addRouterApi
 @layout()
@@ -204,12 +204,26 @@ class Index extends Component {
                 {
                   label: "删除",
                   type: "remove",
-                  onClick: () => {}
+                  onClick: async () => {
+                    const { message: mgs } = await removeDocument(id);
+                    this.message.success(mgs);
+
+                    this.loadTableData();
+                  }
                 },
                 {
                   label: "查看",
                   type: "view",
-                  onClick: () => {}
+                  onClick: () => {
+                    pushRoute({
+                      path: officeDocumentDetails,
+                      params: {
+                        action: "view",
+                        id,
+                        type: "document"
+                      } // 地址传参
+                    });
+                  }
                 }
               ]}
             />
@@ -241,6 +255,11 @@ class Index extends Component {
     const { tabsValue, open } = this.state;
     return (
       <div className="table-page">
+        <Message
+          ref={(ref) => {
+            this.message = ref;
+          }}
+        />
         <Create
           {...this.props}
           confirm={() => {

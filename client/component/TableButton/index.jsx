@@ -10,7 +10,7 @@ import React, { useCallback } from 'react'
 import { Popconfirm } from 'antd'
 import './styles.less'
 
-export default React.forwardRef((props, ref) => {
+export default (props) => {
   const { render } = props
   return (
     <ul className="table-button">
@@ -33,4 +33,4 @@ export default React.forwardRef((props, ref) => {
         })}
     </ul>
   )
-})
+}

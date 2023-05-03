@@ -1,7 +1,7 @@
 import "./index.less";
 
 import { message } from "antd";
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 
@@ -14,12 +14,12 @@ const Quill = (props) => {
     },
     state: {
       user: {
-        userInfo: {
-          user: { id: userId, name: userName }
-        }
-      }
-    }
+        userInfo: { user: { id: userId, name: userName } = {} } = {}
+      } = {}
+    } = {}
   } = props;
+
+  const mainRef = useRef();
 
   useEffect(() => {
     var toolbarOptions = [
@@ -43,8 +43,11 @@ const Quill = (props) => {
       ["clean"] // remove formatting button
     ];
 
+    if (mainRef.current) {
+      return false;
+    }
     // 实例化 富文本
-    const main = new Main({
+    mainRef.current = new Main({
       quillElId: "#editor",
       quillOptions: {
         theme: "snow",
@@ -61,7 +64,7 @@ const Quill = (props) => {
       }
     });
 
-    main.init({
+    mainRef.current.init({
       documentTitle: "ot协同文档",
       documentId: id, // 文档id
       documentType: type, // 文档类型
@@ -84,7 +87,7 @@ const Quill = (props) => {
             indicatorColor = "red";
             break;
         }
-   
+
         // sharedbSocketIndicatorEl.style.backgroundColor = indicatorColor;
       },
       // 光标连接状态
@@ -108,9 +111,7 @@ const Quill = (props) => {
         // updateUserList(cursorList, localCursor);
       },
       // 改变文档内容
-      onChangeDocument: (data) => {
-        
-      },
+      onChangeDocument: (data) => {},
       // 文档websocket 连接
       documentConnectionUrl:
         (location.protocol === "https:" ? "wss" : "ws") +
@@ -127,12 +128,20 @@ const Quill = (props) => {
       //   `?documentId=${id}&documentType=${type}`,
     });
 
-    main.quill.enable();
-    
+    console.log("userId==", userId);
+    // 修改是否可以编辑
+    if (userId) {
+      mainRef.current.quill.enable();
+    }
   }, []);
+
   return (
     <div className="account-management-details">
-      <div id="editor"></div>
+      <div
+        id="editor"
+        onClick={() => {
+          // mainRef.current.quill.enable();
+        }}></div>
     </div>
   );
 };

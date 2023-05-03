@@ -1,8 +1,5 @@
-import { init } from "@rematch/core";
 import { CheckDataType } from "client/utils";
 import { connect } from "react-redux";
-
-import * as models from "./models";
 
 const mapRedux = (modelsName) => (Component) => {
   const mapStateToProps = (state) => {
@@ -64,30 +61,3 @@ const getPropsState = (global, modelKey, dataKey = "initState") => {
 };
 
 export { getPropsState, mapRedux };
-
-export const createStore = (global) => {
-  const newModels = {};
-  /* eslint-disable   */
-  for (const key in models) {
-    // if (models.hasOwnProperty(key)) {
-    newModels[key] = models[key](global);
-    // }
-  }
-  /* eslint-enable   */
-  // 文档： https://www.icode9.com/content-4-1343821.html
-  return init({
-    models: newModels
-  });
-};
-
-let $global = {};
-try {
-  if (window) {
-    $global = window;
-  }
-} catch (error) {
-  // 不要挂载在global中不然会很慢
-  $global = {};
-}
-
-export default createStore($global); // (global || {})

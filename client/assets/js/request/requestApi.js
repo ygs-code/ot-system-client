@@ -114,9 +114,9 @@ export const removeUser = (id) => {
 // 登录
 export const login = (parameter) => {
   const { password, name, verificationCode } = parameter;
-  return query(
+  return mutation(
     "login",
-    ` query{
+    ` mutation{
         login(
           password:"${password}",
           name:"${name}",
@@ -144,6 +144,29 @@ export const login = (parameter) => {
               } 
             }
             message
+          } 
+   }
+    `
+
+    // {
+    //   userInfo: parameter,
+    // }
+  );
+
+  //return Request.post("/set/user/login", parameter);
+};
+
+// 登录
+export const logOut = () => {
+  return mutation(
+    "logOut",
+    ` mutation{
+       logOut {
+            code
+            message
+            data{
+              flag
+            }
           } 
    }
     `
@@ -694,3 +717,20 @@ export const checkLogin = () => {
   `
   );
 };
+
+
+// 删除文档
+export const removeDocument = (id) => {
+  return mutation(
+    "removeDocument",
+    `
+      mutation  {
+        removeDocument(id: ${id}) {
+          code
+          message
+        }
+      }
+    `
+  );
+};
+

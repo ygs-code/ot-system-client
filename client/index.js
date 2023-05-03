@@ -6,7 +6,7 @@
  * @FilePath: /react-ssr-lazy-loading/client/index.js
  * @Description:
  */
-import store from "client/redux";
+import store from "client/redux/Store";
 import { getBrowserHistory } from "client/router/history";
 import routesComponent from "client/router/routesComponent";
 import React from "react";
