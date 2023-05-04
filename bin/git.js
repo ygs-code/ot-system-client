@@ -24,12 +24,9 @@ class Git {
     this.init();
   }
   async init() {
-
-
     let { stdout: remote } = await this.PromiseExec("git remote -v", {
       stdio: undefined
     });
-
 
     this.remote = remote.split("\n")[1];
     let { stdout: branch } = await this.PromiseExec("git branch", {
@@ -51,17 +48,15 @@ class Git {
 
   // 执行程序
   PromiseExec(cmd, options = {}) {
-
     const { getStdout = () => {}, callback = () => {} } = options;
     return new Promise((reslove, reject) => {
       execute(cmd, {
         // stdio: null,
         ...options,
         getStdout: (stdout) => {
-      
           getStdout(stdout);
           callback();
-  
+
           reslove({
             cmd,
             stdout,
@@ -72,7 +67,6 @@ class Git {
         callback: () => {
           callback();
           reslove();
-       
         }
       });
     });
@@ -181,16 +175,14 @@ class Git {
       //   stdout: commitStdout,
       //   code: commitCode,
 
-
-
       //   cmd,
       //   stderr: commitStderr,
-      // } =
+      // } = 
 
       await this.PromiseExec(
         `git commit -m  ${commitType.split(":")[0]}: ${commitMessage}`,
         {
-          // stdio:undefined
+          // stdio: undefined,
           transformCmd: (cmd) => {
             return cmd.slice(0, 2).concat([cmd.slice(2).join(" ")]);
           }

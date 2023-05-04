@@ -1,17 +1,18 @@
-import React, { useState, useCallback, useEffect, useRef, memo } from "react";
-import PropTypes from "prop-types";
-import {
-  Card,
-  CardImg,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardText
-} from "reactstrap";
-import _ from "lodash";
+import "./index.less";
+
 import { mapRedux } from "client/redux";
 import { getStyle } from "client/utils";
-import "./index.less";
+import _ from "lodash";
+import PropTypes from "prop-types";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Card,
+  CardBody,
+  CardImg,
+  CardSubtitle,
+  CardText,
+  CardTitle
+} from "reactstrap";
 
 // 权限跳转登录页面可以在这控制
 const Index = memo((props) => {

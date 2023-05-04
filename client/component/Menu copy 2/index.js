@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import Header from "client/component/Header";
+import { stabilization } from "client/utils";
 import React, {
   Children,
   cloneElement,
@@ -25,7 +26,6 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { stabilization } from "client/utils";
 
 export default (props) => {
   const { open } = props;

@@ -1,5 +1,6 @@
-import React, { Component } from "react";
 import hoistStatics from "hoist-non-react-statics";
+import React, { Component } from "react";
+
 export default (options = {}) => {
   return (Traget) => {
     const displayName =

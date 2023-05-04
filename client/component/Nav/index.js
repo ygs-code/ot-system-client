@@ -6,12 +6,13 @@
  * @FilePath: /react-ssr-lazy-loading/client/component/Nav/index.js
  * @Description:
  */
-import React from "react";
-import { Nav, NavItem, NavLink } from "reactstrap";
-import PropTypes from "prop-types";
+import "./index.less";
+
 import { mapRedux } from "client/redux";
 import addRouterApi from "client/router/addRouterApi";
-import "./index.less";
+import PropTypes from "prop-types";
+import React from "react";
+import { Nav, NavItem, NavLink } from "reactstrap";
 
 const Index = (props) => {
   const {
