@@ -128,7 +128,6 @@ const Quill = (props) => {
       //   `?documentId=${id}&documentType=${type}`,
     });
 
-    console.log("userId==", userId);
     // 修改是否可以编辑
     if (userId) {
       mainRef.current.quill.enable();

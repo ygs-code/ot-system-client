@@ -24,13 +24,13 @@ class Git {
     this.init();
   }
   async init() {
-    console.log(0);
+
 
     let { stdout: remote } = await this.PromiseExec("git remote -v", {
       stdio: undefined
     });
 
-    console.log(1);
+
     this.remote = remote.split("\n")[1];
     let { stdout: branch } = await this.PromiseExec("git branch", {
       stdio: undefined
@@ -51,17 +51,17 @@ class Git {
 
   // 执行程序
   PromiseExec(cmd, options = {}) {
-    console.log("cmd====", cmd);
+
     const { getStdout = () => {}, callback = () => {} } = options;
     return new Promise((reslove, reject) => {
       execute(cmd, {
         // stdio: null,
         ...options,
         getStdout: (stdout) => {
-          console.log("stdout=====", stdout);
+      
           getStdout(stdout);
           callback();
-          console.log(2);
+  
           reslove({
             cmd,
             stdout,
@@ -72,7 +72,7 @@ class Git {
         callback: () => {
           callback();
           reslove();
-          console.log(3);
+       
         }
       });
     });
@@ -192,12 +192,6 @@ class Git {
         {
           // stdio:undefined
           transformCmd: (cmd) => {
-            console.log('cmd===========================',cmd)
-            // // cmd.slice(0, 1).concat([cmd.slice(2).join(" ")]);
-            console.log(
-              "cmd111====",
-              cmd.slice(0, 2).concat([cmd.slice(2).join(" ")])
-            );
             return cmd.slice(0, 2).concat([cmd.slice(2).join(" ")]);
           }
         }

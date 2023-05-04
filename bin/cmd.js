@@ -58,7 +58,7 @@ class Cmd {
     this.text = "";
     // options = Object.assign(options || {}, { cwd: this.cfg.cwd });
     return new Promise((resolve, reject) => {
-      console.log(`run command: ${command}, params:`, params, options);
+    
 
       if (!options) {
         options = {
@@ -71,7 +71,7 @@ class Cmd {
       options.stdio = "pipe";
 
       let proc = spawn(command, params, options);
-      // console.log('proc===', proc)
+   
 
       proc.stdout.on("data", (data) => {
         let dataStr = String(data);
@@ -105,7 +105,7 @@ class Cmd {
 
       // 进程关闭
       proc.on("close", (code) => {
-        console.log(`process closed with exit code: ${code}`);
+    
         if (code === 0) {
           resolve(this.text || "");
         } else {
@@ -118,7 +118,7 @@ class Cmd {
       });
 
       proc.on("exit", (code, signal) => {
-        console.log(`process exits`);
+   
       });
     });
   }
@@ -144,17 +144,13 @@ const execute = (command, options = { stdio: "inherit" }) => {
   // if (os.type() === 'Windows_NT' && !command[0].match(/\.cmd$/)) {
   //   command[0] += '.cmd'
   // }
-  console.log("command===", command);
-  console.log(
-    "transformCmd(command.slice(1))===",
-    transformCmd(command.slice(1))
-  );
+
 
   const proc = spawn(command[0], transformCmd(command.slice(1)), options);
 
   // 进程错误
   proc.on("error", (error) => {
-    console.log("error");
+    
     if (error) {
       callback(error);
       console.error("process error:", error);

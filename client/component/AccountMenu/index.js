@@ -25,8 +25,6 @@ export default addRouterApi((props) => {
     pushRoute
   } = props;
 
-  console.log("props=========", props);
-
   const message = useRef(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -90,7 +88,6 @@ export default addRouterApi((props) => {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}>
         <MenuItem
           onClick={() => {
-            console.log("routePaths.logIn==", routePaths);
             onClick(id ? "account" : "logIn");
 
             id ? null : pushRoute(routePaths.logIn);
