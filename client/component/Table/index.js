@@ -187,7 +187,7 @@ const Index = (props) => {
           ...rowSelection,
           ...$rowSelection
         };
- 
+
   return (
     <div className="table-box">
       <div className="table">

@@ -12,6 +12,23 @@ node_modules/**/*
 **/node_modules/**/*
 **/node_modules/**/*
 
+bin
+bin/*
+bin/**/*
+**/bin
+**/bin/**/*
+**/bin/**/*
+
+
+modules
+modules/*
+modules/**/*
+**/modules
+**/modules/**/*
+**/modules/**/*
+
+
+
 webpack
 webpack/*
 webpack/**/*

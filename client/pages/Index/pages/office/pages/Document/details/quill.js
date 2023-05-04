@@ -1,7 +1,8 @@
-import Quill from "quill";
-import QuillCursors from "quill-cursors";
 import "quill/dist/quill.snow.css";
 import "./quill-cursors.css";
+
+import Quill from "quill";
+import QuillCursors from "quill-cursors";
 
 Quill.register("modules/cursors", QuillCursors);
 
@@ -10,17 +11,14 @@ class $Quill {
     { elId, onTextChange = () => {}, onSelectionChange = () => {} },
     quillOptions = {}
   ) {
- 
     this.options = {};
     this.documentConnectionState = null;
     this.initQuill({ elId, onTextChange, onSelectionChange }, quillOptions);
- 
   }
   initQuill(
     { elId, onTextChange = () => {}, onSelectionChange = () => {} },
     quillOptions
   ) {
-   
     this.quill = new Quill(elId, quillOptions);
     this.cursorsModule = this.quill.getModule("cursors");
     // local -> server
@@ -55,7 +53,6 @@ class $Quill {
   }
   // 设置光标
   setCursor(...ags) {
-    
     this.cursorsModule.setCursor(...ags);
   }
   getDelta() {
@@ -72,7 +69,7 @@ class $Quill {
     // update editor contents  更新文本内容
     this.quill.setContents(delta);
   }
-  
+
   registerTextChangeListener() {
     this.cursorsModule.registerTextChangeListener();
   }

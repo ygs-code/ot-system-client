@@ -11,16 +11,18 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import React, { memo, useRef } from "react";
+import { logOut } from "client/assets/js/request";
 import Message from "client/component/Message";
 import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
-import { logOut } from "client/assets/js/request";
+import React, { memo, useRef } from "react";
 
 export default addRouterApi((props) => {
   const {
     user: { user: { email, id, name, phone, type } = {} } = {},
-    onClick = () => {}
+    onClick = () => {},
+    routePaths,
+    pushRoute
   } = props;
 
   console.log("props=========", props);

@@ -25,9 +25,6 @@ let {
   htmlWebpackPluginOptions = ""
 } = process.env; // 环境参数
 
-
-console.log('htmlWebpackPluginOptions=====',htmlWebpackPluginOptions)
-
 class Index extends Component {
   render() {
     const { history, store, routesComponent } = this.props;

@@ -20,8 +20,8 @@ import {
   // Typography
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import React, { memo, useCallback, useEffect, useState } from "react";
 import { stabilization } from "client/utils";
+import React, { memo, useCallback, useEffect, useState } from "react";
 
 import Dropdown from "./Dropdown";
 import Header from "./Header";
@@ -93,8 +93,6 @@ export default memo((props) => {
       window.removeEventListener("resize", getWindosWidth);
     };
   }, []);
-
- 
 
   const onChangeDrawerOpen = useCallback(async () => {
     setOpen(!open);

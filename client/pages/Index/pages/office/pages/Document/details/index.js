@@ -1,9 +1,9 @@
 import "./index.less";
 
 import { message } from "antd";
-import React, { memo, useEffect, useRef } from "react";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
+import React, { memo, useEffect, useRef } from "react";
 
 import Main from "./main";
 
@@ -93,7 +93,7 @@ const Quill = (props) => {
       // 光标连接状态
       onCursorConnectionState: (state) => {
         var indicatorColor;
-        socketStateEl.innerHTML = state;
+        // socketStateEl.innerHTML = state;
         switch (state.toString()) {
           case "connected":
             indicatorColor = "lime";
@@ -103,7 +103,7 @@ const Quill = (props) => {
             indicatorColor = "red";
             break;
         }
-        socketIndicatorEl.style.backgroundColor = indicatorColor;
+        // socketIndicatorEl.style.backgroundColor = indicatorColor;
       },
       // 改变光标位置
       onChangeCursors: (data) => {

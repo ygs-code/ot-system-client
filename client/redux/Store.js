@@ -1,5 +1,7 @@
 import { init } from "@rematch/core";
+
 import * as models from "./models";
+
 export const createStore = (global) => {
   const newModels = {};
   /* eslint-disable   */
@@ -21,7 +23,7 @@ try {
     $global = window;
   }
 } catch (error) {
-  // 
+  //
   $global = {};
 }
 

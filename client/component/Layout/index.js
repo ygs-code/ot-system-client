@@ -1,6 +1,5 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import AccountMenu from "client/component/AccountMenu";
 import {
   // AppBar,
   Box,
@@ -15,8 +14,11 @@ import {
   // rgbToHex
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
+import AccountMenu from "client/component/AccountMenu";
 import Header from "client/component/Header";
 import Menu from "client/component/Menu/index.js";
+import { mapRedux } from "client/redux/index";
+import { stabilization } from "client/utils";
 import React, {
   Children,
   cloneElement,
@@ -24,8 +26,7 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { stabilization } from "client/utils";
-import { mapRedux } from "client/redux/index";
+
 import Main from "./Main";
 import Sider from "./Sider";
 

@@ -83,7 +83,6 @@ export const historyPush = (parameter) => {
   const { location } = window;
   const { pathname } = location;
 
- 
   //拆分浏览器地址
   const pathnameArr = pathname.split("/");
   // 拆分传入的地址

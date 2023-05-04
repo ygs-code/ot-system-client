@@ -24,7 +24,7 @@ module.exports = {
     // "stylelint-config-standard-scss"
   ],
   rules: {
-    "csstree/validator": false,
+    "csstree/validator": null,
     "prettier/prettier": true
     // "selector-pseudo-class-no-unknown": null,
     // "shorthand-property-no-redundant-values": null,

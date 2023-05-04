@@ -80,7 +80,6 @@ const Index = memo((props) => {
     });
     // const data = new FormData(event.currentTarget);
 
- 
     event.preventDefault();
   };
 

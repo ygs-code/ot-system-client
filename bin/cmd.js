@@ -6,17 +6,51 @@
  * @FilePath: /react-loading-ssr/bin/cmd.js
  * @Description:
  */
-import os from "os";
-import { spawn, SpawnOptions, exec, execSync } from "child_process";
-import moment from "moment";
 
-export default class Cmd {
+const {
+  spawn,
+  SpawnOptions,
+  exec,
+  execSync,
+  spawnSync
+} = require("child_process");
+
+/**
+ * 格式化日期
+ * @param {string | number | Date} value 指定日期
+ * @param {string} format 格式化的规则
+ * @example
+ * ```js
+ * formatDate();
+ * formatDate(1603264465956);
+ * formatDate(1603264465956, "h:m:s");
+ * formatDate(1603264465956, "Y年M月D日");
+ * ```
+ */
+function formatDate(value = Date.now(), format = "YY-MM-DD hh:mm:ss") {
+  const formatNumber = (n) => `0${n}`.slice(-2);
+  const date = new Date(value);
+  const formatList = ["YY", "MM", "DD", "hh", "mm", "ss"];
+  const resultList = [];
+  resultList.push(date.getFullYear().toString());
+  resultList.push(formatNumber(date.getMonth() + 1));
+  resultList.push(formatNumber(date.getDate()));
+  resultList.push(formatNumber(date.getHours()));
+  resultList.push(formatNumber(date.getMinutes()));
+  resultList.push(formatNumber(date.getSeconds()));
+  for (let i = 0; i < resultList.length; i++) {
+    format = format.replace(formatList[i], resultList[i]);
+  }
+  return format;
+}
+
+class Cmd {
   text = "";
 
   runNodeModule(moduleName, params, options) {
-    if (os.type() == "Windows_NT" && !moduleName.match(/\.cmd$/)) {
-      moduleName += ".cmd";
-    }
+    // if (os.type() == 'Windows_NT' && !moduleName.match(/\.cmd$/)) {
+    //   moduleName += '.cmd'
+    // }
     return this.run(moduleName, params, options);
   }
 
@@ -37,7 +71,8 @@ export default class Cmd {
       options.stdio = "pipe";
 
       let proc = spawn(command, params, options);
-    
+      // console.log('proc===', proc)
+
       proc.stdout.on("data", (data) => {
         let dataStr = String(data);
         if (options.logPrefix) {
@@ -45,7 +80,7 @@ export default class Cmd {
         }
         this.text += dataStr;
         if (!options?.silent) {
-          process.stdout.write(moment().format("HH:mm:ss:SSS ") + dataStr);
+          process.stdout.write(formatDate() + dataStr);
         }
       });
 
@@ -56,7 +91,7 @@ export default class Cmd {
           dataStr = options.logPrefix + dataStr;
         }
         if (!options?.silent) {
-          process.stderr.write(moment().format("HH:mm:ss:SSS ") + dataStr);
+          process.stderr.write(formatDate() + dataStr);
         }
       });
 
@@ -94,33 +129,64 @@ export default class Cmd {
 //   ['run', 'ssr:dev', '--progress', 'bar:force'],
 // )
 
-export const execute = (command, options = { stdio: "inherit" }) => {
+const execute = (command, options = { stdio: "inherit" }) => {
+  options = {
+    stdio: "inherit",
+    // silent:true,
+    logPrefix: true,
+    transformCmd: (cmd,) => cmd,
+    ...options
+  };
+
+  const { getStdout = () => {}, callback = () => {}, transformCmd } = options;
   command = command.split(" ").filter((item) => item);
 
-  if (os.type() === "Windows_NT" && !command[0].match(/\.cmd$/)) {
-    command[0] += ".cmd";
-  }
+  // if (os.type() === 'Windows_NT' && !command[0].match(/\.cmd$/)) {
+  //   command[0] += '.cmd'
+  // }
+  console.log("command===", command);
+  console.log(
+    "transformCmd(command.slice(1))===",
+    transformCmd(command.slice(1))
+  );
 
-  const proc = spawn(command[0], command.slice(1), options);
+  const proc = spawn(command[0], transformCmd(command.slice(1)), options);
 
   // 进程错误
   proc.on("error", (error) => {
+    console.log("error");
     if (error) {
+      callback(error);
       console.error("process error:", error);
     }
   });
 
   // 进程关闭
   proc.on("close", (code) => {
-    console.log(`process closed with exit code: ${code}`);
+    // callback(code);
+    // console.log(`process closed with exit code: ${code}`)
     // process.exit(code);
   });
 
   // 退出
   proc.on("exit", (code, signal) => {
-    console.log(`process exits`);
+    callback(code, signal);
     // process.exit(code);
   });
+
+  if (proc.stderr) {
+    proc.stderr.on("data", (data) => {
+      // 不一定代表进程exitcode != 0，可能只是进程调用了console.error
+      // console.log('stderr==', data.toString());
+      getStdout(String(data));
+    });
+  }
+  if (proc.stdout) {
+    proc.stdout.on("data", (data) => {
+      // console.log('stdout==', data.toString());
+      getStdout(data.toString());
+    });
+  }
 
   return proc;
 };
@@ -130,7 +196,7 @@ export const execute = (command, options = { stdio: "inherit" }) => {
  * @param port 端口号
  * @returns 该端口是否被占用
  */
-export const iSportTake = (port) => {
+const iSportTake = (port) => {
   const cmd =
     process.platform === "win32"
       ? `netstat -aon|findstr ${port}`
@@ -142,4 +208,10 @@ export const iSportTake = (port) => {
     // console.log('error:', error);
     return false;
   }
+};
+
+module.exports = {
+  Cmd,
+  execute,
+  iSportTake
 };

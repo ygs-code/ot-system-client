@@ -718,7 +718,6 @@ export const checkLogin = () => {
   );
 };
 
-
 // 删除文档
 export const removeDocument = (id) => {
   return mutation(
@@ -733,4 +732,3 @@ export const removeDocument = (id) => {
     `
   );
 };
-

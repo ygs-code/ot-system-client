@@ -1,7 +1,7 @@
 var isarray =
   Array.isArray ||
   function (arr) {
-    var toString = {}.toString;
+    var { toString } = {};
 
     return toString.call(arr) == "[object Array]";
   };
@@ -369,7 +369,7 @@ function tokensToRegExp(tokens, keys, options) {
 
   options = options || {};
 
-  var strict = options.strict;
+  var { strict } = options;
   var end = options.end !== false;
   var route = "";
 
@@ -470,7 +470,7 @@ function pathToRegexp(path, keys, options) {
 
 export default pathToRegexp;
 
-export { parse, compile, tokensToFunction, tokensToRegExp };
+export { compile, parse, tokensToFunction, tokensToRegExp };
 
 /**
  * Expose `pathToRegexp`.

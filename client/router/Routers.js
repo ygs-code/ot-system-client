@@ -6,17 +6,15 @@
  * @FilePath: /react-ssr-lazy-loading/client/router/Routers.js
  * @Description:
  */
-import Loading from "client/component/Loading";
-import { toComponent } from "client/router";
 import NoPages from "client/component/404";
 import Layout, { layout } from "client/component/Layout";
-
+import Loading from "client/component/Loading";
+import { toComponent } from "client/router";
 import {
   Route,
   Router,
   Switch as Routes
 } from "client/router/react-lazy-router-dom";
-
 import PropTypes from "prop-types";
 import React from "react";
 

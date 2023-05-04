@@ -1,5 +1,5 @@
 import { Skeleton } from "antd";
-import { getUserInfo, checkLogin } from "client/assets/js/request";
+import { checkLogin, getUserInfo } from "client/assets/js/request";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 import Routers, { addRouterApi } from "client/router";

@@ -85,7 +85,7 @@ module.exports = {
     "import/no-duplicates": "error",
     "sort-imports": "off",
     "import/order": "off",
-    "simple-import-sort/imports": "error",
+    "simple-import-sort/imports": "warn",
     "simple-import-sort/exports": "error",
     "no-constant-condition": 2, //禁止在条件中使用常量表达式 if(true) if(1)
     "no-lonely-if": 1, //禁止else语句内只有if语句

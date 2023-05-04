@@ -3,12 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "scripts": {
-    "lint-style": "stylelint \"client/**/*.(less|css)\" --syntax less",
+    "git": "node  -r @babel/register  ./bin/git.js",
+    "commit": "git-cz",
+    "commitlint": "npx --no-install commitlint --edit $1",
+    "lint-staged": "lint-staged",
+    "husky-install": "husky install",
+    "lint-style": "stylelint \"client/**/*.(less|css)\" --syntax less --fix",
     "copyFile": "node ./webpack/utils/copyFile.js",
     "webpack-plugin-copy-file": "node  ./webpack/definePlugin/webpack-plugin-copy-file/index.js",
     "//注释10": "eslint校验",
-    "eslint": "eslint ./client/**/*.{js,jsx}&&eslint ./server/**/*.{js,jsx}",
+    "eslint:client": "eslint ./client/**/*.{js,jsx} --fix",
+    "eslint:server": "eslint ./server/**/*.{js,jsx} --fix",
+    "eslint": "npm run eslint:client",
     "watchFile": "node  ./webpack/utils/watchFile.js",
     "test": "node  -r @babel/register    ./client/assets/js/request/test.js",
     "bin": "cross-env NODE_ENV=development       RENDER=ssr   node   -r @babel/register    ./bin/index.js",
@@ -19,6 +31,14 @@
     "web:dev:server": "cross-env    RENDER=csr  webpack-dev-server   -r @babel/register      --config  ./webpack/config/client/index.js  ",
     "start:client:dev": "cross-env  RENDER=csr  npx babel-node    -r @babel/register    ./bin/index.js   -r  dotenv/config  dotenv_config_path=.env.development",
     "build:client:prod": "cross-env  RENDER=csr  npx babel-node    -r @babel/register    ./bin/index.js   -r  dotenv/config  dotenv_config_path=.env.production"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "npm run eslint"
+    ],
+    "*.{htm,html,css,sss,less,scss,saas}": [
+      "npm run lint-style"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -62,6 +82,8 @@
     "@babel/register": "^7.18.6",
     "@babel/runtime": "^7.1.2",
     "@babel/runtime-corejs3": "^7.18.9",
+    "@commitlint/cli": "^17.6.3",
+    "@commitlint/config-conventional": "^17.0.2",
     "@ecomfe/eslint-config": "^7.4.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
@@ -86,11 +108,13 @@
     "chalk": "4.1.0",
     "chance": "^1.1.11",
     "clean-webpack-plugin": "^3.0.0",
+    "commitizen": "^4.2.4",
     "copy-webpack-plugin": "5.0.0",
     "core-js": "^3.24.1",
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.7",
     "css-minimizer-webpack-plugin": "^4.0.0",
+    "detect-port": "^1.5.1",
     "directory-named-webpack-plugin": "^4.0.1",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
@@ -114,6 +138,7 @@
     "history": "5.3.0",
     "html-webpack-plugin": "4.4.1",
     "http-proxy-middleware": "^2.0.6",
+    "husky": "^8.0.1",
     "json-loader": "^0.5.7",
     "kill-port": "^2.0.1",
     "koa": "^2.4.1",
@@ -126,6 +151,7 @@
     "koa2-proxy-middleware": "^0.0.4",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
+    "lint-staged": "^13.0.0",
     "map-stream": "^0.0.7",
     "mini-css-extract-plugin": "1.6.2",
     "moment": "^2.29.4",
@@ -154,6 +180,7 @@
     "reactstrap": "^9.1.2",
     "reconnectingwebsocket": "^1.0.0",
     "rich-text": "^4.1.0",
+    "rimraf": "^5.0.0",
     "stream": "^0.0.2",
     "style-loader": "^0.19.1",
     "styled-components": "^5.3.6",

@@ -1,17 +1,13 @@
 import "./index.less";
 
-import {
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
-import { Button, Modal,  Input,  } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Button, Input, Modal } from "antd";
+import React, { Component } from "react";
 
-import React, { Component, } from "react";
-import  TreeContent from "./TreeContent";
- 
+import TreeContent from "./TreeContent";
 
 const { Search } = Input;
 const { confirm } = Modal;
- 
 
 class Index extends Component {
   constructor(props) {
@@ -203,7 +199,5 @@ class Index extends Component {
   }
 }
 
-export {
-  TreeContent
-}
+export { TreeContent };
 export default Index;

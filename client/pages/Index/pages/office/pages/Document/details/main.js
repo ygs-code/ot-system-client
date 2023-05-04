@@ -1,14 +1,15 @@
 import { message } from "antd";
-import React, { memo, useEffect } from "react";
-import ReconnectingWebSocket from "reconnectingwebsocket";
 import ShareDB from "client/modules/otServe/lib/client";
-import Quill from "./quill";
 import { mapRedux } from "client/redux";
 // import Cursors from "./cursors";
 import { stabilization } from "client/utils";
+import React, { memo, useEffect } from "react";
+import ReconnectingWebSocket from "reconnectingwebsocket";
 import { type } from "rich-text";
 
-const Cursors = ShareDB.Cursors;
+import Quill from "./quill";
+
+const { Cursors } = ShareDB;
 let $stabilization = stabilization();
 
 export default class Main {

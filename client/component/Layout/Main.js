@@ -50,7 +50,7 @@ export default (props) => {
     user: { user: { id } = {} } = {}
   } = props;
 
-  console.log('menuProps=====',mainProps)
+  console.log("menuProps=====", mainProps);
   return !id || windosWidth >= 950 ? (
     <Box
       component="main"
