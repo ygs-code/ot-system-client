@@ -216,11 +216,11 @@ class Git {
       spinner.start();
 
       await new Promise((reslove, reject) => {
-        let stderrs=[]
+        let stderrs = [];
         execute("git push", {
           stdio: null,
           getStderr: (stderr) => {
-            stderrs.push(stderr)
+            stderrs.push(stderr);
           },
           getStdout: (stdout) => {},
           callback: () => {
@@ -229,19 +229,11 @@ class Git {
         });
       })
         .then((stderrs) => {
-          stderrs=stderrs.join('\n')
-          if (stderrs.search("error") >= 0) {
-            throw stderrs
-          }  
-          console.log(
-            chalk.rgb(
-              13,
-              188,
-              121
-            )(
-              `${stderrs}\n`
-            )
-          );
+          stderrs = stderrs.join("\n");
+          if (stderrs.search("error") >= 0 || stderrs.search("fatal") >= 0) {
+            throw stderrs;
+          }
+          console.log(chalk.rgb(13, 188, 121)(`${stderrs}\n`));
           console.log(
             chalk.rgb(
               13,
