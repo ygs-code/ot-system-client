@@ -34,7 +34,8 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "npm run eslint"
+      "npm run eslint",
+      "npm run lint-style"
     ],
     "*.{htm,html,css,sss,less,scss,saas}": [
       "npm run lint-style"
