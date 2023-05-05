@@ -204,8 +204,8 @@ class Git {
             chalk.rgb(217, 60, 50)("eslint 校验错误，请检查代码重新提交。")
           );
         });
-    }else{
-      callback()
+    } else {
+      callback();
     }
   }
   async push(callback = () => {}) {
@@ -214,27 +214,41 @@ class Git {
     if (status.match(pushReg) || status.match(committedReg)) {
       spinner = ora("代码在push中...");
       spinner.start();
-      const { stdout: pushStdout, code: pushCode } = await this.PromiseExec(
-        "git push",
-        {
-          stdio: undefined
-        }
-      ).catch((error) => {
-        const { err, stderr } = error;
-        console.error(chalk.red(`\n 文件  git push  失败：${stderr}`));
-        return error;
-      });
-      spinner.stop();
-      if (pushCode === 500) {
-        return false;
-      }
-      console.log(
-        chalk.rgb(
-          13,
-          188,
-          121
-        )(`\n git push 代码成功。\n git源地址：${remote}\n git分支:${branch}`)
-      );
+
+      await new Promise((reslove, reject) => {
+        execute("git push", {
+          // stdio: null,
+          ...options,
+          getStderr: (stderr) => {
+            getStderr(stderr);
+            if (stderr.search("error") >= 0) {
+              reject(stderr);
+            } else {
+              console.log(stderr);
+            }
+          },
+          getStdout: (stdout) => {},
+          callback: () => {
+            reslove();
+          }
+        });
+      })
+        .then(() => {
+          console.log(
+            chalk.rgb(
+              13,
+              188,
+              121
+            )(
+              `\n git push 代码成功。\n git源地址：${remote}\n git分支:${branch}`
+            )
+          );
+          spinner.stop();
+        })
+        .catch((error) => {
+          console.error(chalk.red(`\n 文件 git push  失败：${error}`));
+          spinner.stop();
+        });
     }
     callback();
   }
