@@ -239,7 +239,7 @@ class Git {
           stderrs=stderrs.join('\n')
 
           
-          if (stderr.search("error") >= 0) {
+          if (stderrs.search("error") >= 0) {
             throw stderrs
           }  
           console.log(
