@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-require("@babel/polyfill");
 const inquirer = require("inquirer"); // 与用户互动
 const ora = require("ora");
 const { execSync } = require("child_process");
@@ -199,9 +198,9 @@ class Git {
         })
         .catch((error) => {
           spinner.stop();
-          console.log(chalk.rgb(217, 60, 50)(error));
+          console.log(chalk.red(error));
           console.log(
-            chalk.rgb(217, 60, 50)("eslint 校验错误，请检查代码重新提交。")
+            chalk.red("eslint 校验错误，请检查代码重新提交。")
           );
         });
     } else {
