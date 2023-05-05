@@ -204,6 +204,8 @@ class Git {
             chalk.rgb(217, 60, 50)("eslint 校验错误，请检查代码重新提交。")
           );
         });
+    }else{
+      callback()
     }
   }
   async push(callback = () => {}) {
