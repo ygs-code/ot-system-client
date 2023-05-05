@@ -220,7 +220,6 @@ class Git {
           stdio: null,
           // ...options,
           getStderr: (stderr) => {
-            getStderr(stderr);
             if (stderr.search("error") >= 0) {
               reject(stderr);
             } else {
