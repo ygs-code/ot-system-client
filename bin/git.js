@@ -221,11 +221,11 @@ class Git {
           stdio: null,
           // ...options,
           getStderr: (stderr) => {
-            if (stderr.search("error") >= 0) {
-              // reject(stderr);
-            } else {
-              console.log(stderr);
-            }
+            // if (stderr.search("error") >= 0) {
+            //   // reject(stderr);
+            // } else {
+            //   console.log(stderr);
+            // }
 
             stderrs.push(stderr)
           },
@@ -236,7 +236,21 @@ class Git {
         });
       })
         .then((stderrs) => {
-          console.log('stderrs====',stderrs)
+          stderrs=stderrs.join('\n')
+
+          
+          if (stderr.search("error") >= 0) {
+            throw stderrs
+          }  
+          console.log(
+            chalk.rgb(
+              13,
+              188,
+              121
+            )(
+              `${stderrs}\n`
+            )
+          );
           console.log(
             chalk.rgb(
               13,
