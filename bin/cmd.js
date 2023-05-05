@@ -134,7 +134,12 @@ const execute = (command, options = { stdio: "inherit" }) => {
     ...options
   };
 
-  const { getStdout = () => {}, callback = () => {}, transformCmd } = options;
+  const {
+    getStderr = () => {},
+    getStdout = () => {},
+    callback = () => {},
+    transformCmd
+  } = options;
   command = command.split(" ").filter((item) => item);
 
   if (
@@ -171,13 +176,13 @@ const execute = (command, options = { stdio: "inherit" }) => {
   if (proc.stderr) {
     proc.stderr.on("data", (data) => {
       // 不一定代表进程exitcode != 0，可能只是进程调用了console.error
-      // console.log('stderr==', data.toString());
-      getStdout(String(data));
+    //   console.log("stderr==", data.toString());
+      getStderr(String(data));
     });
   }
   if (proc.stdout) {
     proc.stdout.on("data", (data) => {
-      // console.log('stdout==', data.toString());
+    //   console.log("stdout==", data.toString());
       getStdout(data.toString());
     });
   }
