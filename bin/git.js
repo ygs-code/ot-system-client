@@ -182,12 +182,7 @@ class Git {
               }
             },
             getStdout: (stdout) => {
-              reslove({
-                cmd,
-                stdout,
-                // stderr,
-                code: 200
-              });
+              reslove();
             },
             callback: () => {
               reslove();
@@ -205,7 +200,9 @@ class Git {
         .catch((error) => {
           spinner.stop();
           console.log(chalk.rgb(217, 60, 50)(error));
-          console.log(chalk.rgb(217, 60, 50)('eslint 校验错误，请检查代码重新提交。'));
+          console.log(
+            chalk.rgb(217, 60, 50)("eslint 校验错误，请检查代码重新提交。")
+          );
         });
     }
   }
@@ -218,7 +215,7 @@ class Git {
       const { stdout: pushStdout, code: pushCode } = await this.PromiseExec(
         "git push",
         {
-           stdio: undefined
+          stdio: undefined
         }
       ).catch((error) => {
         const { err, stderr } = error;
