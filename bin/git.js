@@ -216,23 +216,27 @@ class Git {
       spinner.start();
 
       await new Promise((reslove, reject) => {
+        let stderrs=[]
         execute("git push", {
           stdio: null,
           // ...options,
           getStderr: (stderr) => {
             if (stderr.search("error") >= 0) {
-              reject(stderr);
+              // reject(stderr);
             } else {
               console.log(stderr);
             }
+
+            stderrs.push(stderr)
           },
           getStdout: (stdout) => {},
           callback: () => {
-            reslove();
+            reslove(stderrs);
           }
         });
       })
-        .then(() => {
+        .then((stderrs) => {
+          console.log('stderrs====',stderrs)
           console.log(
             chalk.rgb(
               13,
