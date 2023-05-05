@@ -219,14 +219,7 @@ class Git {
         let stderrs=[]
         execute("git push", {
           stdio: null,
-          // ...options,
           getStderr: (stderr) => {
-            // if (stderr.search("error") >= 0) {
-            //   // reject(stderr);
-            // } else {
-            //   console.log(stderr);
-            // }
-
             stderrs.push(stderr)
           },
           getStdout: (stdout) => {},
@@ -237,8 +230,6 @@ class Git {
       })
         .then((stderrs) => {
           stderrs=stderrs.join('\n')
-
-          
           if (stderrs.search("error") >= 0) {
             throw stderrs
           }  
@@ -263,7 +254,7 @@ class Git {
           spinner.stop();
         })
         .catch((error) => {
-          console.error(chalk.red(`\n 文件 git push  失败：${error}`));
+          console.error(chalk.red(`\n 文件 git push  失败：\n ${error}`));
           spinner.stop();
         });
     }
