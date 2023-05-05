@@ -37,7 +37,7 @@ class Git {
     await this.submit(() => {
       this.add(() => {
         this.committed(() => {
-          this.push();
+          // this.push();
         });
       });
     });

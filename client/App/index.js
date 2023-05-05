@@ -19,12 +19,6 @@ import Routers from "client/router";
 import React, { Component } from "react";
 import { Provider } from "react-redux";
 
-let {
-  NODE_ENV, // 环境参数
-  target, // 环境参数
-  htmlWebpackPluginOptions = ""
-} = process.env; // 环境参数
-
 class Index extends Component {
   render() {
     const { history, store, routesComponent } = this.props;
