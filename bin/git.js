@@ -217,8 +217,8 @@ class Git {
 
       await new Promise((reslove, reject) => {
         execute("git push", {
-          // stdio: null,
-          ...options,
+          stdio: null,
+          // ...options,
           getStderr: (stderr) => {
             getStderr(stderr);
             if (stderr.search("error") >= 0) {
