@@ -192,7 +192,7 @@ class Git {
         .then(() => {
           spinner.stop();
           console.log(
-            chalk.rgb(13, 188, 121)("\nlint校验成功 , git commit成功：")
+            chalk.rgb(13, 188, 121)("\nlint校验成功 , git commit成功。\n")
           );
           callback();
         })
