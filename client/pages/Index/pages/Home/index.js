@@ -90,7 +90,11 @@ export default setBreadcrumbAndTitle({
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{
+                    mt: 3,
+                    mb: 2,
+                    textTransform: "lowercase"
+                  }}
                   onClick={() => {
                     window.open("https://github.com/ygs-code/ot-system");
                   }}>
@@ -107,3 +111,4 @@ export default setBreadcrumbAndTitle({
     })
   )
 );
+//
