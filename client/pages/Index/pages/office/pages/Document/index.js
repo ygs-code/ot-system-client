@@ -1,23 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Chip,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Radio,
-  RadioGroup,
-  Select,
-  Skeleton,
-  Slider,
-  Switch,
-  TextField
-} from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import {
   createDocument,
   getDocumentList,
@@ -26,20 +7,18 @@ import {
 import Actions from "client/component/Actions";
 import Dialog from "client/component/Dialog";
 import FormItem from "client/component/FormItem";
-import Layout, { layout } from "client/component/Layout";
+import { layout } from "client/component/Layout";
 import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
-import TableButton from "client/component/TableButton";
 import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
-import TreePicker from "client/component/TreePicker";
 import { addRouterApi } from "client/router";
 import { createForm } from "rc-form";
 import React, { Component, useRef, useState } from "react";
 
 const Create = createForm()((props) => {
   const [open, setOpen] = useState(false);
-  const { form, pushRoute, confirm } = props;
+  const { form, confirm } = props;
   const { validateFields } = form;
   const message = useRef(null);
 
@@ -50,7 +29,7 @@ const Create = createForm()((props) => {
         confirm={() => {
           validateFields(async (error, values) => {
             if (!error) {
-              let data = await createDocument(values);
+              await createDocument(values);
 
               message.current.success("文档创建成功");
               setOpen(false);
@@ -141,7 +120,6 @@ class Index extends Component {
 
   // 定义搜索栏字段
   getSearchFields() {
-    const { tabsValue } = this.state;
     return [
       {
         label: "文档标题",
@@ -159,7 +137,6 @@ class Index extends Component {
 
   // 定义表头字段
   getColumns = () => {
-    const { tabsValue } = this.state;
     const {
       pushRoute,
       routePaths: { officeDocumentDetails }
@@ -183,7 +160,7 @@ class Index extends Component {
         key: "actions",
         width: 120,
         render: (text, row) => {
-          const { id, title } = row;
+          const { id } = row;
 
           return (
             <Actions
@@ -194,6 +171,7 @@ class Index extends Component {
                   onClick: () => {
                     pushRoute({
                       path: officeDocumentDetails,
+                      isOpenWin: true,
                       params: {
                         action: "edit",
                         id,
@@ -253,7 +231,7 @@ class Index extends Component {
   };
   componentDidMount() {}
   render() {
-    const { tabsValue, open } = this.state;
+    const { tabsValue } = this.state;
     return (
       <div className="table-page">
         <Message

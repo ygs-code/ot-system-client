@@ -1,9 +1,5 @@
-import { message } from "antd";
 import ShareDB from "client/modules/otServe/lib/client";
-import { mapRedux } from "client/redux";
-// import Cursors from "./cursors";
 import { stabilization } from "client/utils";
-import React, { memo, useEffect } from "react";
 import ReconnectingWebSocket from "reconnectingwebsocket";
 import { type } from "rich-text";
 
@@ -147,7 +143,7 @@ export default class Main {
     // 连接初始化 回调
     this.shareDBConnection.on("hs", (message) => {
       const {
-        data: { cursor: { a, gp, d } = {} }
+        data: { cursor: { a, gp } = {} }
       } = message;
 
       let cursors = this.cursors.setLocalCursor(a, gp);
@@ -161,7 +157,7 @@ export default class Main {
   // 状态监听
   shareDBConnectionState() {
     const { onDocumentConnectionState } = this.options;
-    this.shareDBConnection.on("state", (state, reason) => {
+    this.shareDBConnection.on("state", (state) => {
       this.documentConnectionState = state.toString();
       onDocumentConnectionState(state.toString());
     });
@@ -215,10 +211,6 @@ export default class Main {
     });
   }
   docSubscribe() {
-    const {
-      userName, // 用户名称
-      userId // 用户id
-    } = this.options;
     this.doc.subscribe((err) => {
       if (err) {
         throw err;
@@ -320,7 +312,7 @@ export default class Main {
     const { ops = [] } = delta;
     // // local -> server
     // this.quill.on("text-change", (delta, oldDelta, source) => {
-    if (source == "user") {
+    if (source === "user") {
       const { localCursor } = this.cursors;
 
       if (this.documentConnectionState === "connected") {
@@ -376,7 +368,7 @@ export default class Main {
     // });
   }
 
-  selectionChange(range, oldRange, source) {
+  selectionChange(range) {
     const {
       userName, // 用户名称
       userId // 用户id

@@ -1,9 +1,11 @@
+/* eslint-disable   */
+
 var isarray =
   Array.isArray ||
   function (arr) {
     var { toString } = {};
 
-    return toString.call(arr) == "[object Array]";
+    return toString.call(arr) === "[object Array]";
   };
 
 /**
@@ -471,12 +473,4 @@ function pathToRegexp(path, keys, options) {
 export default pathToRegexp;
 
 export { compile, parse, tokensToFunction, tokensToRegExp };
-
-/**
- * Expose `pathToRegexp`.
- */
-// module.exports = pathToRegexp;
-// module.exports.parse = parse;
-// module.exports.compile = compile;
-// module.exports.tokensToFunction = tokensToFunction;
-// module.exports.tokensToRegExp = tokensToRegExp;
+/* eslint-enable   */

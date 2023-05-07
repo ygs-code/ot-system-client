@@ -20,7 +20,7 @@ export default [
     path: "/",
     exact: true,
     name: "~index", // 特殊路由  / 路径入口
-    entry: "/pages/Index/pages/office/pages/Document",
+    entry: "/pages/Index/pages/Home",
     level: 2
   },
 
@@ -32,14 +32,6 @@ export default [
   //   entry: "/pages/Index/pages/office/pages/Document/details/index.js",
   //   level: 1
   // },
-
-  {
-    path: "/home",
-    exact: false,
-    name: "home",
-    entry: "/pages/Home/index.js",
-    level: 1
-  },
   {
     path: "/log-in",
     exact: true,
@@ -51,13 +43,6 @@ export default [
     path: "/register",
     name: "register",
     entry: "/pages/Register/index.js",
-    level: 1
-  },
-  {
-    path: "/drawer",
-    exact: false,
-    name: "drawer",
-    entry: "/pages/Drawer/index.js",
     level: 1
   }
 ];

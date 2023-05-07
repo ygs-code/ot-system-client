@@ -1,24 +1,11 @@
 import "./index.less";
 
 import img from "client/assets/img/404.png";
-import Layout, { layout } from "client/component/Layout";
-import React, { memo } from "react";
+import { layout } from "client/component/Layout";
+import React from "react";
 
-const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
-export default layout()((props) => {
-  const {
-    user: { user: { email, id, name, phone, type } = {} } = {},
-    onClick = () => {}
-  } = props;
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+const { env: { PUBLICPATH } = {} } = process;
+export default layout()(() => {
   return (
     <div className="no-page">
       <div className="container">

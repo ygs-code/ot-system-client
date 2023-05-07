@@ -3,9 +3,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField
+  DialogTitle
 } from "@mui/material";
 import React, { Children } from "react";
 
@@ -17,7 +15,7 @@ export default (props) => {
       <Dialog open={open} onClose={cancel}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent sx={sx}>
-          {Children.map(children, (child, index) => {
+          {Children.map(children, (child) => {
             return <> {child}</>;
           })}
         </DialogContent>

@@ -7,7 +7,6 @@
  * @Description:
  */
 import NoPages from "client/component/404";
-import Layout, { layout } from "client/component/Layout";
 import Loading from "client/component/Loading";
 import { toComponent } from "client/router";
 import {

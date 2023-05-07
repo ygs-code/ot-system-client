@@ -10,7 +10,6 @@ import {
   // Typography
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import AccountMenu from "client/component/AccountMenu";
 import React, { Children, memo } from "react";
 
 const MuiAppBar = styled(AppBar, {
@@ -40,7 +39,6 @@ export default memo((props) => {
     onChange = () => {},
     windosWidth,
     user: { user: { id } = {} } = {},
-    onClick = () => {},
     children
   } = props;
   return (

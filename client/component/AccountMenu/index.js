@@ -13,13 +13,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { logOut } from "client/assets/js/request";
 import Message from "client/component/Message";
-import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
-import React, { memo, useRef } from "react";
+import React, { useRef } from "react";
 
 export default addRouterApi((props) => {
   const {
-    user: { user: { email, id, name, phone, type } = {} } = {},
+    user: { user: { id, name, phone } = {} } = {},
     onClick = () => {},
     routePaths,
     pushRoute

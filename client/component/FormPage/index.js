@@ -9,7 +9,7 @@
 import "./index.less";
 
 import { Button } from "@mui/material";
-import Form from "client/component/Form1";
+import Form from "client/component/Form";
 import React, { PureComponent } from "react";
 
 export default class extends PureComponent {

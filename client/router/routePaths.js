@@ -3,8 +3,6 @@ export default {
   officeDocument: "/office/document",
   office: "/office",
   index: "/",
-  home: "/home",
   logIn: "/log-in",
-  register: "/register",
-  drawer: "/drawer"
+  register: "/register"
 };

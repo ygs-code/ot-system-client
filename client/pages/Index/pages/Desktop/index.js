@@ -1,6 +1,6 @@
 import "./index.less";
 
-import { SearchForm } from "client/component/Form1";
+import { SearchForm } from "client/component/Form";
 import Message from "client/component/Message";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
 import { checkEmail, checkPhone, checkUser } from "client/utils";

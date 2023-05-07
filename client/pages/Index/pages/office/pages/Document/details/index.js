@@ -1,16 +1,15 @@
 import "./index.less";
 
-import { message } from "antd";
 import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
-import React, { memo, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import Main from "./main";
 
 const Quill = (props) => {
   const {
     match: {
-      params: { action, id, type }
+      params: { id, type }
     },
     state: {
       user: {
@@ -71,47 +70,46 @@ const Quill = (props) => {
       userName, // 用户名称
       userId,
       // 文档连接状态
-      onDocumentConnectionState: (state) => {
-        var indicatorColor;
-        // sharedbSocketStateEl.innerHTML = state;
-        switch (state.toString()) {
-          case "connecting":
-            indicatorColor = "silver";
-            break;
-          case "connected":
-            indicatorColor = "lime";
-            break;
-          case "disconnected":
-          case "closed":
-          case "stopped":
-            indicatorColor = "red";
-            break;
-        }
-
+      onDocumentConnectionState: () => {
+        // var indicatorColor;
+        // // sharedbSocketStateEl.innerHTML = state;
+        // switch (state.toString()) {
+        //   case "connecting":
+        //     indicatorColor = "silver";
+        //     break;
+        //   case "connected":
+        //     indicatorColor = "lime";
+        //     break;
+        //   case "disconnected":
+        //   case "closed":
+        //   case "stopped":
+        //     indicatorColor = "red";
+        //     break;
+        // }
         // sharedbSocketIndicatorEl.style.backgroundColor = indicatorColor;
       },
       // 光标连接状态
-      onCursorConnectionState: (state) => {
-        var indicatorColor;
-        // socketStateEl.innerHTML = state;
-        switch (state.toString()) {
-          case "connected":
-            indicatorColor = "lime";
-            break;
-          case "error":
-          case "closed":
-            indicatorColor = "red";
-            break;
-        }
+      onCursorConnectionState: () => {
+        // var indicatorColor;
+        // // socketStateEl.innerHTML = state;
+        // switch (state.toString()) {
+        //   case "connected":
+        //     indicatorColor = "lime";
+        //     break;
+        //   case "error":
+        //   case "closed":
+        //     indicatorColor = "red";
+        //     break;
+        // }
         // socketIndicatorEl.style.backgroundColor = indicatorColor;
       },
       // 改变光标位置
-      onChangeCursors: (data) => {
+      onChangeCursors: () => {
         // const { cursorList, localCursor } = data;
         // updateUserList(cursorList, localCursor);
       },
       // 改变文档内容
-      onChangeDocument: (data) => {},
+      onChangeDocument: () => {},
       // 文档websocket 连接
       documentConnectionUrl:
         (location.protocol === "https:" ? "wss" : "ws") +

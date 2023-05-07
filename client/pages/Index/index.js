@@ -1,6 +1,5 @@
 import { Skeleton } from "antd";
 import { checkLogin, getUserInfo } from "client/assets/js/request";
-import Layout from "client/component/Layout";
 import { mapRedux } from "client/redux";
 import Routers, { addRouterApi } from "client/router";
 import React, { useCallback, useEffect, useState } from "react";

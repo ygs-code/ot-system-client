@@ -14,6 +14,7 @@ import TreeView from "@mui/lab/TreeView";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { addRouterApi } from "client/router";
 import { findTreeData } from "client/utils";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
@@ -91,8 +92,10 @@ StyledTreeItem.propTypes = {
   labelText: PropTypes.string.isRequired
 };
 
-export default (props) => {
-  const { onChange = () => {}, open } = props;
+export default addRouterApi((props) => {
+  const { onChange = () => {}, open, routePaths, pushRoute } = props;
+  console.log("props==========", props);
+
   const [expanded, setExpanded] = useState([]);
   const [selected, setSelected] = useState(["0-0"]);
   const menus = [
@@ -104,22 +107,23 @@ export default (props) => {
         {
           key: "0-0",
           title: "word文档",
-          icon: DescriptionIcon
-        },
-        {
-          key: "0-1",
-          title: "excel工作表",
-          icon: DescriptionIcon
-        },
-        {
-          key: "0-2",
-          title: "ppt演示稿",
-          icon: DescriptionIcon
+          icon: DescriptionIcon,
+          url: routePaths.officeDocument
         }
+        // {
+        //   key: "0-1",
+        //   title: "excel工作表",
+        //   icon: DescriptionIcon
+        // },
+        // {
+        //   key: "0-2",
+        //   title: "ppt演示稿",
+        //   icon: DescriptionIcon
+        // }
       ]
     }
   ];
-  console.log("selected=====", selected);
+
   useEffect(() => {
     if (open === false) {
       setExpanded([]);
@@ -141,7 +145,7 @@ export default (props) => {
             // color="#1a73e8"
             // bgColor="#e8f0fe"
             onClick={() => {
-              console.log("url===", url);
+              // pushRoute(url)
             }}>
             {runderTreeItem(children)}
           </StyledTreeItem>
@@ -158,7 +162,7 @@ export default (props) => {
           color="#1a73e8"
           bgColor="#e8f0fe"
           onClick={() => {
-            console.log("url===", url);
+            pushRoute(url);
           }}
         />
       );
@@ -241,4 +245,4 @@ export default (props) => {
         */}
     </TreeView>
   );
-};
+});

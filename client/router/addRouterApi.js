@@ -70,6 +70,7 @@ class AddRouterApi extends React.Component {
     historyPush({
       history,
       ...parameter,
+
       url: routePaths[name] || url || path
     });
   };
