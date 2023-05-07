@@ -88,8 +88,11 @@ export default setBreadcrumbAndTitle({
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}>
-                  GITHUB地址
+                  sx={{ mt: 3, mb: 2 }}
+                  onClick={() => {
+                    window.open("https://github.com/ygs-code/ot-system");
+                  }}>
+                  GitHub地址
                 </Button>
               </div>
             </div>
