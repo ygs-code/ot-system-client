@@ -75,7 +75,9 @@ export default setBreadcrumbAndTitle({
                   redis，mysql，graphql， http链路请求，node 错误俘获，
                   docker容器部署
                 </div>
-                <div>部署：docker docker-compose 容器部署</div>
+                <div>
+                  部署：自动化shell CI 脚本，docker docker-compose 容器部署
+                </div>
                 <div>
                   规范：eslint 和 stylelint，git提交工作流：git
                   hook+husky+commitlint+lint-staged
