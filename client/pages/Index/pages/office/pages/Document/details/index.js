@@ -117,8 +117,6 @@ const Quill = (props) => {
         (location.protocol === "https:" ? "wss" : "ws") +
         "://" +
         ENTRY_SERVER_NAME +
-        ":" +
-        ENTRY_PORT +
         "/socket/document" +
         `?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
       // // 光标websocket 连接
