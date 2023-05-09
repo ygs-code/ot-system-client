@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 
 import Main from "./main";
 
-const { env: { ENTRY_SERVER_NAME, ENTRY_PORT } = {} } = process;
+const { env: { ENTRY_SERVER_NAME } = {} } = process;
 
 const Quill = (props) => {
   const {

@@ -1,7 +1,7 @@
 import { CheckDataType } from "./CheckDataType";
 //按方式 kye 导出
 
-const SubscribePublished = function (type = null, options = {}) {
+const SubscribePublished = function () {
   return (
     this instanceof SubscribePublished ||
     new SubscribePublished(...arguments).init(...arguments)

@@ -294,7 +294,9 @@ module.exports = {
           );
         })
         .forEach((mod) => {
-          if (mod.indexOf(".") === 0) return;
+          if (mod.indexOf(".") === 0) {
+            return false;
+          }
           nodeModules[mod] = "commonjs " + mod;
         });
 

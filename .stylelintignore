@@ -21,6 +21,10 @@ webpack/**/*
 **/webpack/**/*
 **/webpack/**/*
 
+**/public
+**/public/**/*
+**/public/**/*
+
 
 bin
 bin/*

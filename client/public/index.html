@@ -21,12 +21,28 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
+    <!-- require cdn assets css -->
+    <% for (var i in htmlWebpackPlugin.options.cdn &&
+    htmlWebpackPlugin.options.cdn.css) { %>
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.options.cdn.css[i] %>" />
+    <% } %>
 
     <title><%= htmlWebpackPlugin.options.title %></title>
+
+    <!-- require cdn assets js -->
+    <% for (var i in htmlWebpackPlugin.options.cdn &&
+    htmlWebpackPlugin.options.cdn.js) { %>
+    <script
+      type="text/javascript"
+      src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"
+    ></script>
+    <% } %>
   </head>
 
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript
+      >You need to enable JavaScript to run this app. asdfsdfsdf</noscript
+    >
     <div id="root"></div>
   </body>
   <script>

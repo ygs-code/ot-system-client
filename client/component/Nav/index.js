@@ -17,7 +17,7 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 const Index = (props) => {
   const {
     dispatch: { nav: { setMenuActive } = {} } = {},
-    match: { params = {}, path: matchPath } = {},
+    match: { path: matchPath } = {},
     pushRoute
   } = props;
 

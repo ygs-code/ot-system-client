@@ -7,7 +7,6 @@
  * @FilePath: /error-sytem/client/src/common/component/CheckPermission/index.js
  */
 import { mapRedux } from "client/redux";
-import Store from "client/redux/Store";
 import { CheckDataType } from "client/utils";
 import React, { Children, cloneElement, Component } from "react";
 
@@ -42,10 +41,10 @@ export const checkAuth = (authKey) => {
 };
 
 // 检查组件授权
-const CheckAuth = (props) => {
+export const CheckAuth = (props) => {
   const { authKey, children } = props;
   return checkAuthKey(authKey)
-    ? Children.map(children, (child, index) => {
+    ? Children.map(children, (child) => {
         return cloneElement(child, props);
       })
     : null;

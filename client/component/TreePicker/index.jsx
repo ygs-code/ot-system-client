@@ -1,12 +1,11 @@
 import "./index.less";
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Input, Modal } from "antd";
+import { Button, Modal } from "antd";
 import React, { Component } from "react";
 
 import TreeContent from "./TreeContent";
 
-const { Search } = Input;
 const { confirm } = Modal;
 
 class Index extends Component {

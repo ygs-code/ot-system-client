@@ -1,9 +1,3 @@
-import Chance from "chance";
-import ReconnectingWebSocket from "reconnectingwebsocket";
-import { v4 as uuidv4 } from "uuid";
-
-const chance = new Chance();
-
 export default class Cursors {
   constructor(name) {
     this.name = name;
@@ -38,7 +32,7 @@ export default class Cursors {
 
   setCursorList(cursor = {}, cursorList) {
     let index = this.cursorList.findIndex((item) => {
-      return item.id == cursor.id;
+      return item.id === cursor.id;
     });
 
     if (index >= 0) {

@@ -17,6 +17,7 @@ const ReactLoadableSSRAddon = require("react-loadable-ssr-addon");
 const StylelintPlugin = require("stylelint-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const { stringToObject, alias } = require("../../utils");
+const { cdn, externals } = require("./cdn");
 
 let {
   NODE_ENV, // 环境参数
@@ -388,6 +389,8 @@ module.exports = {
       }
     ]
   },
+  // cdn
+  externals,
   plugins: [
     // 下面是复制文件的插件，我认为在这里并不是起到复制文件的作用，而是过滤掉打包过程中产生的以.开头的文件
     new CopyWebpackPlugin([
@@ -494,6 +497,17 @@ module.exports = {
       : [
           // // // html静态页面
           new HtmlWebpackPlugin({
+            cdn,
+            // assets: {
+            //   // publicPath: string,
+            //   js: [
+            //     "https://unpkg.com/react@18/umd/react.production.min.js",
+            //     "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+            //   ]
+            //   // css: Array<{string}>,
+            //   // favicon?: string | undefined,
+            //   // manifest?: string | undefined
+            // },
             ...htmlWebpackPluginOptions,
             publicPath,
             minify: true,
