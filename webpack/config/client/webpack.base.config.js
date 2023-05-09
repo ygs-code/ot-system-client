@@ -26,6 +26,7 @@ let {
   PUBLICPATH,
   RENDER,
   ENTRY_SERVER_NAME,
+  ENTRY_PORT
 } = process.env; // 环境参数
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
@@ -467,6 +468,7 @@ module.exports = {
           RENDER, // 渲染环境参数
           PUBLICPATH: PUBLICPATH,
           ENTRY_SERVER_NAME,
+          ENTRY_PORT,
           htmlWebpackPluginOptions: {
             ...htmlWebpackPluginOptions,
             publicPath

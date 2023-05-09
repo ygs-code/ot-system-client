@@ -6,6 +6,8 @@ import React, { useEffect, useRef } from "react";
 
 import Main from "./main";
 
+const { env: { ENTRY_SERVER_NAME, ENTRY_PORT } = {} } = process;
+
 const Quill = (props) => {
   const {
     match: {
@@ -114,7 +116,9 @@ const Quill = (props) => {
       documentConnectionUrl:
         (location.protocol === "https:" ? "wss" : "ws") +
         "://" +
-        "127.0.0.1:3003" +
+        ENTRY_SERVER_NAME +
+        ":" +
+        ENTRY_PORT +
         "/socket/document" +
         `?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
       // // 光标websocket 连接
