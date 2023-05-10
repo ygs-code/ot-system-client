@@ -14,24 +14,22 @@ import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
 import { createForm } from "rc-form";
-import React, { Component, useRef, useState } from "react";
+import React, { Component, useState } from "react";
 
 const Create = createForm()((props) => {
   const [open, setOpen] = useState(false);
   const { form, confirm } = props;
   const { validateFields } = form;
-  const message = useRef(null);
 
   return (
     <div>
-      <Message ref={message} />
       <Dialog
         confirm={() => {
           validateFields(async (error, values) => {
             if (!error) {
               await createDocument(values);
 
-              message.current.success("文档创建成功");
+              Message.success("文档创建成功");
               setOpen(false);
               confirm();
             } else {
@@ -185,7 +183,7 @@ class Index extends Component {
                   type: "remove",
                   onClick: async () => {
                     const { message: mgs } = await removeDocument(id);
-                    this.message.success(mgs);
+                    Message.success(mgs);
 
                     this.loadTableData();
                   }
@@ -234,11 +232,6 @@ class Index extends Component {
     const { tabsValue } = this.state;
     return (
       <div className="table-page">
-        <Message
-          ref={(ref) => {
-            this.message = ref;
-          }}
-        />
         <Create
           {...this.props}
           confirm={() => {

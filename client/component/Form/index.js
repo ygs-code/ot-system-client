@@ -8,7 +8,8 @@
  */
 import "./index.less";
 
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
   Box,
   Button,
@@ -799,12 +800,12 @@ const SearchForm = createForm()((props) => {
             }}>
             {expand ? (
               <>
-                <UpOutlined />
+                <KeyboardArrowUpIcon />
                 收起
               </>
             ) : (
               <>
-                <DownOutlined /> 展开
+                <KeyboardArrowDownIcon /> 展开
               </>
             )}
           </a>

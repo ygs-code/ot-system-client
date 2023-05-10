@@ -6,9 +6,15 @@
  * @FilePath: /react-loading-ssr/client/component/Loading/index.js
  * @Description:
  */
-import { Skeleton } from "antd";
+// import { Skeleton } from "antd";
+import Skeleton from "client/component/Skeleton";
 import React from "react";
 
 export default () => {
-  return <Skeleton active />;
+  return (
+    <Skeleton
+      height={document.documentElement.clientHeight}
+      itemHight={60}
+      loading={true}></Skeleton>
+  );
 };

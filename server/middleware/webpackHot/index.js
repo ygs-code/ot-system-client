@@ -9,9 +9,11 @@ import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
 import webpackHotMiddleware from "webpack-hot-middleware";
 import webpackHotServerMiddleware from "webpack-hot-server-middleware";
-
 // import connectHistoryApiFallback from "connect-history-api-fallback";
+
+/* eslint-disable   */
 import { compiler, config } from "@/webpack";
+/* eslint-enable   */
 // import { writeFile } from "@/webpack/utils";
 
 let {
@@ -70,7 +72,7 @@ class WebpackHot {
   addWebpackHotMiddleware() {
     this.app.use(async (ctx, next) => {
       const { response, request, req, res } = ctx;
- 
+
       await webpackHotMiddleware(
         this.compiler.compilers.find((compiler) => compiler.name === "client")
       )(request, response, next);

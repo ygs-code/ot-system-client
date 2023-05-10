@@ -1,46 +1,19 @@
-import { Alert, Snackbar } from "@mui/material";
-import React, { forwardRef, useImperativeHandle } from "react";
+import StatusAlert, { StatusAlertService } from "react-status-alert";
+// https://www.npmjs.com/package/react-status-alert 文档地址
+const error = (...ags) => StatusAlertService.showError(...ags);
+const warning = (...ags) => StatusAlertService.showWarning(...ags);
+const success = (...ags) => StatusAlertService.showSuccess(...ags);
+const alert = (...ags) => StatusAlertService.showError(...ags);
+const info = (...ags) => StatusAlertService.showInfo(...ags);
+const removeAlert = (...ags) => StatusAlertService.removeAlert(...ags);
+const removeAllAlerts = (...ags) => StatusAlertService.removeAllAlerts(...ags);
 
-export default forwardRef((props, ref) => {
-  const [state, setState] = React.useState({
-    open: false,
-    message: "",
-    severity: "success"
-  });
-
-  const { open, message, severity } = state;
-
-  const handleClick = (message, severity) => {
-    setState({ open: true, message, severity });
-  };
-
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
-  useImperativeHandle(ref, () => ({
-    error: (message) => {
-      handleClick(message, "error");
-    },
-    warning: (message) => {
-      handleClick(message, "warning");
-    },
-    info: (message) => {
-      handleClick(message, "info");
-    },
-    success: (message) => {
-      handleClick(message, "success");
-    }
-  }));
-
-  return (
-    <Snackbar
-      autoHideDuration={3000}
-      anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      open={open}
-      onClose={handleClose}>
-      <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
-        {message}
-      </Alert>
-    </Snackbar>
-  );
-});
+StatusAlert.error = error;
+StatusAlert.warning = warning;
+StatusAlert.alert = alert;
+StatusAlert.removeAlert = removeAlert;
+StatusAlert.removeAllAlerts = removeAllAlerts;
+StatusAlert.success = success;
+StatusAlert.warning = warning;
+export default StatusAlert;
+export { alert, error, info, removeAlert, removeAllAlerts, success, warning };

@@ -23,7 +23,7 @@ import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
 import { createForm } from "rc-form";
-import React, { memo, useRef } from "react";
+import React, { memo } from "react";
 
 function Copyright(props) {
   return (
@@ -53,8 +53,6 @@ const Index = memo((props) => {
 
   const { validateFields } = form;
 
-  const message = useRef(null);
-
   const onFinish = async (values) => {
     const { data } = await login(values);
 
@@ -64,7 +62,7 @@ const Index = memo((props) => {
 
     setUserInfo(data);
 
-    message.current.success("登录成功");
+    Message.success("登录成功");
     setTimeout(() => {
       pushRoute(routePaths.officeDocument);
     }, 1500);
@@ -85,7 +83,6 @@ const Index = memo((props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Message ref={message} />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid

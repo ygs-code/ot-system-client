@@ -6,16 +6,17 @@
  * @Description: In User Settings Edit
  * @FilePath: /error-sytem/client/src/common/js/request/requestMessage.js
  */
-import { message } from "antd";
+
+import Message from "client/component/Message";
 
 export const error = (msg) => {
-  message.error(msg);
+  Message.error(msg);
 };
 
 export const warning = (msg) => {
-  message.warning(msg);
+  Message.warning(msg);
 };
 
 export const success = (msg) => {
-  message.success(msg);
+  Message.success(msg);
 };
