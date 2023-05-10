@@ -1,16 +1,14 @@
 FROM node:14-alpine AS BUILD_IMAGE
 #声明作者
 MAINTAINER yao guan shou
-RUN npm i yarn -g
+
 RUN mkdir ot-system-client
 # 复制package.json文件
 COPY  package.json  /ot-system-client
 WORKDIR /ot-system-client
 # RUN echo 'dist , node_modules目录下所有文件,以及清理缓存'
 RUN echo '删除dist,node_modules目录下所有文件,以及清理缓存' & rm -rf ./node_modules & rm -rf  ./dist & rm -rf package-lock.json & rm -rf yarn.lock & npm cache clean --force
-# RUN echo '安装node_modules依赖包' & npm install --production 
-# 只安装生产环境依赖
-RUN echo '安装node_modules依赖包' & yarn install --production  
+RUN echo '安装node_modules依赖包' & npm install --production 
 
 ARG CLIENT_ADDRESS 
 ARG CLIENT_PORT 
