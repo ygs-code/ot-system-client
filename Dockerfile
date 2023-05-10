@@ -1,7 +1,7 @@
 FROM node:14-alpine AS BUILD_IMAGE
 #声明作者
 MAINTAINER yao guan shou
-
+RUN npm config set ignore-engines true
 RUN mkdir ot-system-client
 # 复制package.json文件
 COPY  package.json  /ot-system-client
