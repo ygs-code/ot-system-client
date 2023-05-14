@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpackPluginCopyFile = require("../../definePlugin/webpack-plugin-copy-file");
 const rootPath = process.cwd();
 let {
-  NODE_ENV, // 环境参数
+  NODE_ENV // 环境参数
 } = process.env; // 环境参数
 const isDevelopment = NODE_ENV === "development";
 
@@ -197,9 +197,9 @@ module.exports = {
           // name: "chunk-node_modules",
           chunks: "initial", // 只处理初始 chunk
           // 最大超过多少就要拆分
-          maxSize: 204800, //大小超过204800个字节 200kb 就要拆分
+          maxSize: 204800 / 2, //大小超过204800个字节 200kb 就要拆分
           // // 最小多少被匹配拆分
-          minSize: 102400, //大小超过102400个字节  100kb 就要拆分
+          minSize: 102400 / 2, //大小超过102400个字节  100kb 就要拆分
           enforceSizeThreshold: 102400
         }
 
