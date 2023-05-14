@@ -25,7 +25,7 @@ const externals = {
 // 配置cdn引入
 const cdn = {
   css: [
-    "https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css"
+    `${PUBLICPATH}static/css/antd.min.css`
     // "https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/theme.min.js"
   ],
   js: [
