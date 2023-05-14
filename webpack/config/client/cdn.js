@@ -16,8 +16,8 @@ NODE_ENV == "development";
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 // 配置不进行webpack打包的文件
 const externals = {
-  react: "React",
-  "react-dom": "ReactDOM"
+  // react: "React",
+  // "react-dom": "ReactDOM"
   // "react-redux": "ReactRedux"
   // "react-lazy-router-dom": "ReactRouterDOM"
 };
@@ -32,17 +32,18 @@ const cdn = {
     // "https://cdnjs.cloudflare.com/ajax/libs/react-redux/8.0.1/react-redux.min.js",
     `${PUBLICPATH}static/js/errCatch.js`
     // `${PUBLICPATH}static/js/react-lazy-router-dom/index.js`
-  ].concat(
-    NODE_ENV === "development"
-      ? [
-          "https://unpkg.com/react@18.2.0/umd/react.development.js",
-          "https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"
-        ]
-      : [
-          "https://unpkg.com/react@18.2.0/umd/react.production.min.js",
-          "https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"
-        ]
-  )
+  ]
+  // .concat(
+  //   NODE_ENV === "development"
+  //     ? [
+  //         "https://unpkg.com/react@18.2.0/umd/react.development.js",
+  //         "https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"
+  //       ]
+  //     : [
+  //         "https://unpkg.com/react@18.2.0/umd/react.production.min.js",
+  //         "https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"
+  //       ]
+  // )
 };
 
 module.exports = {
