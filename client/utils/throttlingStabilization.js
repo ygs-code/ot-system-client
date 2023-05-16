@@ -9,7 +9,7 @@
 import lodash from "lodash";
 
 // 节流函数
-export const throttle = () => {
+export const throttle = (() => {
   let startTime = null;
   return (time, callback) =>
     new Promise((resolve) => {
@@ -24,10 +24,10 @@ export const throttle = () => {
         // callback&&callback()
       }
     });
-};
+})();
 
 // 防抖函数
-export const stabilization = () => {
+export const stabilization = (() => {
   let timer = null;
   return (time, callback) =>
     new Promise((resolve) => {
@@ -42,10 +42,10 @@ export const stabilization = () => {
         resolve();
       }, time);
     });
-};
+})();
 
 // 因为状态拦截需要传递的是地址，所以只能传对象参数
-export const statusThrottle = () => {
+export const statusThrottle = (() => {
   const objParameter = {
     status: true
   };
@@ -69,4 +69,4 @@ export const statusThrottle = () => {
       resolve(objParameter);
     });
   // callback && callback(objParameter)
-};
+})();

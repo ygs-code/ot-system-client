@@ -114,7 +114,7 @@ export const removeUser = (id) => {
 // 登录
 export const login = (parameter) => {
   const { password, name, verificationCode } = parameter;
-  return mutation(
+  return query(
     "login",
     ` mutation{
         login(
@@ -144,29 +144,6 @@ export const login = (parameter) => {
               } 
             }
             message
-          } 
-   }
-    `
-
-    // {
-    //   userInfo: parameter,
-    // }
-  );
-
-  //return Request.post("/set/user/login", parameter);
-};
-
-// 登录
-export const logOut = () => {
-  return mutation(
-    "logOut",
-    ` mutation{
-       logOut {
-            code
-            message
-            data{
-              flag
-            }
           } 
    }
     `
@@ -637,27 +614,6 @@ export const editRolePermission = (parameter = {}) => {
   );
 };
 
-// 创建文档
-export const createDocument = (parameter = {}) => {
-  return mutation(
-    "createDocument",
-    `
-        mutation($parameter: CreateDocumentInput!) { 
-          createDocument(parameter: $parameter) {
-              code
-              message
-              data {
-                id
-              }
-            }
-        }
-    `,
-    {
-      parameter
-    }
-  );
-};
-
 // 获取文档列表
 export const getDocumentList = (parameter = {}) => {
   // const { type = "" } = parameter;
@@ -701,23 +657,6 @@ export const getDocumentList = (parameter = {}) => {
   );
 };
 
-// 获取验证码
-export const checkLogin = () => {
-  return query(
-    "checkLogin",
-    ` query{
-      checkLogin {
-          code
-          message
-          data {
-            flag
-          }
-        }
-    }
-  `
-  );
-};
-
 // 删除文档
 export const removeDocument = (id) => {
   return mutation(
@@ -730,5 +669,26 @@ export const removeDocument = (id) => {
         }
       }
     `
+  );
+};
+
+// 创建文档
+export const createDocument = (parameter = {}) => {
+  return mutation(
+    "createDocument",
+    `
+        mutation($parameter: CreateDocumentInput!) { 
+          createDocument(parameter: $parameter) {
+              code
+              message
+              data {
+                id
+              }
+            }
+        }
+    `,
+    {
+      parameter
+    }
   );
 };

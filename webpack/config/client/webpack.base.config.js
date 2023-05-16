@@ -17,23 +17,20 @@ const ReactLoadableSSRAddon = require("react-loadable-ssr-addon");
 const StylelintPlugin = require("stylelint-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const { stringToObject, alias } = require("../../utils");
-const { cdn, externals } = require("./cdn");
 
 let {
   NODE_ENV, // 环境参数
+  RENDER, // 环境参数
   htmlWebpackPluginOptions = "",
-  ADDRESS,
-  PORT,
   PUBLICPATH,
-  RENDER,
-  ENTRY_SERVER_NAME,
-  ENTRY_PORT
+  ADDRESS,
+  CLIENT_PORT,
+  CLIENT_PUBLICPATH,
+  ENTRY_SERVER_NAME
 } = process.env; // 环境参数
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
-// const { publicPath = "/" } = htmlWebpackPluginOptions;
-
-let publicPath = PUBLICPATH;
+const publicPath = PUBLICPATH;
 
 const isSsr = RENDER === "ssr";
 //    是否是生产环境
@@ -41,9 +38,7 @@ const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
 const isEnvDevelopment = NODE_ENV === "development";
 
-const happyThreadPool = HappyPack.ThreadPool({
-  size: os.cpus().length - 3 <= 1 ? 1 : os.cpus().length - 3
-});
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 });
 const rootPath = process.cwd();
 
 const cacheLoader = (happypackId) => {
@@ -85,7 +80,7 @@ module.exports = {
     chunkFilename: `static/js/[name].[hash:8].chunk.js`,
     path: path.join(process.cwd(), "./dist/client"),
     // publicPath: "/",
-    publicPath, // 静态资源不能用相对路径，否则路由改变的时候会发生静态资源引用路径错误问题。
+    publicPath,
     // libraryTarget: isServer?'commonjs2':'umd',
     chunkLoadTimeout: 120000,
     // 「devtool 中模块」的文件名模板 调试webpack的配置问题
@@ -333,8 +328,7 @@ module.exports = {
     rules: [
       {
         test: /(\.jsx?$)|(\.js?$)/,
-        // exclude: /node_modules/,
-        exclude: /(node_modules|bower_components|otServe)/,
+        exclude: /node_modules/,
         include: path.resolve(rootPath, "client"),
         use: cacheLoader("jsx")
         // {
@@ -346,25 +340,6 @@ module.exports = {
         //     },
         // },
       },
-
-      // "file" loader makes sure those assets get served by WebpackDevServer.
-      // When you `import` an asset, you get its (virtual) filename.
-      // In production, they would get copied to the `build` folder.
-      // This loader doesn't use a "test" so it will catch all modules
-      // that fall through the other loaders.
-      // {
-      //   loader: require.resolve("file-loader"),
-      //   // Exclude `js` files to keep "css" loader working as it injects
-      //   // its runtime that would otherwise be processed through "file" loader.
-      //   // Also exclude `html` and `json` extensions so they get processed
-      //   // by webpacks internal loaders.
-      //   exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-      //   options: {
-      //     name: "static/[name].[hash:8].[ext]"
-      //   }
-      // },
-      // ** STOP ** Are you adding a new loader?
-      // Make sure to add the new loader(s) before the "file" loader.
 
       {
         test: /\.(svg|woff2?|woff|ttf|eot|otf|jpe?g|png|gif)(\?.*)?$/i,
@@ -387,10 +362,21 @@ module.exports = {
         //     },
         // },
       }
+
+      // {
+      //   test: /\.(svg|woff2?|ttf|eot|jpe?g|png|gif)(\?.*)?$/i,
+      //   // exclude: /node_modules/,
+      //   use: cacheLoader("url-loader")
+      //   //  {
+      //   //     loader: 'url-loader',
+      //   //     options: {
+      //   //         limit: 1024,
+      //   //         name: 'img/[sha512:hash:base64:7].[ext]',
+      //   //     },
+      //   // },
+      // }
     ]
   },
-  // cdn
-  externals,
   plugins: [
     // 下面是复制文件的插件，我认为在这里并不是起到复制文件的作用，而是过滤掉打包过程中产生的以.开头的文件
     new CopyWebpackPlugin([
@@ -402,8 +388,19 @@ module.exports = {
     ]),
 
     new webpack.HashedModuleIdsPlugin(), // 确保 hash 不被意外改变
-
-    // eslint 插件
+    // stylelint 插件
+    // new StylelintPlugin({
+    //   emitError: true, //发现的错误将始终被触发，将禁用设置为false。
+    //   emitWarning: true, //如果将disable设置为false，则发现的警告将始终被发出。
+    //   failOnError: false, //如果有任何错误，将导致模块构建失败，禁用设置为false。
+    //   failOnWarning: false, //如果有任何警告，如果设置为true，将导致模块构建失败。
+    //   quiet: false, //如果设置为true，将只处理和报告错误，而忽略警告。
+    //   fix: true, //自动修复
+    //   files: path.resolve(rootPath, "client/**/*.(less|css)"), // 文件设置
+    //   // stylelintPath:'',
+    //   extensions: ["dist/server/static/css/*.css"] // 排除目录检查
+    // }),
+    // eslint 插件 
     new ESLintPlugin({
       emitError: true, //发现的错误将始终被触发，将禁用设置为false。
       emitWarning: true, //如果将disable设置为false，则发现的警告将始终被发出。
@@ -452,6 +449,24 @@ module.exports = {
       threadPool: happyThreadPool
     }),
 
+    // new HappyPack({
+    //   id: "url-loader",
+    //   //添加loader
+    //   use: [
+    //     {
+    //       loader: "url-loader",
+    //       options: {
+    //         limit: 1024,
+    //         name: "static/img/[sha512:hash:base64:7].[ext]"
+    //       }
+    //     }
+    //   ],
+    //   // 输出执行日志
+    //   // verbose: true,
+    //   // 使用共享线程池
+    //   threadPool: happyThreadPool
+    // }),
+
     new WebpackPluginRouter({
       publicPath,
       entry: path.join(process.cwd(), "/client"),
@@ -468,10 +483,12 @@ module.exports = {
       process: {
         env: {
           NODE_ENV, // 环境参数
-          RENDER, // 渲染环境参数
-          PUBLICPATH: PUBLICPATH,
+          RENDER, // 环境参数
+          PUBLICPATH,
+          ADDRESS,
+          CLIENT_PORT,
+          CLIENT_PUBLICPATH,
           ENTRY_SERVER_NAME,
-          ENTRY_PORT,
           htmlWebpackPluginOptions: {
             ...htmlWebpackPluginOptions,
             publicPath
@@ -497,19 +514,7 @@ module.exports = {
       : [
           // // // html静态页面
           new HtmlWebpackPlugin({
-            cdn,
-            // assets: {
-            //   // publicPath: string,
-            //   js: [
-            //     "https://unpkg.com/react@18/umd/react.production.min.js",
-            //     "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
-            //   ]
-            //   // css: Array<{string}>,
-            //   // favicon?: string | undefined,
-            //   // manifest?: string | undefined
-            // },
             ...htmlWebpackPluginOptions,
-            publicPath,
             minify: true,
             // title: 'Custom template using Handlebars',
             // 生成出来的html文件名

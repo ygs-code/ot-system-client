@@ -1,91 +1,21 @@
-import { Button, TextField } from "@mui/material";
+import { Button, message } from "antd";
+// import { getDocumentList, removeDocument } from "client/assets/js/request";
 import {
   createDocument,
   getDocumentList,
   removeDocument
 } from "client/assets/js/request";
-import Actions from "client/component/Actions";
-import Dialog from "client/component/Dialog";
-import FormItem from "client/component/FormItem";
-import { layout } from "client/component/Layout";
-import Message from "client/component/Message";
+import ModalForm from "client/component/ModalForm";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
+import TableButton from "client/component/TableButton";
 import { tablePage } from "client/component/TablePage";
 import Tabs from "client/component/Tabs";
 import { addRouterApi } from "client/router";
-import { createForm } from "rc-form";
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 
-const Create = createForm()((props) => {
-  const [open, setOpen] = useState(false);
-  const { form, confirm } = props;
-  const { validateFields } = form;
-
-  return (
-    <div>
-      <Dialog
-        confirm={() => {
-          validateFields(async (error, values) => {
-            if (!error) {
-              await createDocument(values);
-
-              Message.success("文档创建成功");
-              setOpen(false);
-              confirm();
-            } else {
-              console.error(error);
-            }
-          });
-        }}
-        open={open}
-        cancel={() => {
-          setOpen(false);
-        }}
-        title="创建文档"
-        sx={{
-          width: 500,
-          height: 100
-        }}>
-        <FormItem
-          className="padding-top-15"
-          rules={[
-            {
-              required: true,
-              message: "请输入文档标题"
-            },
-            {
-              validator: (rule, value = "") => {
-                if (!value.trim()) {
-                  return Promise.reject("请输入文档标题");
-                }
-
-                return Promise.reject();
-              }
-            }
-          ]}
-          label="文档标题"
-          form={form}
-          // span={24}
-          name="title">
-          <TextField
-            required
-            fullWidth
-            placeholder="请输入文档标题"
-            variant="outlined"
-          />
-        </FormItem>
-      </Dialog>
-
-      <Button
-        variant="contained"
-        onClick={() => {
-          setOpen(true);
-        }}>
-        创建文档
-      </Button>
-    </div>
-  );
-});
+/*eslint no-undef: "error"*/
+/*eslint-env process*/
+const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
 
 // 权限控制
 @setBreadcrumbAndTitle({
@@ -98,14 +28,12 @@ const Create = createForm()((props) => {
   title: "文档"
 })
 @addRouterApi
-@layout()
 @tablePage
 class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabsValue: "all",
-      open: false
+      tabsValue: "0"
     };
   }
 
@@ -118,14 +46,25 @@ class Index extends Component {
 
   // 定义搜索栏字段
   getSearchFields() {
+    const { tabsValue } = this.state;
     return [
-      {
-        label: "文档标题",
-        name: "title",
-        type: "input",
-        span: 1
-      }
-    ];
+      [
+        {
+          label: "文档标题",
+          name: "title",
+          type: "input",
+          span: 1
+        }
+      ],
+      [
+        {
+          label: "文档标题",
+          name: "title",
+          type: "input",
+          span: 1
+        }
+      ]
+    ][tabsValue];
   }
 
   // 定义Tab字段
@@ -135,11 +74,8 @@ class Index extends Component {
 
   // 定义表头字段
   getColumns = () => {
-    const {
-      pushRoute,
-      routePaths: { officeDocumentDetails }
-    } = this.props;
-
+    const { tabsValue } = this.state;
+    const { pushRoute, routePaths: { userRoleDetails } = {} } = this.props;
     return [
       {
         title: "文档标题",
@@ -156,50 +92,75 @@ class Index extends Component {
         title: "操作",
         dataIndex: "actions",
         key: "actions",
-        width: 120,
+        width: 300,
+        fixed: "right",
         render: (text, row) => {
           const { id } = row;
 
-          return (
-            <Actions
-              options={[
-                {
-                  label: "编辑",
-                  type: "edit",
-                  onClick: () => {
-                    pushRoute({
-                      path: officeDocumentDetails,
-                      isOpenWin: true,
-                      params: {
-                        action: "edit",
-                        id,
-                        type: "document"
-                      } // 地址传参
-                    });
-                  }
-                },
-                {
-                  label: "删除",
-                  type: "remove",
-                  onClick: async () => {
-                    const { message: mgs } = await removeDocument(id);
-                    Message.success(mgs);
+          // const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
 
-                    this.loadTableData();
+          // process: {
+          //   env: {
+          //     NODE_ENV, // 环境参数
+          //     RENDER, // 环境参数
+          //     PUBLICPATH,
+          //     ADDRESS,
+          //     htmlWebpackPluginOptions: {
+          //       ...htmlWebpackPluginOptions,
+          //       publicPath
+          //     }
+          //   }
+          // }
+
+          return (
+            <TableButton
+              render={[
+                {
+                  // showPopconfirm: true, // 是否需要弹窗提示
+                  // confirmInfo: "你确定要发布该标签吗？", //弹窗信息
+                  label: "编辑", // 按钮文字
+                  status: true, //权限控制
+                  props: {
+                    onClick: () => {
+                      // /office/document/details/:action/:type/:id?
+
+                      const { origin, protocol, hostname } = window.location;
+                      // window.open(
+                      //   NODE_ENV == "development"
+                      //     ? `${protocol}//${hostname}:${CLIENT_PORT}/office/document/details/edit/document/${id}`
+                      //     : `${protocol}//${hostname}${CLIENT_PUBLICPATH}office/document/details/edit/document/${id}`
+                      // );
+                    }
                   }
                 },
                 {
-                  label: "查看",
-                  type: "view",
-                  onClick: () => {
-                    pushRoute({
-                      path: officeDocumentDetails,
-                      params: {
-                        action: "view",
-                        id,
-                        type: "document"
-                      } // 地址传参
-                    });
+                  // showPopconfirm: true, // 是否需要弹窗提示
+                  // confirmInfo: "你确定要发布该标签吗？", //弹窗信息
+                  label: "查看", // 按钮文字
+                  status: true, //权限控制
+                  props: {
+                    onClick: () => {
+                      const { origin, protocol, hostname } = window.location;
+                      // window.open(
+                      //   NODE_ENV == "development"
+                      //     ? `${protocol}//${hostname}:${CLIENT_PORT}/office/document/details/view/document/${id}`
+                      //     : `${protocol}//${hostname}${CLIENT_PUBLICPATH}office/document/details/view/document/${id}`
+                      // );
+                    }
+                  }
+                },
+                {
+                  showPopconfirm: true, // 是否需要弹窗提示
+                  // confirmInfo: "你确定要发布该标签吗？", //弹窗信息
+                  label: "删除", // 按钮文字
+                  status: true, //权限控制
+                  props: {
+                    onClick: async () => {
+                      const { message: mgs } = await removeDocument(id);
+                      message.success(mgs);
+
+                      this.loadTableData();
+                    }
                   }
                 }
               ]}
@@ -216,10 +177,12 @@ class Index extends Component {
   tableDataLoader = async (searchParams = {}) => {
     const { tabsValue } = this.state;
 
-    const { data } = await getDocumentList({
-      ...searchParams,
-      createBy: tabsValue
-    });
+    const mapRequest = {
+      0: getDocumentList,
+      1: getDocumentList
+    };
+
+    const { data } = await mapRequest[tabsValue](searchParams);
 
     return data;
   };
@@ -232,12 +195,6 @@ class Index extends Component {
     const { tabsValue } = this.state;
     return (
       <div className="table-page">
-        <Create
-          {...this.props}
-          confirm={() => {
-            this.loadTableData();
-          }}
-        />
         <Tabs
           onChange={(value) => {
             this.setState(
@@ -255,13 +212,75 @@ class Index extends Component {
           items={[
             {
               label: "全部文档",
-              value: "all"
+              value: "0"
             },
             {
               label: "我的文档",
-              value: "my"
+              value: "1"
             }
           ]}></Tabs>
+        <div
+          style={{
+            marginBottom: "20px"
+          }}>
+          <ModalForm
+            onOk={async (values) => {
+              await createDocument(values);
+              message.success("文档创建成功");
+            }}
+            fields={[
+              {
+                label: "文档标题",
+                name: "title",
+                type: "input",
+                props: {
+                  // readOnly,
+                  showCount: true,
+                  maxLength: 50
+                },
+
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入文档标题"
+                  }
+                ]
+              }
+
+              // {
+              //   label: "描述",
+              //   name: "description",
+              //   type: "textArea",
+              //   props: {
+              //     // readOnly,
+              //     showCount: true,
+              //     maxLength: 200
+              //   },
+
+              //   rules: [
+              //     {
+              //       required: true,
+              //       message: "请输入描述"
+              //     }
+              //   ]
+              // }
+            ]}
+            buttonText="新建文档"
+            title="新建文档"></ModalForm>
+
+          {/* <Button
+            type="primary"
+            onClick={() => {
+              // pushRoute({
+              //   path: permissionManagementDetails,
+              //   params: {
+              //     action: "create"
+              //   } // 地址传参
+              // });
+            }}>
+            新建文档
+          </Button> */}
+        </div>
         {this.renderSearch({
           shrinkLength: 5,
           initialValues: {

@@ -17,16 +17,15 @@ import { stabilization } from "../client/utils";
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 
-const $stabilization=stabilization()
 // 如果是开发环境 先拷贝 服务器文件到 dist
 let {
   NODE_ENV, // 环境参数
-  target, // 环境参数
+  RENDER, // 环境参数
   htmlWebpackPluginOptions = "",
   port
 } = process.env; // 环境参数
 
-const isSsr = target === "ssr";
+const isSsr = RENDER === "ssr";
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
@@ -71,12 +70,12 @@ class Bin {
         if (iSportTake(port)) {
           await kill(port, "tcp");
         }
-        $stabilization(1500, async () => {
+        stabilization(1500, async () => {
           this.counter = this.counter >= 10 ? 2 : this.counter + 1;
           if (this.counter === 1) {
             const cmd = isSsr
-              ? "cross-env  target='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.development"
-              : "cross-env target='client' npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.development";
+              ? "cross-env  RENDER='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.development"
+              : "cross-env RENDER='csr' npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.development";
             this.child = execute(cmd);
           } else {
             this.child = execute("npm run bin");
@@ -93,6 +92,8 @@ class Bin {
     if (isEnvDevelopment) {
       this.development();
     } else {
+    
+      // throw '错误'
       this.production();
     }
   }

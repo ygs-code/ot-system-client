@@ -9,10 +9,13 @@
 import NoPages from "client/component/404";
 import Loading from "client/component/Loading";
 import { toComponent } from "client/router";
+import {
+  Route,
+  Router,
+  Switch as Routes
+} from "client/router/react-lazy-router-dom";
 import PropTypes from "prop-types";
 import React from "react";
-
-import { Route, Router, Switch as Routes } from "./react-lazy-router-dom";
 
 // const NoPages = () => {
 //   return (

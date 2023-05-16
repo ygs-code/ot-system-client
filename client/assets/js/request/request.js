@@ -373,7 +373,7 @@ export class Graphql {
   }
   static gql(/* arguments */) {
     var args = Array.prototype.slice.call(arguments);
-    var [literals] = args;
+    var literals = args[0];
     var result = typeof literals === "string" ? literals : literals[0];
 
     for (var i = 1; i < args.length; i++) {
@@ -410,7 +410,7 @@ export class Graphql {
   };
 }
 
-export const { gql } = Graphql;
+export const gql = Graphql.gql;
 
 // Graphql 配置项 start
 //Graphql 错误请求

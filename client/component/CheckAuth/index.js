@@ -41,10 +41,10 @@ export const checkAuth = (authKey) => {
 };
 
 // 检查组件授权
-export const CheckAuth = (props) => {
+const CheckAuth = (props) => {
   const { authKey, children } = props;
   return checkAuthKey(authKey)
-    ? Children.map(children, (child) => {
+    ? Children.map(children, (child, index) => {
         return cloneElement(child, props);
       })
     : null;

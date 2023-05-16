@@ -8,27 +8,20 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpackPluginCopyFile = require("../../definePlugin/webpack-plugin-copy-file");
 const rootPath = process.cwd();
 let {
-  NODE_ENV // 环境参数
+  NODE_ENV, // 环境参数
 } = process.env; // 环境参数
-const isDevelopment = NODE_ENV === "development";
+const isDevelopment = NODE_ENV == "development";
 
 module.exports = {
-  mode: "development",
+  mode: NODE_ENV,
   watch: false,
-  output: {
-    // path: path.join(__dirname, 'dist'),
-    // filename:'bundle.js',
-    // 配置 二级目录
-    // publicPath: "/client/"
-  },
-
   module: {
     rules: [
       // css
       {
         test: /\.css$/i,
         // 排除文件,因为这些包已经编译过，无需再次编译  不排除bootstrap
-        // exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
+        exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
         use: [
           // 'thread-loader',
           MiniCssExtractPlugin.loader,
@@ -59,7 +52,7 @@ module.exports = {
       {
         test: /\.less$/i,
         // 排除文件,因为这些包已经编译过，无需再次编译  不排除bootstrap
-        // exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
+        exclude: /(node_modules|bower_components)^((?!bootstrap).)+$/,
         use: [
           // 'thread-loader',
           // compiles Less to CSS
@@ -197,9 +190,9 @@ module.exports = {
           // name: "chunk-node_modules",
           chunks: "initial", // 只处理初始 chunk
           // 最大超过多少就要拆分
-          maxSize: 204800 / 2, //大小超过204800个字节 200kb 就要拆分
+          maxSize: 204800, //大小超过204800个字节 200kb 就要拆分
           // // 最小多少被匹配拆分
-          minSize: 102400 / 2, //大小超过102400个字节  100kb 就要拆分
+          minSize: 102400, //大小超过102400个字节  100kb 就要拆分
           enforceSizeThreshold: 102400
         }
 

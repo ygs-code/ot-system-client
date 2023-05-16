@@ -8,7 +8,7 @@
  */
 import "./index.less";
 
-import { Button } from "@mui/material";
+import { Button } from "antd";
 import Form from "client/component/Form";
 import React, { PureComponent } from "react";
 
@@ -69,7 +69,6 @@ export default class extends PureComponent {
   //    提交请求到接口
   onSubmitForm = async (formData) => {
     const data = await this.mapSubmitData(formData);
-    console.log("formData=", data);
   };
 
   // 初始化表单
@@ -95,16 +94,12 @@ export default class extends PureComponent {
     return (
       <div className="button-box">
         {!readOnly ? (
-          <Button
-            variant="contained"
-            loading={loading}
-            onClick={this.onValidaForm}>
+          <Button type="primary" loading={loading} onClick={this.onValidaForm}>
             确认
           </Button>
         ) : null}
         <Button
           loading={loading}
-          variant="outlined"
           onClick={() => {
             history.back();
           }}>

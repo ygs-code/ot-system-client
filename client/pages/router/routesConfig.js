@@ -17,21 +17,12 @@ export default [
   },
 
   {
-    path: "/",
+    path: "/main",
     exact: true,
-    name: "~index", // 特殊路由  / 路径入口
-    entry: "/pages/Index/pages/Home",
-    level: 2
+    name: "main",
+    entry: "/pages/Main/index.js",
+    level: 1
   },
-
-  // // 文档详情
-  // {
-  //   path: "/office/document/details",
-  //   exact: true,
-  //   name: "officeDocumentDetails",
-  //   entry: "/pages/Index/pages/office/pages/Document/details/index.js",
-  //   level: 1
-  // },
   {
     path: "/log-in",
     exact: true,

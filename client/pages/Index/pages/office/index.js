@@ -9,7 +9,7 @@
 import React, { memo } from "react";
 
 const Index = memo(() => {
-  return <div className="user">office页面</div>;
+  return <div className="user">系统菜单页面</div>;
 });
 
 export default Index;

@@ -12,6 +12,14 @@ node_modules/**/*
 **/node_modules/**/*
 **/node_modules/**/*
 
+webpack
+webpack/*
+webpack/**/*
+**/webpack
+**/webpack/**/*
+**/webpack/**/*
+
+
 bin
 bin/*
 bin/**/*
@@ -27,37 +35,15 @@ modules/**/*
 **/modules/**/*
 **/modules/**/*
 
-server
-server/*
-server/**/*
-**/server
-**/server/**/*
-**/server/**/*
-
-webpack
-webpack/*
-webpack/**/*
-**/webpack
-**/webpack/**/*
-**/webpack/**/*
-
-
-
-webpack
-webpack/*
-webpack/**/*
-**/webpack
-**/webpack/**/*
-**/webpack/**/*
 
 
 @babel
 @babel/*
 @babel/**/*
 
-nginx/nginx.conf
+ 
  
 
-
+nginx/nginx.conf
 
  

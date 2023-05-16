@@ -150,7 +150,7 @@ class CopyFile {
 //     path.join(process.cwd(), 'webpack/definePlugin/**/*'),
 //     path.join(process.cwd(), '/webpack/newDefinePlugin'),
 //     (value) => {
-//         console.log('value=', value);
+ 
 //         return value;
 //     }
 // );

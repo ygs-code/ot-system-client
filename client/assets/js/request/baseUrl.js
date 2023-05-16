@@ -6,7 +6,8 @@
  * @Description: In User Settings Edit
  * @FilePath: /error-sytem/client/src/common/js/request/baseUrl.js
  */
-const { env: { NODE_ENV, ENTRY_SERVER_NAME } = {} } = process;
+// const env = process.env.NODE_ENV; // 环境参数
+const { env: { NODE_ENV, ENTRY_SERVER_NAME, RENDER } = {} } = process;
 let baseUrl = "";
 if (NODE_ENV === "development") {
   baseUrl = "http://127.0.0.1:3003/api/";

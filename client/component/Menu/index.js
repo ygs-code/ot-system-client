@@ -1,238 +1,261 @@
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import DescriptionIcon from "@mui/icons-material/Description";
-import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
-import TreeView from "@mui/lab/TreeView";
-import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import { addRouterApi } from "client/router";
-import { findTreeData } from "client/utils";
-import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import "./index.less";
 
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  [`& .${treeItemClasses.content}`]: {
-    color: theme.palette.text.secondary,
-    borderTopRightRadius: theme.spacing(2),
-    borderBottomRightRadius: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-    fontWeight: theme.typography.fontWeightMedium,
-    "&.Mui-expanded": {
-      fontWeight: theme.typography.fontWeightRegular
-    },
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover
-    },
-    "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: "var(--tree-view-color)"
-    },
-    [`& .${treeItemClasses.label}`]: {
-      fontWeight: "inherit",
-      color: "inherit"
-    }
-  },
-  [`& .${treeItemClasses.group}`]: {
-    marginLeft: 0,
-    [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(2)
-    }
-  }
-}));
+import {
+  // MenuUnfoldOutlined,
+  // MenuFoldOutlined,
+  // UserOutlined,
+  // VideoCameraOutlined,
+  // UploadOutlined,
+  // HomeOutlined,
+  // PieChartOutlined,
+  // DesktopOutlined,
+  // ContainerOutlined,
+  // MailOutlined,
+  // AppstoreOutlined,
+  // WarningOutlined,
+  SettingOutlined,
+  SnippetsOutlined
+  // ProjectOutlined
+} from "@ant-design/icons";
+import {
+  Menu
+  //  Select
+} from "antd";
+import React, {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 
-function StyledTreeItem(props) {
+const { SubMenu } = Menu;
+// const { Option } = Select;
+// const { Header, Sider, Content } = Layout;
+const MindMap = memo(
+  forwardRef(() => {
+    return (
+      <div className="mind-map">
+        <svg
+          className="icon"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18">
+          <path d="M122.368 165.888h778.24c-9.216 0-16.384-7.168-16.384-16.384v713.728c0-9.216 7.168-16.384 16.384-16.384h-778.24c9.216 0 16.384 7.168 16.384 16.384V150.016c0 8.192-6.656 15.872-16.384 15.872z m-32.768 684.544c0 26.112 20.992 47.104 47.104 47.104h750.08c26.112 0 47.104-20.992 47.104-47.104V162.304c0-26.112-20.992-47.104-47.104-47.104H136.704c-26.112 0-47.104 20.992-47.104 47.104v688.128z"></path>
+          <path d="M716.8 642.56h-71.68c-34.304 0-61.952 27.136-62.976 61.44-48.64-2.56-90.112-14.336-123.392-34.304-26.112-15.872-47.616-37.376-64-64.512 32.768-3.584 58.88-29.184 63.488-62.464h123.392c6.656 28.672 31.744 49.152 61.44 49.664h71.68c34.816 0 62.976-28.16 62.976-62.976v-30.208c0-34.816-28.16-62.976-62.976-62.976h-71.68c-31.232 0-57.856 23.04-62.464 54.272H458.24c-3.584-33.792-30.72-60.416-64-63.488 16.896-27.648 38.4-49.152 65.024-65.536 33.28-19.968 74.24-31.744 122.368-34.304 4.096 31.232 30.72 54.272 62.464 54.784h71.68c34.816 0 62.976-28.16 62.976-62.976v-30.208c0-34.816-28.16-62.976-62.976-62.976h-71.68c-29.184 0-54.784 20.48-61.44 49.152-58.368 2.56-109.056 16.896-150.528 41.984-41.984 25.6-74.752 62.464-96.768 109.568h-38.912c-39.424 0-71.68 32.256-71.68 71.68v35.84c0 39.424 32.256 71.68 71.68 71.68h39.424c22.528 46.592 54.784 83.456 96.256 108.544 42.496 25.6 94.208 39.936 154.112 42.496 8.704 25.088 32.768 41.984 59.392 41.984h71.68c34.816 0 62.976-28.16 62.976-62.976v-30.208c-0.512-34.816-28.672-62.976-63.488-62.976z m-83.968-354.304c0-5.632 4.608-10.24 10.752-10.752h71.68c5.632 0 10.752 4.608 10.752 10.752v30.208c0 5.632-4.608 10.752-10.752 10.752h-71.68c-5.632 0-10.752-4.608-10.752-10.752v-30.208z m-0.512 210.944c0-5.632 4.608-10.752 10.752-10.752h71.68c5.632 0 10.752 4.608 10.752 10.752v30.208c0 5.632-4.608 10.24-10.752 10.752h-71.68c-5.632 0-10.752-4.608-10.752-10.752v-30.208z m-356.352 34.816v-35.84c0-10.752 8.704-19.456 19.456-19.456h91.136c10.752 0 19.456 8.704 19.456 19.456v35.84c0 10.752-8.704 19.456-19.456 19.456H295.424c-10.752-0.512-19.456-8.704-19.456-19.456z m451.584 201.728c0 5.632-4.608 10.752-10.752 10.752h-71.68c-5.632 0-10.752-4.608-10.752-10.752v-30.208c0-5.632 4.608-10.24 10.752-10.752h71.68c5.632 0 10.752 4.608 10.752 10.752v30.208z"></path>
+        </svg>
+      </div>
+    );
+  })
+);
+
+export default memo((props) => {
   const {
-    bgColor,
-    color,
-    labelIcon: LabelIcon,
-    labelInfo,
-    labelText,
-    ...other
+    match: { path, params: { id } = {} } = {},
+    routePaths = {},
+    pushRoute
   } = props;
 
-  return (
-    <StyledTreeItemRoot
-      label={
-        <Box sx={{ display: "flex", alignItems: "center", p: 0.5, pr: 0 }}>
-          <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "inherit", flexGrow: 1 }}>
-            {labelText}
-          </Typography>
-          <Typography variant="caption" color="inherit">
-            {labelInfo}
-          </Typography>
-        </Box>
+  const [selectedKeys, setSelectedKeys] = useState("-1");
+  const [openKeys, setOpenKeys] = useState([]);
+
+  const goTo = useCallback((url) => {
+    pushRoute({
+      url
+    });
+  }, []);
+  console.log("routePaths=======", routePaths.document);
+
+  const menuData = useMemo(() => {
+    return [
+      {
+        title: "系统设置",
+        iconComponent: <SettingOutlined />,
+        key: "0",
+        children: [
+          {
+            title: "用户权限设置",
+            key: "0-0",
+            children: [
+              {
+                title: "用户管理",
+                url: routePaths.userManagement, // 路由地址
+
+                key: "0-0-0",
+                children: [
+                  // 子菜单
+                ]
+              },
+              {
+                title: "角色管理",
+                url: routePaths.roleManagement, // 路由地址
+
+                key: "0-0-1",
+                children: [
+                  // 子菜单
+                ]
+              },
+
+              {
+                title: "权限管理",
+                url: routePaths.permissionManagement, // 路由地址
+
+                key: "0-0-2",
+                children: [
+                  // 子菜单
+                ]
+              },
+              {
+                title: "角色&权限",
+                url: routePaths.rolePermission, // 路由地址
+
+                key: "0-0-3",
+                children: [
+                  // 子菜单
+                ]
+              },
+              {
+                title: "用户&角色",
+                url: routePaths.userRole, // 路由地址
+
+                key: "0-0-4",
+                children: [
+                  // 子菜单
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        title: "协同文档",
+        iconComponent: <SnippetsOutlined />,
+        key: "1",
+        children: [
+          {
+            url: routePaths.document, // 路由地址
+            title: "文档",
+            key: "1-0"
+          }
+          // {
+          //   title: "思维导图",
+          //   url: "http:xxxxx", // 路由地址
+          //   iconComponent: <MindMap />,
+          //   key: "1-1"
+          // }
+        ]
       }
-      style={{
-        "--tree-view-color": color,
-        "--tree-view-bg-color": bgColor
-      }}
-      {...other}
-    />
-  );
-}
-
-StyledTreeItem.propTypes = {
-  bgColor: PropTypes.string,
-  color: PropTypes.string,
-  labelIcon: PropTypes.elementType.isRequired,
-  labelInfo: PropTypes.string,
-  labelText: PropTypes.string.isRequired
-};
-
-export default addRouterApi((props) => {
-  const { onChange = () => {}, open, routePaths, pushRoute } = props;
-  const [expanded, setExpanded] = useState([]);
-  const [selected, setSelected] = useState(["0-0"]);
-  const menus = [
-    {
-      key: "0",
-      title: "office文档",
-      icon: DescriptionIcon,
-      children: [
-        {
-          key: "0-0",
-          title: "word文档",
-          icon: DescriptionIcon,
-          url: routePaths.officeDocument
-        }
-        // {
-        //   key: "0-1",
-        //   title: "excel工作表",
-        //   icon: DescriptionIcon
-        // },
-        // {
-        //   key: "0-2",
-        //   title: "ppt演示稿",
-        //   icon: DescriptionIcon
-        // }
-      ]
-    }
-  ];
+    ];
+  }, []);
 
   useEffect(() => {
-    if (open === false) {
-      setExpanded([]);
-    }
-  }, [open]);
+    const menuSelectedKeys =
+      sessionStorage.getItem("adminMenuSelectedKeys") || "";
+    let menuOpenKeys = sessionStorage.getItem("adminMenuOpenKeys") || "[]";
+    menuOpenKeys = JSON.parse(menuOpenKeys);
 
-  const runderTreeItem = (data = []) => {
-    return data.map((item) => {
-      const { children = [], title, url, icon, key, labelInfo } = item;
+    setSelectedKeys(menuSelectedKeys);
+    setOpenKeys(menuOpenKeys);
+  }, [id, path]);
 
-      if (children.length) {
-        return (
-          <StyledTreeItem
-            nodeId={key}
-            labelText={title}
-            labelIcon={icon}
-            labelInfo={labelInfo}
-            key={key}
-            // color="#1a73e8"
-            // bgColor="#e8f0fe"
-            onClick={() => {
-              // pushRoute(url)
-            }}>
-            {runderTreeItem(children)}
-          </StyledTreeItem>
-        );
-      }
-
-      return (
-        <StyledTreeItem
-          nodeId={key}
-          key={key}
-          labelText={title}
-          labelIcon={icon}
-          labelInfo={labelInfo}
-          color="#1a73e8"
-          bgColor="#e8f0fe"
+  const getItems = useCallback((menuData, index = null) => {
+    return menuData.map((item, _index) => {
+      const menuKey = index === null ? _index : `${index}_${_index}`;
+      const { title, iconComponent = null, children = [], url } = item;
+      return {
+        url,
+        label: title,
+        key: menuKey,
+        icon: iconComponent,
+        children: children.length ? getItems(children, menuKey) : null
+      };
+    });
+  }, []);
+  const getMenu = useCallback((menuData = [], index = null) => {
+    return menuData.map((item, _index) => {
+      const menuKey = index === null ? _index : `${index}_${_index}`;
+      return item.children && item.children.length ? (
+        <SubMenu key={menuKey} icon={item.iconComponent} title={item.title}>
+          {getMenu(item.children, menuKey)}
+        </SubMenu>
+      ) : (
+        <Menu.Item
+          key={menuKey}
+          icon={item.iconComponent}
           onClick={() => {
-            pushRoute(url);
-          }}
-        />
+            goTo(item);
+          }}>
+          {item.title}
+        </Menu.Item>
       );
     });
-  };
+  }, []);
+
+  // const onChange = useCallback((value) => {});
+
+  // const onBlur = useCallback(() => {});
+
+  // const onFocus = useCallback(() => {});
+
+  // const onSearch = useCallback((val) => {});
 
   return (
-    <TreeView
-      onNodeSelect={(event, selected) => {
-        const { children = [] } = findTreeData(
-          menus, // 树形数组或者数组数据
-          selected, // 需要查找的value
-          "key" //需要查找数组对象的key
-        );
+    <Menu
+      theme="dark"
+      mode="inline"
+      selectedKeys={[selectedKeys]}
+      openKeys={openKeys}
+      onOpenChange={(keyPath) => {
+        sessionStorage.setItem("adminMenuOpenKeys", JSON.stringify(keyPath));
+        setOpenKeys(keyPath);
+      }}
+      onSelect={(value) => {
+        const {
+          key: selectedKeys,
+          keyPath,
+          item: { props: { url } = {} } = {}
+        } = value;
 
-        if (children.length) {
-          return false;
-        }
-        setSelected([selected]);
+        sessionStorage.setItem("adminMenuSelectedKeys", selectedKeys);
+        sessionStorage.setItem("adminMenuOpenKeys", JSON.stringify(keyPath));
+        setSelectedKeys(selectedKeys);
+        setOpenKeys(keyPath);
+
+        goTo(url);
       }}
-      defaultSelected={selected}
-      selected={selected}
-      onNodeToggle={(event, expanded) => {
-        if (expanded.length) {
-          onChange(true);
-        }
-        setExpanded(expanded);
-        // setSelected(expanded);
-      }}
-      expanded={expanded}
-      aria-label="gmail"
-      // defaultExpanded={["3"]}
-      defaultCollapseIcon={<ArrowDropDownIcon />}
-      defaultExpandIcon={<ArrowRightIcon />}
-      defaultEndIcon={<div style={{ width: 24 }} />}
-      sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}>
-      {runderTreeItem(menus)}
+      items={getItems(menuData)}
+      defaultSelectedKeys={[selectedKeys]}>
       {/*
-      <StyledTreeItem nodeId="1" labelText="All Mail" labelIcon={MailIcon} />
-      <StyledTreeItem nodeId="2" labelText="Trash" labelIcon={DeleteIcon} />
-      <StyledTreeItem
-        nodeId="3"
-        labelText="Categories"
-        labelIcon={DescriptionIcon}>
-        <StyledTreeItem
-          nodeId="5"
-          labelText="Social"
-          labelIcon={SupervisorAccountIcon}
-          labelInfo="90"
-          color="#1a73e8"
-          bgColor="#e8f0fe"
-        />
-        <StyledTreeItem
-          nodeId="6"
-          labelText="Updates"
-          labelIcon={InfoIcon}
-          labelInfo="2,294"
-          color="#e3742f"
-          bgColor="#fcefe3"
-        />
-        <StyledTreeItem
-          nodeId="7"
-          labelText="Forums"
-          labelIcon={ForumIcon}
-          labelInfo="3,566"
-          color="#a250f5"
-          bgColor="#f3e8fd"
-        />
-        <StyledTreeItem
-          nodeId="8"
-          labelText="Promotions"
-          labelIcon={LocalOfferIcon}
-          labelInfo="733"
-          color="#3c8039"
-          bgColor="#e6f4ea"
-        />
-      </StyledTreeItem>
-      <StyledTreeItem nodeId="4" labelText="History" labelIcon={Label} />
-
+        //   isProjectPage() ? (
+        //   <Menu.Item key="-1" icon={<HomeOutlined />}>
+        //     <Select
+        //       style={{ width: "185px" }}
+        //       className="menu-select"
+        //       showSearch
+        //       placeholder="请选择项目"
+        //       optionFilterProp="children"
+        //       onChange={onChange}
+        //       onFocus={onFocus}
+        //       onBlur={onBlur}
+        //       onSearch={onSearch}
+        //       filterOption={(input, option) =>
+        //         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        //       }
+        //     >
+        //       <Option value="jack">Jack</Option>
+        //       <Option value="lucy">Lucy</Option>
+        //       <Option value="tom">Tom</Option>
+        //     </Select>
+        //   </Menu.Item>
+        // ) : null}
         */}
-    </TreeView>
+      {/*
+    {getMenu(menuData)}
+    */}
+    </Menu>
   );
 });

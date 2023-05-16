@@ -201,13 +201,12 @@ const tablePage = (Component) => {
     };
     loadTableData = async (searchParams = {}) => {
       const { getFieldsValue } = this.searchForm;
-      const { searchParams: stateSearchParams = {} } = this.state;
       let newSearchParams = {};
 
       if (this.getDefaultSearchParams) {
         searchParams = {
           ...this.getDefaultSearchParams(),
-          ...stateSearchParams,
+          ...this.state.searchParams,
           ...searchParams
         };
       }

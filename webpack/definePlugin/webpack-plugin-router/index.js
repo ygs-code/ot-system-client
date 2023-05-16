@@ -6,7 +6,7 @@ const dataDiff = require("./diff");
 const chalk = require("chalk");
 
 let {
-  NODE_ENV, // 环境参数
+  NODE_ENV // 环境参数
 } = process.env; // 环境参数
 
 // https://juejin.cn/post/6844903991508205576
@@ -209,7 +209,7 @@ import ${this.firstToUpper(name)} from "client${entry}"`;
   }
   getCode(routesConfigs, compilation) {
     let {
-      NODE_ENV, // 环境参数
+      NODE_ENV // 环境参数
     } = process.env; // 环境参数
 
     NODE_ENV == "development";
@@ -364,9 +364,7 @@ export default routesComponentConfig;
     // });
     // this.hook(compiler, "done", (stats) => {
     //     if (stats.compilation.errors && stats.compilation.errors.length) {
-    //         console.log(
-    //             " stats.compilation.errors===",
-    //             chalk.red(stats.compilation.errors)
+ 
     //         );
     //         // process.exit(1);
     //     }

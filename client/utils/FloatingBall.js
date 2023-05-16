@@ -97,11 +97,9 @@ FloatingBall.prototype = {
     this.timer = setInterval(() => {
       this.rotateX();
       this.rotateY();
-      /* eslint-disable  */
       for (const [index, item] of this.tags.entries()) {
         item.move(this.fallLength, this.RADIUS, this.CX, this.CY);
       }
-      /* eslint-enable  */
       requestAnimationFrame(() => {
         this.callback(this.tags.map((item) => item.style));
       });
@@ -122,8 +120,7 @@ FloatingBall.prototype = {
     //   this.angleY = Math.PI/500,
     var cos = Math.cos(this.angleX);
     var sin = Math.sin(this.angleX);
-
-    this.tags.forEach(function (target) {
+    this.tags.forEach(function (target, index) {
       var y1 = target.x * cos - target.z * sin;
       var z1 = target.z * cos + target.x * sin;
       target.x = y1;
@@ -135,7 +132,7 @@ FloatingBall.prototype = {
     this.angleY *= 0.995;
     var cos = Math.cos(this.angleY);
     var sin = Math.sin(this.angleY);
-    this.tags.forEach(function (target) {
+    this.tags.forEach(function (target, index) {
       var x1 = target.y * cos - target.z * sin;
       var z1 = target.z * cos + target.y * sin;
       target.y = x1;
@@ -186,7 +183,7 @@ FloatingBall.prototype = {
           this.animate(); // 添加动画
         }
       });
-      this.ele.addEventListener("mouseout", () => {
+      this.ele.addEventListener("mouseout", (event) => {
         // this.onChangeAngle(event)
         if (this.isAnimate) {
           this.animate(); // 添加动画
@@ -199,7 +196,7 @@ FloatingBall.prototype = {
           this.animate(); // 添加动画
         }
       });
-      this.ele.attachEvent("onmouseout", () => {
+      this.ele.attachEvent("onmouseout", (event) => {
         // this.onChangeAngle(event)
         if (this.isAnimate) {
           this.animate(); // 添加动画
@@ -277,12 +274,9 @@ FloatingBall.prototype = {
 
         this.rotateX();
         this.rotateY();
-        /* eslint-disable   */
-
         for (const [index, item] of this.tags.entries()) {
           item.move(this.fallLength, this.RADIUS, this.CX, this.CY);
         }
-        /* eslint-enable   */
         requestAnimationFrame(() => {
           this.callback(this.tags.map((item) => item.style));
         });

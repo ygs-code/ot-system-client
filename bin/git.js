@@ -148,7 +148,7 @@ class Git {
             "build: 修改项目构建系统(例如 glup,webpack,rollup 的配置等)的提交",
             "perf: 性能优化",
             "docs: 文档更新(documentation)",
-            "ci: 修改项目继续集成流程(例如 Travis,Jenkins,GitLab CI,Circle等)的提交",
+            "ci: 修改项目继续集成流程(例如 Travis,Jenkins,GitLab CI,Circle,等)的提交",
             "revert: 回滚某个更早之前的提交",
             "chore: 构建过程或辅助工具的变动"
           ]

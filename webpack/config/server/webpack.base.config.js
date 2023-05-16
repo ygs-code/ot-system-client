@@ -23,11 +23,12 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const { stringToObject, alias } = require("../../utils");
 let {
   NODE_ENV, // 环境参数
-  CLIENT_PUBLICPATH
+  RENDER, // 环境参数
+  htmlWebpackPluginOptions = ""
 } = process.env; // 环境参数
 
-// const { publicPath = "/" } = htmlWebpackPluginOptions;
-let publicPath = CLIENT_PUBLICPATH;
+htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
+const { publicPath = "/" } = htmlWebpackPluginOptions;
 
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
@@ -62,8 +63,8 @@ module.exports = {
   output: {
     filename: "[name].js",
     path: path.join(process.cwd(), "./dist/server"),
-    publicPath,
     // publicPath: "/",
+    publicPath,
     chunkFilename: "[name].chunk.js",
     // libraryTarget: isServer?'commonjs2':'umd',
     chunkLoadTimeout: 120000,
@@ -294,9 +295,7 @@ module.exports = {
           );
         })
         .forEach((mod) => {
-          if (mod.indexOf(".") === 0) {
-            return false;
-          }
+          if (mod.indexOf(".") === 0) return;
           nodeModules[mod] = "commonjs " + mod;
         });
 
@@ -417,8 +416,7 @@ module.exports = {
       },
       {
         test: /(\.jsx?$)|(\.js?$)/,
-        // exclude: /node_modules/,
-        exclude: /(node_modules|bower_components|otServe)/,
+        exclude: /node_modules/,
         // include: path.resolve(rootPath, 'client'),
         use: cacheLoader("jsx")
         // {

@@ -8,10 +8,9 @@ const StylelintPlugin = require("stylelint-webpack-plugin");
 const rootPath = process.cwd();
 let {
   NODE_ENV, // 环境参数
-  target // 环境参数
 } = process.env; // 环境参数
 
-const isSsr = target == "ssr";
+
 //    是否是生产环境
 const isEnvProduction = NODE_ENV === "production";
 //   是否是测试开发环境
@@ -21,27 +20,27 @@ module.exports = {
   mode: NODE_ENV,
   devServer: {
     open: true,
-    // publicPath: "/client/",
     // publicPath: "/",
     // contentBase: "assets",
     hot: true,
     // historyApiFallback: true,
-    host: "0.0.0.0",
+    host:"0.0.0.0",
     liveReload: true, // 编译之后是否自动刷新浏览器
     writeToDisk: true, // isSsr || isEnvProduction, // 写入硬盘
     // port: 5000,
-    compress: true, //浏览器请求静态资源时压缩一下，打开浏览器的检查时可以看到bundle.js的content-encoding是gzip，浏览器自动解压
+    compress:true,  //浏览器请求静态资源时压缩一下，打开浏览器的检查时可以看到bundle.js的content-encoding是gzip，浏览器自动解压
     proxy: [
       {
         context: "/api",
         target: "http://localhost:3002",
         changeOrigin: true,
-        secure: false
+         secure: false,
         // pathRewrite: {
         //   "^/api/v1/common/upload/": "/",
         // },
-      }
-    ]
+      },
+    ],
+  
   },
   watch: true,
   watchOptions: {
@@ -67,6 +66,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               sourceMap: true
+
             }
           },
           {
@@ -158,7 +158,7 @@ module.exports = {
     ]
   },
   plugins: [
-    // stylelint 插件
+        // stylelint 插件
     new StylelintPlugin({
       emitError: true, //发现的错误将始终被触发，将禁用设置为false。
       emitWarning: true, //如果将disable设置为false，则发现的警告将始终被发出。
@@ -176,6 +176,8 @@ module.exports = {
       // both options are optional
       filename: "static/css/[name].[contenthash:8].css",
       chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
-    })
+    }),
+
+
   ]
 };

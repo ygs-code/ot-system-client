@@ -5,16 +5,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { stringToObject, alias } = require("../../utils");
 const rootPath = process.cwd();
+ 
 
 module.exports = {
-  output: {
-    // path: path.join(__dirname, 'dist'),
-    // filename:'bundle.js',
-    // 配置 二级目录
-    // publicPath
-  },
   entry: {
     index: [
       // '@babel/polyfill',

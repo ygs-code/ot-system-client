@@ -9,16 +9,15 @@ import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
 import webpackHotMiddleware from "webpack-hot-middleware";
 import webpackHotServerMiddleware from "webpack-hot-server-middleware";
-// import connectHistoryApiFallback from "connect-history-api-fallback";
 
-/* eslint-disable   */
+// import connectHistoryApiFallback from "connect-history-api-fallback";
 import { compiler, config } from "@/webpack";
-/* eslint-enable   */
 // import { writeFile } from "@/webpack/utils";
 
 let {
   NODE_ENV, // 环境参数
-  RENDER
+  RENDER, // 环境参数
+  port
 } = process.env; // 环境参数
 
 const isSsr = RENDER === "ssr";
@@ -72,7 +71,8 @@ class WebpackHot {
   addWebpackHotMiddleware() {
     this.app.use(async (ctx, next) => {
       const { response, request, req, res } = ctx;
-
+      // console.log("req==", req);
+      // console.log("res==", res);
       await webpackHotMiddleware(
         this.compiler.compilers.find((compiler) => compiler.name === "client")
       )(request, response, next);
@@ -284,7 +284,6 @@ class WebpackHot {
         });
       });
 
-    // ssr 路由入口
     return async (ctx, next) => {
       await waitMiddleware();
       await dev(

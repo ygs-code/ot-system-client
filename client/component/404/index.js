@@ -1,11 +1,26 @@
 import "./index.less";
 
 import img from "client/assets/img/404.png";
-import { layout } from "client/component/Layout";
-import React from "react";
+import Layout, { layout } from "client/component/Layout";
+import React, { memo } from "react";
 
-const { env: { PUBLICPATH } = {} } = process;
-export default layout()(() => {
+/*eslint no-undef: "error"*/
+/*eslint-env process*/
+const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
+export default (props) => {
+  const {
+    user: { user: { email, id, name, phone, type } = {} } = {},
+    onClick = () => {}
+  } = props;
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <div className="no-page">
       <div className="container">
@@ -25,4 +40,4 @@ export default layout()(() => {
       </div>
     </div>
   );
-});
+};

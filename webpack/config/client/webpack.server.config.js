@@ -16,6 +16,7 @@ let $ResolveAlias = new ResolveAlias({
 
 let {
   NODE_ENV, // 环境参数
+  RENDER // 环境参数
 } = process.env; // 环境参数
 
 module.exports = {

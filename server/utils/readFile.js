@@ -8,6 +8,7 @@
  */
 var fs = require("fs");
 var path = require("path");
+
 const { readdirSync, stat, statSync } = fs;
 const readFile = (path, callback = () => {}) => {
   var files = readdirSync(path);
@@ -30,5 +31,5 @@ const readFile = (path, callback = () => {}) => {
 module.exports = readFile;
 
 // readFile(path.join(process.cwd(), '../../../node_modules'),(value)=>{
-//    console.log('value=',value)
+
 // });

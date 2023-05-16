@@ -9,91 +9,20 @@
 
 import "./index.less";
 
-import { Pagination } from "@mui/material";
+import { Pagination, Table } from "antd";
 import React, { useEffect, useState } from "react";
-
-const Table = (props) => {
-  const { columns = [], dataSource = [] } = props;
-  console.log("props==", props);
-  return (
-    <div className="ant-table-wrapper">
-      <div className="ant-spin-nested-loading">
-        <div className="ant-spin-container">
-          <div className="ant-table">
-            <div className="ant-table-container">
-              <div className="ant-table-content">
-                <table style={{ tableLayout: "auto" }}>
-                  <thead className="ant-table-thead">
-                    <tr>
-                      {columns.map((item, index) => {
-                        const { dataIndex, key, title, width, style } = item;
-                        return (
-                          <th
-                            key={key || dataIndex || index}
-                            style={{
-                              ...style,
-                              ...(width ? { width } : {})
-                            }}
-                            className="ant-table-cell">
-                            {title}
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody className="ant-table-tbody">
-                    {dataSource.map((item, index) => {
-                      return (
-                        <tr
-                          data-row-key={index}
-                          key={index}
-                          className="ant-table-row ant-table-row-level-0">
-                          {columns.map(($item, $index) => {
-                            const {
-                              dataIndex,
-                              render,
-                              width,
-                              style = {}
-                            } = $item;
-                            return (
-                              <td
-                                key={`${index}_${$index}`}
-                                className="ant-table-cell"
-                                style={{
-                                  ...style,
-                                  ...(width ? { width } : {})
-                                }}>
-                                {render
-                                  ? render(item[dataIndex], item)
-                                  : item[dataIndex]}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Index = (props) => {
   const {
     columns,
     tableProps = {},
-    // paginationProps = {},
+    paginationProps = {},
     data: {
       list = [],
       pageNum = 1,
       pageSize = 10,
       // pages,
-      total = 0
+      total
     } = {},
     // onChange = () => {},
     // onSelect = () => {}
@@ -203,10 +132,17 @@ const Index = (props) => {
       <div className="pagination-box">
         <Pagination
           className="ant-pagination ant-table-pagination ant-table-pagination-right ant-table-pagination-right"
-          count={Math.ceil(total / 10)}
-          page={pageNum}
-          rowsPerPage={pageSize}
-          onChange={(event, pageNum) => {
+          showSizeChanger
+          showQuickJumper
+          defaultCurrent={pageNum}
+          current={pageNum}
+          defaultPageSize={pageSize}
+          total={total}
+          showTotal={(total) => `总共 ${total} 条`}
+          // rowKey={rowKey}
+          rowKey={(record) => record.uid}
+          {...paginationProps}
+          onChange={(pageNum, pageSize) => {
             onChange({
               pageNum,
               pageSize

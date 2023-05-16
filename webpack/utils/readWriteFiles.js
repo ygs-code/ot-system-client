@@ -42,7 +42,7 @@ const transformCode = ($callback = (data, path) => data) => {
   })
 }
 // var log = function (file, cb) {
-//     console.log(file);
+ 
 //     cb(null, file);
 // };
 const readWriteFile = ({ from, to, transform }) => {

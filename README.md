@@ -555,7 +555,7 @@ This framework has been configured with CSS and LESS. If you need SASS, you can 
 If you need other environments, you can add the.env.xxxx file and then run the shell script dotenv_config_path=.env.xxxx. Such as:
 
 ```
-"cross-env  target='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.xxxx ",
+"cross-env  RENDER='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.xxxx ",
 ```
 
 
@@ -1007,7 +1007,7 @@ const Index = (props) => {
     dispatch: { home: { setInitState = () => {} } = {} } = {},
     state: { home: { initState: { list = [] } = {} } = {} } = {}
   } = props;
-  console.log("props=======", props);
+ 
   return (
     <div className="home"> home </div>
   );
@@ -1139,7 +1139,7 @@ function Profile() {
 如果需要其他环境 可自行添加 .env.xxxx 文件 然后在运行shell脚本的时候 dotenv_config_path=.env.xxxx 即可。比如：
 
 ```
-"cross-env  target='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.xxxx ",
+"cross-env  RENDER='ssr'  npx babel-node  -r  @babel/register    ./dist/server/index.js   -r  dotenv/config  dotenv_config_path=.env.xxxx ",
 ```
 
 

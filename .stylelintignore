@@ -1,5 +1,4 @@
- 
- yarn.lock
+yarn.lock
 dist
 dist/*
 dist/**/*
@@ -20,20 +19,6 @@ webpack/**/*
 **/webpack
 **/webpack/**/*
 **/webpack/**/*
-
-public
-public/*
-public/**/*
-**/public
-**/public/**/*
-**/public/**/*
-
-static
-static/*
-static/**/*
-**/static
-**/static/**/*
-**/static/**/*
 
 
 bin

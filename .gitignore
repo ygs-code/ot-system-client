@@ -1,4 +1,6 @@
+node_modules
 
+package-lock.json
 
 yarn-error.log
 
@@ -15,17 +17,5 @@ client/router/routesComponent.js
 dist/
 
 *.lock
-
-
-
-
-package-lock.json
 yarn-error.log
 
-dist/ 
-dist/* 
-dist/**/* 
-
-node_modules/ 
-node_modules/* 
-node_modules/**/* 

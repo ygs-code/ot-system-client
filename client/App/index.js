@@ -6,16 +6,22 @@
  * @FilePath: /react-ssr-lazy-loading/client/App/App.js
  * @Description:
  */
+import "antd/dist/antd.css";
 import "./index.less";
 import "client/assets/css/base.less";
 import "bootstrap/dist/css/bootstrap.css";
-import "@fontsource/roboto/400.css";
-import "react-status-alert/dist/status-alert.css";
 
-import Message from "client/component/Message";
+import { ConfigProvider } from "antd";
+// 由于 antd 组件的默认文案是英文，所以需要修改为中文
+import zhCN from "antd/es/locale/zh_CN";
 import Routers from "client/router";
 import React, { Component } from "react";
 import { Provider } from "react-redux";
+
+// let {
+//   NODE_ENV, // 环境参数
+//   htmlWebpackPluginOptions = ""
+// } = process.env; // 环境参数
 
 class Index extends Component {
   render() {
@@ -26,7 +32,7 @@ class Index extends Component {
   来自Provider组件
   */
     return (
-      <div>
+      <ConfigProvider locale={zhCN}>
         <Provider store={store}>
           <Routers
             level={1}
@@ -34,8 +40,7 @@ class Index extends Component {
             routesComponent={routesComponent}
           />
         </Provider>
-        <Message />
-      </div>
+      </ConfigProvider>
     );
   }
   componentDidCatch(error, info) {

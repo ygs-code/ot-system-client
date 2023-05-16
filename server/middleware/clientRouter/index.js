@@ -1,23 +1,21 @@
-import React from "react";
-import { renderToString } from "react-dom/server";
-import { getBundles } from "react-loadable-ssr-addon";
-import Helmet from "react-helmet";
-import { matchPath } from "react-lazy-router-dom";
-import store from "client/redux/Store";
-import routesComponent from "client/router/routesComponent";
-import { getMemoryHistory } from "client/router/history";
-import { findTreeData } from "client/utils";
 import App from "client/App";
-import { stringToObject } from "client/utils";
+import store from "client/redux/Store";
+import { getMemoryHistory } from "client/router/history";
+import routesComponent from "client/router/routesComponent";
+import { findTreeData, stringToObject } from "client/utils";
+import ejs from "ejs";
+import fs from "fs";
 // import otherModules from "./otherModules";
 import path, { resolve } from "path";
-import fs from "fs";
-import ejs from "ejs";
+import React from "react";
+import { renderToString } from "react-dom/server";
+import Helmet from "react-helmet";
+import { matchPath } from "react-lazy-router-dom";
+import { getBundles } from "react-loadable-ssr-addon";
 
 const absolutePath = resolve("./");
 let {
   NODE_ENV, // 环境参数
-  // target, // 环境参数
   htmlWebpackPluginOptions
 } = process.env; // 环境参数
 
@@ -164,7 +162,7 @@ class ClientRouter {
           }
         }
       });
-    
+
       ctx.body = renderedHtml;
     }
     next();
@@ -192,7 +190,6 @@ class ClientRouter {
       } catch (error) {}
     }
 
-    
     const modulesToBeLoaded = [
       ...assetsManifest.entrypoints,
       ...isMatchRoutes.map((item) => {
@@ -250,8 +247,6 @@ class ClientRouter {
         exact: router.exact
       });
 
-   
-
       if ($router) {
         routers.push({
           ...router,
@@ -273,7 +268,7 @@ class ClientRouter {
     routesComponent
   }) {
     let initState = store.getState();
-   
+
     let rootString = renderToString(
       <App
         {...{
@@ -298,7 +293,7 @@ class ClientRouter {
       styles,
       initState
     });
-    
+
     return renderedHtml;
   }
 }

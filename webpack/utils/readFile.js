@@ -30,5 +30,5 @@ const readFile = (path, callback = () => {}) => {
 module.exports = readFile;
 
 // readFile(path.join(process.cwd(), '../../../node_modules'),(value)=>{
-//    console.log('value=',value)
+ 
 // });

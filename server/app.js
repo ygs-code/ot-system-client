@@ -14,8 +14,8 @@ import Router from "./router";
 
 let {
   NODE_ENV, // 环境参数
-  ADDRESS,
-  PORT
+  PORT,
+  ADDRESS
 } = process.env; // 环境参数
 
 //    是否是生产环境

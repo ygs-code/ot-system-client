@@ -1,331 +1,185 @@
 import "client/assets/css/base.less";
 import "./index.less";
 
-import HowToRegIcon from "@mui/icons-material/HowToReg";
-import {
-  Avatar,
-  Box,
-  Button,
-  CssBaseline,
-  Grid,
-  Link,
-  Paper,
-  TextField,
-  Typography
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import word from "client/assets/img/word2.png";
-import { login } from "client/assets/js/request/index";
-import FormItem from "client/component/FormItem";
-import Message from "client/component/Message";
+import { Button, Form, Input, message } from "antd";
+import { createUser } from "client/assets/js/request/index";
 import VerificationCode from "client/component/VerificationCode";
-import { mapRedux } from "client/redux";
-import { addRouterApi } from "client/router";
+import { addRouterApi, toComponent } from "client/router";
 import { checkEmail, checkPassword, checkPhone, checkUser } from "client/utils";
-import { createForm } from "rc-form";
-import React, { memo, useRef } from "react";
+import React from "react";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}>
-      {"版权所有 © "}
-      <Link color="inherit"></Link> {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 }
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 }
+};
 
-const theme = createTheme();
-
-const Index = memo((props) => {
-  const {
-    pushRoute,
-    routePaths,
-    form,
-    dispatch: {
-      user: { setUserInfo }
-    }
-  } = props;
-
-  const { getFieldValue, validateFields } = form;
-
-  const message = useRef(null);
-
+const Index = (props) => {
+  const { pushRoute, routePaths } = props;
   const onFinish = async (values) => {
-    const { data } = await login(values);
-
-    const { token } = data;
-
-    localStorage.setItem("token", token);
-
-    setUserInfo(data);
-
-    message.current.success("登录成功");
+    await createUser({
+      type: 1,
+      ...values
+    });
+    message.success("注册成功");
     setTimeout(() => {
-      pushRoute(routePaths.home);
+      pushRoute(routePaths.logIn);
     }, 1500);
   };
 
-  const handleSubmit = async (event) => {
-    validateFields((error, values) => {
-      if (!error) {
-        onFinish(values);
-      } else {
-        console.error(error);
-      }
-    });
-    // const data = new FormData(event.currentTarget);
-
-    event.preventDefault();
-  };
+  const onFinishFailed = () => {};
 
   return (
-    <ThemeProvider theme={theme}>
-      <Message ref={message} />
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: `url(${word})`,
-            backgroundRepeat: "no-repeat",
-            backgroundColor: "rgb(249, 250, 255)",
-            backgroundSize: "cover",
-            // backgroundAttachment: "fixed",
-            backgroundPosition: "center center"
-            // zoom: "50%",
-            // transform: "scale(0.5)" /* 缩放比例 */,
-            // transformOrigin: "0 0" /* 缩放的原点 */
+    <div className="center log-in">
+      <h3>《OT协同办公系统》 </h3>
+      <Form
+        {...layout}
+        name="basic"
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}>
+        <Form.Item
+          label="用户名"
+          name="name"
+          validateFirst={true}
+          rules={[
+            {
+              required: true,
+              message: "请输入用户名!"
+            },
+            () => ({
+              validator(rule, value) {
+                if (checkUser(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("用户名必须最少为4位，并且以字母开头");
+              }
+            })
+          ]}>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="手机号"
+          name="phone"
+          validateFirst={true}
+          rules={[
+            {
+              required: true,
+              message: "请输入手机号！"
+            },
+            () => ({
+              validator(rule, value) {
+                if (checkPhone(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("请输入正确的手机号码");
+              }
+            })
+          ]}>
+          <Input />
+        </Form.Item>
 
-            // // 居中
-            // background-position: center center;
+        <Form.Item
+          label="邮箱"
+          name="email"
+          validateFirst={true}
+          rules={[
+            {
+              required: true,
+              message: "请输入邮箱！"
+            },
+            () => ({
+              validator(rule, value) {
+                if (checkEmail(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("请输入正确的邮箱");
+              }
+            })
+          ]}>
+          <Input />
+        </Form.Item>
 
-            // /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
-            // background-attachment: fixed;
-            // background-size: cover;
-          }}
-        />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <Box
-            sx={{
-              my: 8,
-              mx: 4,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center"
-            }}>
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <HowToRegIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              注册
-            </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 1, width: "calc(100% - 70px)" }}>
-              <FormItem
-                className="padding-top-10"
-                rules={[
-                  {
-                    required: true,
-                    message: "请输入用户名"
-                  },
-                  {
-                    validator: (rule, value) => {
-                      if (checkUser(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        "用户名必须最少为4位，并且以字母开头"
-                      );
-                    }
-                  }
-                ]}
-                label="用户名"
-                form={form}
-                name="name">
-                <TextField
-                  fullWidth
-                  required
-                  placeholder="请输入用户名"
-                  variant="outlined"
-                />
-              </FormItem>
+        <Form.Item
+          label="密码"
+          name="password"
+          validateFirst={true}
+          rules={[
+            {
+              required: true,
+              message: "请输入密码!"
+            },
+            () => ({
+              validator(rule, value) {
+                if (!checkPassword(value)) {
+                  return Promise.reject(
+                    "密码最少为8位，并且最少含有字母和数字组成"
+                  );
+                }
+                return Promise.resolve();
+              }
+            })
+          ]}>
+          <Input.Password />
+        </Form.Item>
+        <Form.Item
+          label="确认密码"
+          name="confirmPassword"
+          validateFirst={true}
+          rules={[
+            {
+              required: true,
+              message: "请输入密码!"
+            },
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                if (!checkPassword(value)) {
+                  return Promise.reject(
+                    "密码最少为8位，并且最少含有字母和数字组成"
+                  );
+                } else if (value && getFieldValue("password") !== value) {
+                  return Promise.reject("输入两次密码不相同，请重新输入");
+                }
+                return Promise.resolve();
 
-              <FormItem
-                className="padding-top-10"
-                rules={[
-                  {
-                    required: true,
-                    message: "请输入手机号"
-                  },
-                  {
-                    validator: (rule, value) => {
-                      if (checkPhone(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject("请输入正确的手机号码");
-                    }
-                  }
-                ]}
-                label="手机号"
-                form={form}
-                name="phone">
-                <TextField
-                  fullWidth
-                  required
-                  placeholder="请输入手机号"
-                  variant="outlined"
-                  // size="small"
-                />
-              </FormItem>
+                //   if (!value || getFieldValue('password') === value) {
+                //     return Promise.resolve();
+                //   }
+                //   return Promise.reject('输入两次密码不相同，请重新输入');
+              }
+            })
+          ]}>
+          <Input.Password />
+        </Form.Item>
 
-              <FormItem
-                className="padding-top-10"
-                rules={[
-                  {
-                    required: true,
-                    message: "请输入邮箱"
-                  },
-                  {
-                    validator: (rule, value) => {
-                      if (checkEmail(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject("请输入正确的邮箱");
-                    }
-                  }
-                ]}
-                label="邮箱"
-                form={form}
-                name="email">
-                <TextField
-                  fullWidth
-                  required
-                  placeholder="请输入邮箱"
-                  variant="outlined"
-                />
-              </FormItem>
-
-              <FormItem
-                label="密码"
-                name="password"
-                className="padding-top-10"
-                rules={[
-                  {
-                    required: true,
-                    message: "请输入密码"
-                  },
-                  {
-                    validator: (rule, value) => {
-                      if (!checkPassword(value)) {
-                        return Promise.reject(
-                          "密码最少为8位，并且最少含有字母和数字组成"
-                        );
-                      }
-                      return Promise.resolve();
-                    }
-                  }
-                ]}
-                form={form}>
-                <TextField
-                  fullWidth
-                  required
-                  placeholder="请输入密码"
-                  variant="outlined"
-                  type="password"
-                  autoComplete="current-password"
-                />
-              </FormItem>
-
-              <FormItem
-                label="确认密码"
-                name="confirmPassword"
-                className="padding-top-10"
-                rules={[
-                  {
-                    required: true,
-                    message: "请输入密码"
-                  },
-                  {
-                    validator: (rule, value) => {
-                      if (!checkPassword(value)) {
-                        return Promise.reject(
-                          "密码最少为8位，并且最少含有字母和数字组成"
-                        );
-                      } else if (value && getFieldValue("password") !== value) {
-                        return Promise.reject("输入两次密码不相同，请重新输入");
-                      }
-                      return Promise.resolve();
-                    }
-                  }
-                ]}
-                form={form}>
-                <TextField
-                  fullWidth
-                  required
-                  placeholder="请输入密码"
-                  variant="outlined"
-                  type="password"
-                  autoComplete="current-password"
-                />
-              </FormItem>
-
-              {/*验证码*/}
-
-              <VerificationCode form={form} className="padding-top-15" />
-
-              {/*
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
-            */}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}>
-                注册
-              </Button>
-              <Grid container>
-                <Grid item xs></Grid>
-                <Grid item>
-                  <Link
-                    href="#"
-                    variant="body2"
-                    onClick={() => {
-                      pushRoute(routePaths.logIn);
-                      // historyPush({
-                      //   url: routePaths.LogIn
-                      // });
-                    }}>
-                    登录
-                  </Link>
-                </Grid>
-              </Grid>
-              <Copyright sx={{ mt: 5 }} />
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </ThemeProvider>
+        {/*验证码*/}
+        <VerificationCode />
+        <Form.Item {...tailLayout}>
+          <div className="buttons">
+            <Button
+              className="submit"
+              type="primary"
+              htmlType="submit"
+              onClick={() => {}}>
+              确定
+            </Button>
+            <Button
+              className="submit"
+              onClick={() => {
+                pushRoute(routePaths.logIn);
+                // historyPush({
+                //   url: routePaths.LogIn
+                // });
+              }}>
+              登录
+            </Button>
+          </div>
+        </Form.Item>
+      </Form>
+    </div>
   );
-});
+};
 
-export default mapRedux()(
-  addRouterApi(
-    createForm({
-      name: "LogIn"
-    })(Index)
-  )
-);
+export default toComponent(addRouterApi(Index));

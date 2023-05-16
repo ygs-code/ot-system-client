@@ -60,32 +60,12 @@ module.exports = {
   //   "warn" or 1 - 将规则视为一个警告（不会影响退出码）,只警告，不会退出程序
   //   "error" or 2 - 将规则视为一个错误 (退出码为1)，报错并退出程序
   rules: {
-    "react/destructuring-assignment": [2, "always"], // 需要解构 this.state 和 this.props 解构。此规则强制使用解构而不是通过成员表达式访问属性。
-    //用于从数组索引或对象属性创建变量，称为解构。此规则强制使用解构而不是通过成员表达式访问属性。
-    "prefer-destructuring": [
-      "error",
-      {
-        VariableDeclarator: {
-          // 变量说明
-          array: false,
-          object: true
-        },
-        AssignmentExpression: {
-          // 赋值表达式
-          array: false,
-          object: false
-        }
-      },
-      {
-        enforceForRenamedProperties: false //强制重命名属性
-      }
-    ],
     "import/first": "error",
     "import/newline-after-import": "error",
     "import/no-duplicates": "error",
     "sort-imports": "off",
     "import/order": "off",
-    "simple-import-sort/imports": "warn",
+    "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "no-constant-condition": 2, //禁止在条件中使用常量表达式 if(true) if(1)
     "no-lonely-if": 1, //禁止else语句内只有if语句
