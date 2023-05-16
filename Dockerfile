@@ -35,7 +35,8 @@ ENV RENDER=${ADMIN_RENDER}
 ENV ENTRY_SERVER_NAME=${ENTRY_SERVER_NAME}
 
 #清理缓存
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=40&format=h" skipcache
+
 #移动当前目录下面的文件到client目录下
 COPY  .  /ot-system-admin
 # RUN echo '复制成功'
