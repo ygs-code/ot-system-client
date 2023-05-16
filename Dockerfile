@@ -9,7 +9,7 @@ COPY  package.json  /ot-system-admin
 WORKDIR /ot-system-admin
 # RUN echo 'dist , node_modules目录下所有文件,以及清理缓存'
 RUN echo '删除dist,node_modules目录下所有文件,以及清理缓存' & rm -rf ./node_modules & rm -rf  ./dist & rm -rf package-lock.json & rm -rf yarn.lock & npm cache clean --force 
-RUN echo '安装node_modules依赖包' & sudo npm install --production 
+RUN echo '安装node_modules依赖包' & npm install --production 
 
 ARG ADMIN_ADDRESS 
 ARG ADMIN_PORT 
