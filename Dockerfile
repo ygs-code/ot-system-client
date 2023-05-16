@@ -34,14 +34,16 @@ ENV RENDER=${ADMIN_RENDER}
 
 ENV ENTRY_SERVER_NAME=${ENTRY_SERVER_NAME}
 
-#清理缓存
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=160&format=h" skipcache
+
 
 #移动当前目录下面的文件到client目录下
 COPY  .  /ot-system-admin
 # RUN echo '复制成功'
 #进入到ot-system-admin目录下面，类似cd
 WORKDIR /ot-system-admin
+#清理缓存
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=160&format=h" skipcache
+
 # RUN echo 'webpack打包编译生产代码'
 RUN echo '编译打包admin' &  npm run build:client:prod
 
