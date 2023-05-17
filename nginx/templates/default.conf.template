@@ -1,11 +1,11 @@
 server {
-    listen       ${ADMIN_PORT};
-    server_name  ${ADMIN_SERVER_NAME};
+    listen       ${CLIENT_PORT};
+    server_name  ${CLIENT_SERVER_NAME};
 
  
     #access_log  /var/log/nginx/host.access.log  main;
  
-   location  ${ADMIN_PUBLICPATH}static/.*  {
+   location  ${CLIENT_PUBLICPATH}static/.*  {
         alias /usr/share/nginx/html/static;
         try_files $uri $uri/;
    }
@@ -14,13 +14,13 @@ server {
      #   try_files $uri $uri/;
    # }
 
-    location ${ADMIN_PUBLICPATH}{
+    location ${CLIENT_PUBLICPATH}{
         alias    /usr/share/nginx/html/;  # root和alias区别 https://zhuanlan.zhihu.com/p/579768206
         index  index.html index.htm;
         try_files $uri $uri/ /index.html;
     }
 
-    location ${ADMIN_PUBLICPATH}.*{
+    location ${CLIENT_PUBLICPATH}.*{
         alias    /usr/share/nginx/html/;  # root和alias区别 https://zhuanlan.zhihu.com/p/579768206
         index  index.html index.htm;
         try_files $uri $uri/ /index.html;
