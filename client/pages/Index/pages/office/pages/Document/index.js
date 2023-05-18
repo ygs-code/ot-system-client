@@ -75,7 +75,8 @@ class Index extends Component {
   // 定义表头字段
   getColumns = () => {
     const { tabsValue } = this.state;
-    const { pushRoute, routePaths: { userRoleDetails } = {} } = this.props;
+    const { pushRoute, routePaths: { documentDetails } = {} } = this.props;
+    console.log("this.props==", this.props);
     return [
       {
         title: "文档标题",
@@ -125,6 +126,15 @@ class Index extends Component {
                       // /office/document/details/:action/:type/:id?
 
                       const { origin, protocol, hostname } = window.location;
+                      pushRoute({
+                        path: documentDetails,
+                        isOpenWin: true,
+                        params: {
+                          action: "edit",
+                          id,
+                          type: "document"
+                        } // 地址传参
+                      });
                       // window.open(
                       //   NODE_ENV == "development"
                       //     ? `${protocol}//${hostname}:${CLIENT_PORT}/office/document/details/edit/document/${id}`
@@ -141,6 +151,15 @@ class Index extends Component {
                   props: {
                     onClick: () => {
                       const { origin, protocol, hostname } = window.location;
+                      pushRoute({
+                        path: documentDetails,
+                        isOpenWin: true,
+                        params: {
+                          action: "edit",
+                          id,
+                          type: "document"
+                        } // 地址传参
+                      });
                       // window.open(
                       //   NODE_ENV == "development"
                       //     ? `${protocol}//${hostname}:${CLIENT_PORT}/office/document/details/view/document/${id}`

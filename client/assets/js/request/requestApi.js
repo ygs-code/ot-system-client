@@ -692,3 +692,43 @@ export const createDocument = (parameter = {}) => {
     }
   );
 };
+
+// 校验是否登录
+export const checkLogin = () => {
+  return query(
+    "checkLogin",
+    ` query{
+      checkLogin {
+          code
+          message
+          data {
+            flag
+          }
+        }
+    }
+  `
+  );
+};
+
+// 登录
+export const logOut = () => {
+  return mutation(
+    "logOut",
+    ` mutation{
+       logOut {
+            code
+            message
+            data{
+              flag
+            }
+          } 
+   }
+    `
+
+    // {
+    //   userInfo: parameter,
+    // }
+  );
+
+  //return Request.post("/set/user/login", parameter);
+};

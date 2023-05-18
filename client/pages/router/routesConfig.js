@@ -23,6 +23,15 @@ export default [
     entry: "/pages/Main/index.js",
     level: 1
   },
+
+  {
+    path: "/office/document/details/:action/:id?",
+    name: "documentDetails",
+    entry: "/pages/Index/pages/office/pages/Document/details/index.js",
+    level: 1,
+    children: []
+  },
+
   {
     path: "/log-in",
     exact: true,

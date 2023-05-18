@@ -13,13 +13,13 @@ export default [
         entry: "/pages/Index/pages/office/pages/Document/index.js",
         level: 2,
         children: [
-          {
-            path: "/details/:action/:id?",
-            name: "documentDetails",
-            entry: "/pages/Index/pages/office/pages/Document/details/index.js",
-            level: 2,
-            children: []
-          }
+          // {
+          //   path: "/details/:action/:id?",
+          //   name: "documentDetails",
+          //   entry: "/pages/Index/pages/office/pages/Document/details/index.js",
+          //   level: 2,
+          //   children: []
+          // }
         ]
       }
     ]
