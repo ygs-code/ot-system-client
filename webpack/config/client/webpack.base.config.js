@@ -26,8 +26,12 @@ let {
   ADDRESS,
   CLIENT_PORT,
   CLIENT_PUBLICPATH,
-  ENTRY_SERVER_NAME
+  ENTRY_SERVER_NAME,
+  SERVER_PORT
 } = process.env; // 环境参数
+
+// }://${ENTRY_SERVER_NAME}${
+//   NODE_ENV == "development" ? `:${SERVER_PORT}` : ""
 
 htmlWebpackPluginOptions = stringToObject(htmlWebpackPluginOptions);
 const publicPath = PUBLICPATH;
@@ -490,6 +494,7 @@ module.exports = {
           CLIENT_PORT,
           CLIENT_PUBLICPATH,
           ENTRY_SERVER_NAME,
+          SERVER_PORT,
           htmlWebpackPluginOptions: {
             ...htmlWebpackPluginOptions,
             publicPath

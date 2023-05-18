@@ -26,6 +26,8 @@ const {
   env: { ENTRY_SERVER_NAME, SERVER_PORT, NODE_ENV = "development" } = {}
 } = process;
 
+console.log("ENTRY_SERVER_NAME==", ENTRY_SERVER_NAME);
+
 const Quill = (props) => {
   const {
     match: {
