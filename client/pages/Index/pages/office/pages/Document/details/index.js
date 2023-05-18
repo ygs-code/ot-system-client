@@ -22,7 +22,9 @@ import React, { Component, useEffect, useRef } from "react";
 
 import Main from "./main";
 
-const { env: { ENTRY_SERVER_NAME } = {} } = process;
+const {
+  env: { ENTRY_SERVER_NAME, SERVER_PORT, NODE_ENV = "development" } = {}
+} = process;
 
 const Quill = (props) => {
   const {
@@ -129,12 +131,11 @@ const Quill = (props) => {
       // 改变文档内容
       onChangeDocument: () => {},
       // 文档websocket 连接
-      documentConnectionUrl:
-        (location.protocol === "https:" ? "wss" : "ws") +
-        "://" +
-        ENTRY_SERVER_NAME +
-        "/socket/document" +
-        `?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
+
+      documentConnectionUrl:`${location.protocol === "https:" ? "wss" : "ws"}://${ENTRY_SERVER_NAME}${NODE_ENV ==
+      "development"
+        ? `:${SERVER_PORT}`
+        : ""}/socket/document?documentId=${id}&documentType=${type}&userName=${"用户名"}&userId=123&documentTitle=ot协同文档`
       // // 光标websocket 连接
       // cursorConnectionUrl:
       //   (location.protocol === "https:" ? "wss" : "ws") +
