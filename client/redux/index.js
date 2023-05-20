@@ -1,4 +1,3 @@
-import { init } from "@rematch/core";
 import { CheckDataType } from "client/utils";
 import { connect } from "react-redux";
 

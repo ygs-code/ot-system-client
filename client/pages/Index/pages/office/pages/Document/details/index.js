@@ -1,24 +1,16 @@
 import "./index.less";
 
+import { Skeleton } from "antd";
 import {
-  editUserRole,
-  getPermissionList,
-  getRoleList,
-  getRolePermissionList,
-  getUserInfo,
-  getUserRoleList
+  checkLogin,
+  getDocumentInfo,
+  getUserInfo
 } from "client/assets/js/request";
-import FormPage from "client/component/FormPage";
 import Header from "client/component/Header";
 import setBreadcrumbAndTitle from "client/component/setBreadcrumbAndTitle";
-import TableButton from "client/component/TableButton";
-import TablePicker from "client/component/TablePicker";
-import { TreeContent } from "client/component/TreePicker";
-import PermissionPicker from "client/pages/Index/pages/system/component/PermissionPicker";
 import { mapRedux } from "client/redux";
-import { addRouterApi, routePaths } from "client/router";
-import { findTreeData } from "client/utils";
-import React, { Component, useEffect, useRef } from "react";
+import { addRouterApi } from "client/router";
+import React, { Component, useCallback, useEffect, useRef } from "react";
 
 import Main from "./main";
 
@@ -26,23 +18,33 @@ const {
   env: { ENTRY_SERVER_NAME, SERVER_PORT, NODE_ENV = "development" } = {}
 } = process;
 
-console.log("ENTRY_SERVER_NAME==", ENTRY_SERVER_NAME);
-
 const Quill = (props) => {
   const {
     match: {
-      params: { id, type }
+      params: { id, type = "document" }
     },
     state: {
       user: {
         userInfo: { user: { id: userId, name: userName } = {} } = {}
       } = {}
-    } = {}
+    } = {},
+    dispatch: { breadcrumb: { setBreadcrumb } = {} } = {}
   } = props;
 
   const mainRef = useRef();
 
-  useEffect(() => {
+  const init = useCallback(async () => {
+    let {
+      data: { content = "", title }
+    } = await getDocumentInfo({ id });
+
+    //设置面包屑和标题
+    setBreadcrumb([
+      {
+        label: title
+      }
+    ]);
+
     var toolbarOptions = [
       // ['bold', 'italic'],
       // ['link', 'image'],
@@ -85,8 +87,13 @@ const Quill = (props) => {
       }
     });
 
+    mainRef.current.quill.setContents([{ insert: content }]);
+
+    if (!userId) {
+      return false;
+    }
     mainRef.current.init({
-      documentTitle: "ot协同文档",
+      documentTitle: title,
       documentId: id, // 文档id
       documentType: type, // 文档类型
       userName, // 用户名称
@@ -137,8 +144,8 @@ const Quill = (props) => {
       documentConnectionUrl: `${
         location.protocol === "https:" ? "wss" : "ws"
       }://${ENTRY_SERVER_NAME}${
-        NODE_ENV == "development" ? `:${SERVER_PORT}` : ""
-      }/socket/document?documentId=${id}&documentType=${type}&userName=${userName}&userId=${userId}&documentTitle=ot协同文档`
+        NODE_ENV === "development" ? `:${SERVER_PORT}` : ""
+      }/socket/document?documentId=${id}&documentType=${type}&userName=${userName}&userId=${userId}&documentTitle=${title}`
       // // 光标websocket 连接
       // cursorConnectionUrl:
       //   (location.protocol === "https:" ? "wss" : "ws") +
@@ -149,9 +156,13 @@ const Quill = (props) => {
     });
 
     // 修改是否可以编辑
-    if (userId) {
-      mainRef.current.quill.enable();
-    }
+    // if (userId) {
+    mainRef.current.quill.enable();
+    // }
+  }, []);
+
+  useEffect(() => {
+    init();
   }, []);
 
   return (
@@ -172,28 +183,60 @@ class Index extends Component {
     this.state = {
       ...this.state,
       authOpen: false,
-      permissionValue: {}
+      permissionValue: {},
+      loading: true
     };
   }
+  getUser = async () => {
+    const {
+      state: { user: { userInfo: { user: { id } = {} } = {} } = {} } = {},
+      dispatch: {
+        user: { setUserInfo }
+      }
+    } = this.props;
 
-  componentDidMount() {}
+    if (id) {
+      return false;
+    }
+
+    let { data: { flag } = {} } = await checkLogin();
+    if (!flag) {
+      return false;
+    }
+
+    let { data } = await getUserInfo({});
+    setUserInfo(data);
+  };
+  init = async () => {
+    await this.getUser();
+    this.setState({
+      loading: false
+    });
+  };
+  componentDidMount() {
+    this.init();
+  }
   render() {
-    const { authOpen, roleId, permissionValue } = this.state;
+    const { loading } = this.state;
 
     return (
-      <div className="form-page user-role-details">
+      <div className="form-page document-details">
         <Header // avatar="头像地址"
           showOutlined={false}
           nickname={""}
           areaCode={""}
           mobile={""}
           collapsed={false}
-          onClick={(type) => {}}
+          onClick={() => {}}
           onChangeCollapsed={() => {
             // toggle();
           }}
           breadcrumb={[]}></Header>
-        <Quill {...this.props}></Quill>
+        {loading ? (
+          <Skeleton active={loading}></Skeleton>
+        ) : (
+          <Quill {...this.props}></Quill>
+        )}
       </div>
     );
   }
@@ -203,15 +246,15 @@ export default mapRedux()(
   // 权限控制
   setBreadcrumbAndTitle({
     //设置面包屑和标题
-    breadcrumb: [
-      {
-        label: "用户&角色",
-        path: routePaths.userRole
-      },
-      {
-        label: "详情"
-      }
-    ],
+    // breadcrumb: [
+    //   {
+    //     label: "用户&角色",
+    //     path: routePaths.userRole
+    //   },
+    //   {
+    //     label: "详情"
+    //   }
+    // ],
     title: "用户&角色/详情"
   })(addRouterApi(Index))
 );

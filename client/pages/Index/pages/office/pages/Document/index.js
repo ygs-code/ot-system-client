@@ -1,4 +1,4 @@
-import { Button, message } from "antd";
+import { message } from "antd";
 // import { getDocumentList, removeDocument } from "client/assets/js/request";
 import {
   createDocument,
@@ -15,7 +15,7 @@ import React, { Component } from "react";
 
 /*eslint no-undef: "error"*/
 /*eslint-env process*/
-const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
+// const { env: { NODE_ENV, PUBLICPATH, RENDER } = {} } = process;
 
 // 权限控制
 @setBreadcrumbAndTitle({
@@ -74,7 +74,6 @@ class Index extends Component {
 
   // 定义表头字段
   getColumns = () => {
-    const { tabsValue } = this.state;
     const { pushRoute, routePaths: { documentDetails } = {} } = this.props;
     console.log("this.props==", this.props);
     return [
@@ -125,7 +124,7 @@ class Index extends Component {
                     onClick: () => {
                       // /office/document/details/:action/:type/:id?
 
-                      const { origin, protocol, hostname } = window.location;
+                      // const { origin, protocol, hostname } = window.location;
                       pushRoute({
                         path: documentDetails,
                         isOpenWin: true,
@@ -150,7 +149,7 @@ class Index extends Component {
                   status: true, //权限控制
                   props: {
                     onClick: () => {
-                      const { origin, protocol, hostname } = window.location;
+                      // const { origin, protocol, hostname } = window.location;
                       pushRoute({
                         path: documentDetails,
                         isOpenWin: true,

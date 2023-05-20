@@ -185,7 +185,7 @@ const BaseForm = (props) => {
     onConfirm(values);
   };
 
-  const onFinishFailed = (errorInfo) => {};
+  const onFinishFailed = () => {};
   useEffect(() => {
     onReady(form);
   }, [form]);
@@ -320,7 +320,7 @@ const SearchForm = (props) => {
     onConfirm(values);
   };
 
-  const onFinishFailed = (errorInfo) => {};
+  const onFinishFailed = () => {};
 
   const onFill = () => {
     const values = form.getFieldsValue();

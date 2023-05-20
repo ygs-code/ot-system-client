@@ -52,7 +52,7 @@ export default setBreadcrumbAndTitle({
             areaCode={""}
             mobile={""}
             collapsed={false}
-            onClick={(type) => {}}
+            onClick={() => {}}
             onChangeCollapsed={() => {
               // toggle();
             }}

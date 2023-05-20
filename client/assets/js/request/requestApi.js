@@ -693,6 +693,36 @@ export const createDocument = (parameter = {}) => {
   );
 };
 
+// 获取文档详情
+export const getDocumentInfo = (parameter = {}) => {
+  const { id = "" } = parameter;
+  return query(
+    "getDocumentInfo",
+    `
+      query{
+        getDocumentInfo(id: "${id}") {
+            code
+            data {
+              createBy
+              updateBy
+              id
+              title
+              v
+              content
+              createTime
+              updateTime
+            }
+            message
+          } 
+      }
+    `,
+    {},
+    {
+      filterData: true
+    }
+  );
+};
+
 // 校验是否登录
 export const checkLogin = () => {
   return query(

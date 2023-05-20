@@ -373,6 +373,9 @@ export default class Main {
       userName, // 用户名称
       userId // 用户id
     } = this.options;
+    if (!this.cursors) {
+      return false;
+    }
     const cursors = this.cursors.setLocalCursor({
       range
     });

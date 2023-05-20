@@ -12,7 +12,7 @@ import { logOut } from "client/assets/js/request";
 import Breadcrumb from "client/component/Breadcrumb";
 import { mapRedux } from "client/redux";
 import { addRouterApi } from "client/router";
-import React, { memo } from "react";
+import React from "react";
 
 const { Header } = Layout;
 
@@ -23,21 +23,17 @@ export default mapRedux()(
       onChangeCollapsed = () => {},
       avatar = "",
       onClick = () => {},
-      breadcrumb,
       showOutlined = true,
       state: {
+        breadcrumb: { items = [] } = {},
         user: {
-          userInfo: {
-            user: { email, id, name: nickname, phone: mobile, type } = {}
-          } = {}
+          userInfo: { user: { id, name: nickname, phone: mobile } = {} } = {}
         } = {}
       } = {},
       routePaths,
       pushRoute
     } = props;
-    console.log("props=====", props);
-    console.log("id=====", id);
-
+    console.log("props======================", props);
     return (
       <Header className={"site-layout-background"} style={{ padding: 0 }}>
         {showOutlined ? (
@@ -51,7 +47,7 @@ export default mapRedux()(
           )
         ) : null}
 
-        <Breadcrumb data={breadcrumb} />
+        <Breadcrumb data={items} />
         <div
           className={
             id
@@ -84,8 +80,7 @@ export default mapRedux()(
                   <ul
                     onClick={async () => {
                       await logOut();
-
-                      message.current.success("注销成功");
+                      message.success("注销成功");
                       setTimeout(() => {
                         pushRoute(routePaths.logIn);
                       }, 1500);

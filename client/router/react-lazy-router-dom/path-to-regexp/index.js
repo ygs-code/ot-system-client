@@ -1,9 +1,11 @@
+/* eslint-disable   */
+
 var isarray =
   Array.isArray ||
   function (arr) {
     var toString = {}.toString;
 
-    return toString.call(arr) == "[object Array]";
+    return toString.call(arr) === "[object Array]";
   };
 
 /**
@@ -480,3 +482,6 @@ export { compile, parse, tokensToFunction, tokensToRegExp };
 // module.exports.compile = compile;
 // module.exports.tokensToFunction = tokensToFunction;
 // module.exports.tokensToRegExp = tokensToRegExp;
+
+
+/* eslint-enable   */
