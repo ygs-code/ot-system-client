@@ -245,6 +245,7 @@ class Index extends Component {
             onOk={async (values) => {
               await createDocument(values);
               message.success("文档创建成功");
+              this.loadTableData();
             }}
             fields={[
               {

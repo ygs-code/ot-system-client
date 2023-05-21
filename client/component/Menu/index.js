@@ -44,65 +44,65 @@ export default memo((props) => {
 
   const menuData = useMemo(() => {
     return [
-      {
-        title: "系统设置",
-        iconComponent: <SettingOutlined />,
-        key: "0",
-        children: [
-          {
-            title: "用户权限设置",
-            key: "0-0",
-            children: [
-              {
-                title: "用户管理",
-                url: routePaths.userManagement, // 路由地址
+      // {
+      //   title: "系统设置",
+      //   iconComponent: <SettingOutlined />,
+      //   key: "0",
+      //   children: [
+      //     {
+      //       title: "用户权限设置",
+      //       key: "0-0",
+      //       children: [
+      //         {
+      //           title: "用户管理",
+      //           url: routePaths.userManagement, // 路由地址
 
-                key: "0-0-0",
-                children: [
-                  // 子菜单
-                ]
-              },
-              {
-                title: "角色管理",
-                url: routePaths.roleManagement, // 路由地址
+      //           key: "0-0-0",
+      //           children: [
+      //             // 子菜单
+      //           ]
+      //         },
+      //         {
+      //           title: "角色管理",
+      //           url: routePaths.roleManagement, // 路由地址
 
-                key: "0-0-1",
-                children: [
-                  // 子菜单
-                ]
-              },
+      //           key: "0-0-1",
+      //           children: [
+      //             // 子菜单
+      //           ]
+      //         },
 
-              {
-                title: "权限管理",
-                url: routePaths.permissionManagement, // 路由地址
+      //         {
+      //           title: "权限管理",
+      //           url: routePaths.permissionManagement, // 路由地址
 
-                key: "0-0-2",
-                children: [
-                  // 子菜单
-                ]
-              },
-              {
-                title: "角色&权限",
-                url: routePaths.rolePermission, // 路由地址
+      //           key: "0-0-2",
+      //           children: [
+      //             // 子菜单
+      //           ]
+      //         },
+      //         {
+      //           title: "角色&权限",
+      //           url: routePaths.rolePermission, // 路由地址
 
-                key: "0-0-3",
-                children: [
-                  // 子菜单
-                ]
-              },
-              {
-                title: "用户&角色",
-                url: routePaths.userRole, // 路由地址
+      //           key: "0-0-3",
+      //           children: [
+      //             // 子菜单
+      //           ]
+      //         },
+      //         {
+      //           title: "用户&角色",
+      //           url: routePaths.userRole, // 路由地址
 
-                key: "0-0-4",
-                children: [
-                  // 子菜单
-                ]
-              }
-            ]
-          }
-        ]
-      },
+      //           key: "0-0-4",
+      //           children: [
+      //             // 子菜单
+      //           ]
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // },
 
       {
         title: "协同文档",

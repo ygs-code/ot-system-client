@@ -47,64 +47,69 @@ const Index = (props) => {
 
   return (
     <div className="center log-in">
-      <h3>《OT协同办公系统》 </h3>
+      <div
+        onClick={() => {
+          window.open("https://github.com/ygs-code/ot-system");
+        }}></div>
+      <div>
+        <h3>登录</h3>
 
-      <Form
-        {...layout}
-        name="basic"
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}>
-        <Form.Item
-          label="用户名/手机号/邮箱"
-          name="name"
-          validateFirst={true}
-          rules={[
-            {
-              required: true,
-              message: "请输入用户名或手机号或邮箱"
-            },
-            () => ({
-              validator(rule, value) {
-                if (
-                  checkUser(value) ||
-                  checkPhone(value) ||
-                  checkEmail(value)
-                ) {
+        <Form
+          {...layout}
+          name="basic"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}>
+          <Form.Item
+            label="用户名/手机号/邮箱"
+            name="name"
+            validateFirst={true}
+            rules={[
+              {
+                required: true,
+                message: "请输入用户名或手机号或邮箱"
+              },
+              () => ({
+                validator(rule, value) {
+                  if (
+                    checkUser(value) ||
+                    checkPhone(value) ||
+                    checkEmail(value)
+                  ) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject("格式不正确请重新输入");
+                }
+              })
+            ]}>
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="密码"
+            name="password"
+            validateFirst={true}
+            rules={[
+              {
+                required: true,
+                message: "请输入密码!"
+              },
+              () => ({
+                validator(rule, value) {
+                  if (!checkPassword(value)) {
+                    return Promise.reject(
+                      "密码最少为8位，并且最少含有字母和数字组成"
+                    );
+                  }
                   return Promise.resolve();
                 }
-                return Promise.reject("格式不正确请重新输入");
-              }
-            })
-          ]}>
-          <Input />
-        </Form.Item>
+              })
+            ]}>
+            <Input.Password />
+          </Form.Item>
+          {/*验证码*/}
+          <VerificationCode />
 
-        <Form.Item
-          label="密码"
-          name="password"
-          validateFirst={true}
-          rules={[
-            {
-              required: true,
-              message: "请输入密码!"
-            },
-            () => ({
-              validator(rule, value) {
-                if (!checkPassword(value)) {
-                  return Promise.reject(
-                    "密码最少为8位，并且最少含有字母和数字组成"
-                  );
-                }
-                return Promise.resolve();
-              }
-            })
-          ]}>
-          <Input.Password />
-        </Form.Item>
-        {/*验证码*/}
-        <VerificationCode />
-        <Form.Item {...tailLayout}>
           <div className="buttons">
             <Button className="submit" type="primary" htmlType="submit">
               登录
@@ -117,8 +122,8 @@ const Index = (props) => {
               注册
             </Button>
           </div>
-        </Form.Item>
-      </Form>
+        </Form>
+      </div>
     </div>
   );
 };

@@ -83,7 +83,11 @@ const Quill = (props) => {
             userOnly: true
           }
         },
-        readOnly: true
+        readOnly: true,
+        onTextChange: (delta, oldDelta, source) => {},
+        selectionChange: (range, oldRange, source) => {
+          debugger;
+        }
       }
     });
 
@@ -92,6 +96,7 @@ const Quill = (props) => {
     if (!userId) {
       return false;
     }
+
     mainRef.current.init({
       documentTitle: title,
       documentId: id, // 文档id
@@ -222,6 +227,7 @@ class Index extends Component {
     return (
       <div className="form-page document-details">
         <Header // avatar="头像地址"
+          className="header"
           showOutlined={false}
           nickname={""}
           areaCode={""}
@@ -255,6 +261,6 @@ export default mapRedux()(
     //     label: "详情"
     //   }
     // ],
-    title: "用户&角色/详情"
+    title: "文档"
   })(addRouterApi(Index))
 );

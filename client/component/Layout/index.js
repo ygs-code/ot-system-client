@@ -71,6 +71,7 @@ const Index = memo((props) => {
       <Layout className="site-layout">
         {/*顶部*/}
         <Header
+          className="site-layout-background"
           // avatar="头像地址"
           nickname={name}
           areaCode={name}

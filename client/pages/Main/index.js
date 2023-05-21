@@ -69,12 +69,10 @@ export default setBreadcrumbAndTitle({
                   <div>不限协作人数使用</div>
                   <Button
                     style={{
-                      width: "150px"
+                      width: "150px",
+                      marginTop: "10px"
                     }}
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
+                    type="primary"
                     onClick={() => {
                       pushRoute(document);
                     }}>
@@ -117,11 +115,10 @@ export default setBreadcrumbAndTitle({
 
                   <Button
                     style={{
-                      width: "150px"
+                      width: "150px",
+                      marginTop: "10px"
                     }}
-                    type="submit"
-                    fullWidth
-                    variant="contained"
+                    type="primary"
                     sx={{
                       mt: 3,
                       mb: 2,

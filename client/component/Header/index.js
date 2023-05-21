@@ -31,11 +31,17 @@ export default mapRedux()(
         } = {}
       } = {},
       routePaths,
-      pushRoute
+      pushRoute,
+      style = {},
+      className = ""
     } = props;
-    console.log("props======================", props);
     return (
-      <Header className={"site-layout-background"} style={{ padding: 0 }}>
+      <Header
+        className={`site-layout-background ${className}`}
+        style={{
+          padding: 0,
+          ...style
+        }}>
         {showOutlined ? (
           collapsed ? (
             <MenuUnfoldOutlined

@@ -15,14 +15,18 @@ export default class Main {
     // this.documentType = type;
     this.options = {};
     this.documentConnectionState = null;
+    const { onTextChange = () => {}, selectionChange = () => {} } =
+      quillOptions;
 
     this.quill = new Quill(
       {
         elId: quillElId,
         onTextChange: (delta, oldDelta, source) => {
+          onTextChange(delta, oldDelta, source);
           this.textChange(delta, oldDelta, source);
         },
         onSelectionChange: (range, oldRange, source) => {
+          selectionChange(range, oldRange, source);
           this.selectionChange(range, oldRange, source);
         }
       },
@@ -250,7 +254,6 @@ export default class Main {
         } = message;
         const { ops = [] } = op;
 
-        // debugger
         if (source !== this.quill) {
           // 更新文本
           this.quill.updateContents(op);
