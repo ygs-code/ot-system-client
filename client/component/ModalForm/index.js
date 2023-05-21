@@ -48,6 +48,7 @@ const App = (props) => {
         {buttonText}
       </Button>
       <Modal
+        destroyOnClose={true}
         width={700}
         title={title}
         open={isModalOpen}
