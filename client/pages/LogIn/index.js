@@ -37,7 +37,7 @@ const Index = (props) => {
 
     message.success("登录成功");
     setTimeout(() => {
-      pushRoute(routePaths.home);
+      pushRoute(routePaths.document);
     }, 1500);
   };
 

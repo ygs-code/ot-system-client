@@ -75,7 +75,7 @@ class Index extends Component {
   // 定义表头字段
   getColumns = () => {
     const { pushRoute, routePaths: { documentDetails } = {} } = this.props;
-    console.log("this.props==", this.props);
+
     return [
       {
         title: "文档标题",

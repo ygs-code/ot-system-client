@@ -40,7 +40,6 @@ export default memo((props) => {
       url
     });
   }, []);
-  console.log("routePaths=======", routePaths.document);
 
   const menuData = useMemo(() => {
     return [
