@@ -229,7 +229,7 @@ const tablePage = (Component) => {
       let errprMessage = this.checkAbstractFunction();
       if (errprMessage) {
         console.error(errprMessage);
-        debugger;
+
         return;
       }
 
@@ -254,7 +254,7 @@ const tablePage = (Component) => {
       errprMessage = this.checkTabelData(data);
       if (errprMessage) {
         console.error(errprMessage);
-        debugger;
+
         return;
       }
       this.setState({ tableData: data });

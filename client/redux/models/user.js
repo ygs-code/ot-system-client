@@ -29,7 +29,6 @@ export default (global) => ({
     return {
       async getUserInfo(state, { payload: param = {} }) {
         const { data } = await getUserInfo(param);
-        // debugger;
 
         dispatch({
           modelsName: "user",

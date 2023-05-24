@@ -179,12 +179,10 @@ export default class Main {
       userId // 用户id
     } = this.options;
     $stabilization(200).then(() => {
-      // debugger;
       var range = this.quill.getSelection();
       const { index, length } = this.cursors.localCursor.range || {};
       const { index: quillRangeIndex, length: quillRangeLength } = range || {};
       if (index !== quillRangeIndex || quillRangeLength !== length) {
-        // debugger;
         const { localCursor } = this.cursors.setLocalCursor({
           range
         });

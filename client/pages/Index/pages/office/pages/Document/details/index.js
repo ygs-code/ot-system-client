@@ -85,9 +85,7 @@ const Quill = (props) => {
         },
         readOnly: true,
         onTextChange: (delta, oldDelta, source) => {},
-        selectionChange: (range, oldRange, source) => {
-          debugger;
-        }
+        selectionChange: (range, oldRange, source) => {}
       }
     });
 
