@@ -89,9 +89,9 @@ const Quill = (props) => {
       }
     });
 
-    mainRef.current.quill.setContents([{ insert: content }]);
-
+    
     if (!userId) {
+      mainRef.current.quill.setContents([{ insert: content }]);
       return false;
     }
 
