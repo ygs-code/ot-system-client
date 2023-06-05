@@ -8,14 +8,6 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "npm run eslint"
-    ],
-    "*.{htm,html,css,sss,less,scss,saas}": [
-      "npm run lint-style"
-    ]
-  },
   "scripts": {
     "git": "node  -r @babel/register  ./bin/git.js",
     "commit": "git-cz",
